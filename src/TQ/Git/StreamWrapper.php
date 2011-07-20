@@ -27,7 +27,7 @@ class StreamWrapper
         }
 
         self::$connector    = $connector;
-        if (!stream_register_wrapper($protocol, __CLASS__)) {
+        if (!stream_wrapper_register($protocol, __CLASS__)) {
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
         }
