@@ -1,1 +1,12 @@
 <?php
+function tq_namespace_autoload($class)
+{
+    if (strpos($class, 'TQ') === 0) {
+        $file = __DIR__.'/src/'.str_replace('\\', '/', $class) . '.php';
+
+        if (file_exists($file) && is_readable($file)) {
+            require_once $file;
+        }
+    }
+}
+spl_autoload_register('tq_namespace_autoload');
