@@ -5,30 +5,18 @@ class Connector
 {
     /**
      *
-     * @var string
+     * @var GitBinary
      */
     protected $gitBinary;
 
     /**
      *
-     * @return  string
+     * @param   GitBinary|null $gitBinary
      */
-    public static function findGitBinary()
-    {
-
-    }
-
-    /**
-     *
-     * @param   string|null $gitBinary
-     */
-    public function __construct($gitBinary = null)
+    public function __construct(GitBinary $gitBinary = null)
     {
         if (!$gitBinary) {
-            $gitBinary  = self::findGitBinary();
-        }
-        if (!is_string($gitBinary) || empty($gitBinary)) {
-            throw new \InvalidArgumentException('No path to the Git binary found');
+            $gitBinary  = new GitBinary();
         }
         $this->gitBinary    = $gitBinary;
     }
