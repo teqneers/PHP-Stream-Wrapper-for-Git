@@ -112,9 +112,10 @@ class SystemCall
 
     /**
      *
-     * @return SystemCallResult
+     * @param   string|null  $stdIn
+     * @return  SystemCallResult
      */
-    public function execute()
+    public function execute($stdIn = null)
     {
         $descriptorspec = array(
            0 => array("pipe", "r"), // stdin is a pipe that the child will read from
@@ -131,6 +132,9 @@ class SystemCall
         );
 
         if (is_resource($process)) {
+            if ($stdIn !== null) {
+                fwrite($pipes[0], (string)$stdIn);
+            }
             fclose($pipes[0]);
 
             $stdOut = stream_get_contents($pipes[1]);

@@ -13,7 +13,7 @@ class GitBinary
      *
      * @return  string
      */
-    public static function findGitBinaryPath()
+    public static function locateBinary()
     {
         if (PHP_OS != 'Windows') {
             $result = SystemCall::create('which git')->execute();
@@ -29,12 +29,61 @@ class GitBinary
     public function __construct($path = null)
     {
         if (!$path) {
-            $path  = self::findGitBinaryPath();
+            $path  = self::locateBinary();
         }
         if (!is_string($path) || empty($path)) {
             throw new \InvalidArgumentException('No path to the Git binary found');
         }
         $this->path    = $path;
     }
+
+    /**
+     *
+     * @param   string  $path
+     * @param   array   $parameters
+     * @return  SystemCall
+     */
+    protected function createGitCall($path, array $parameters)
+    {
+        $cmd    = escapeshellcmd($this->path);
+        array_walk($parameters, function(&$p) {
+            $p  = escapeshellarg($p);
+        });
+
+        $call   = SystemCall::create(sprintf('%s %s', $cmd, implode(' ', $parameters)), $path);
+        return $call;
+    }
+
+    /**
+     *
+     * @param   string  $method
+     * @param   array   $arguments
+     * @return  SystemCallResult
+     */
+    public function __call($method, array $arguments)
+    {
+        if (count($arguments) < 1) {
+            throw new \InvalidArgumentException(sprintf(
+                '"%s" must be called with at least one argument denoting the path', $method
+            ));
+        }
+        $path   = array_shift($arguments);
+        array_unshift($arguments, $method);
+        $call   = $this->createGitCall($path, $arguments);
+        return $call->execute();
+    }
+
+    /**
+     *
+     * @param   string  $path
+     * @return  boolean
+     */
+    public function isRepository($path)
+    {
+        $result = $this->status($path, '-s');
+        return $result->getReturnCode() == 0;
+    }
+
+
 }
 

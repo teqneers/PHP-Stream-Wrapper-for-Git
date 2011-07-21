@@ -27,8 +27,8 @@ class SystemCallResult
      */
     public function __construct($stdOut, $stdErr, $returnCode)
     {
-        $this->stdOut       = (string)$stdOut;
-        $this->stdErr       = (string)$stdErr;
+        $this->stdOut       = trim((string)$stdOut);
+        $this->stdErr       = trim((string)$stdErr);
         $this->returnCode   = (int)$returnCode;
     }
 
