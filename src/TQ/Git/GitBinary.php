@@ -47,7 +47,11 @@ class GitBinary
     {
         $cmd    = escapeshellcmd($this->path);
         array_walk($parameters, function(&$p) {
-            $p  = escapeshellarg($p);
+            if (is_array($p) && count($p) == 2) {
+                $p  = sprintf('%s=%s', escapeshellarg($p[0]), escapeshellarg($p[1]));
+            } else if (is_string($p)) {
+                $p  = escapeshellarg($p);
+            }
         });
 
         $call   = SystemCall::create(sprintf('%s %s', $cmd, implode(' ', $parameters)), $path);
@@ -70,6 +74,7 @@ class GitBinary
         $path   = array_shift($arguments);
         array_unshift($arguments, $method);
         $call   = $this->createGitCall($path, $arguments);
+
         return $call->execute();
     }
 
@@ -81,6 +86,17 @@ class GitBinary
     public function isRepository($path)
     {
         $result = $this->status($path, '-s');
+        return $result->getReturnCode() == 0;
+    }
+
+    /**
+     *
+     * @param   string  $path
+     * @return  boolean
+     */
+    public function createRepository($path)
+    {
+        $result = $this->init($path);
         return $result->getReturnCode() == 0;
     }
 

@@ -8,5 +8,5 @@ if (file_exists($file = __DIR__.'/../autoload.php')) {
 define('PROJECT_PATH',      dirname(__DIR__));
 define('SOURCE_PATH',       PROJECT_PATH.'/src');
 define('TESTS_PATH',        __DIR__);
-define('TESTS_TMP_PATH',    TESTS_PATH.'/_temp');
-define('TESTS_REPO_PATH',   TESTS_TMP_PATH.'/test');
+define('TESTS_TMP_PATH',    sys_get_temp_dir().'/_tq_git_streamwrapper_tests');
+define('TESTS_REPO_PATH',   TESTS_TMP_PATH.'/repo');

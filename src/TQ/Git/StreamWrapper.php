@@ -5,28 +5,28 @@ class StreamWrapper
 {
     /**
      *
-     * @var Connector
+     * @var Repository
      */
-    protected static $connector;
+    protected static $Repository;
 
     /**
      *
      * @param   string              $protocol
-     * @param   Connector|string    $connector
+     * @param   Repository|string    $Repository
      */
-    public static function register($protocol, $connector = null)
+    public static function register($protocol, $Repository = null)
     {
-        if ($connector === null || is_string($connector)) {
-            $connector  = new Connector($connector);
+        if ($Repository === null || is_string($Repository)) {
+            $Repository  = new Repository($Repository);
         }
-        if (!($connector instanceof Connector)) {
-            throw new \InvalidArgumentException(sprintf('The $connector argument must either
-                be a TQ\Git\Connector instance or a path to the Git binary (%s given)',
-                (is_object($connector)) ? get_class($connector) : gettype($connector)
+        if (!($Repository instanceof Repository)) {
+            throw new \InvalidArgumentException(sprintf('The $Repository argument must either
+                be a TQ\Git\Repository instance or a path to the Git binary (%s given)',
+                (is_object($Repository)) ? get_class($Repository) : gettype($Repository)
             ));
         }
 
-        self::$connector    = $connector;
+        self::$Repository    = $Repository;
         if (!stream_wrapper_register($protocol, __CLASS__)) {
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
@@ -44,11 +44,11 @@ class StreamWrapper
 
     /**
      *
-     * @return  Connector
+     * @return  Repository
      */
-    protected function getConnector()
+    protected function getRepository()
     {
-        return self::$connector;
+        return self::$Repository;
     }
 }
 
