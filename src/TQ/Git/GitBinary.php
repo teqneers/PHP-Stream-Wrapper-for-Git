@@ -1,6 +1,10 @@
 <?php
 namespace TQ\Git;
 
+/**
+ * @method  SystemCall  status(string $path, mixed $args...)
+ * @method  SystemCall  init(string $path, mixed $args...)
+ */
 class GitBinary
 {
     /**
@@ -77,29 +81,5 @@ class GitBinary
 
         return $call->execute();
     }
-
-    /**
-     *
-     * @param   string  $path
-     * @return  boolean
-     */
-    public function isRepository($path)
-    {
-        $result = $this->status($path, '-s');
-        return $result->getReturnCode() == 0;
-    }
-
-    /**
-     *
-     * @param   string  $path
-     * @return  boolean
-     */
-    public function createRepository($path)
-    {
-        $result = $this->init($path);
-        return $result->getReturnCode() == 0;
-    }
-
-
 }
 

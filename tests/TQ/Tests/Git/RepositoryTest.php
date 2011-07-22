@@ -9,12 +9,18 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
-     *
      */
     protected function setUp()
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         mkdir(TESTS_TMP_PATH, 0777, true);
+        mkdir(TESTS_REPO_PATH_1, 0777, true);
+        mkdir(TESTS_REPO_PATH_2, 0777, true);
+
+        exec(sprintf('cd %s && %s init',
+            escapeshellarg(TESTS_REPO_PATH_1),
+            escapeshellcmd(GIT_BINARY)
+        ));
     }
 
     /**
@@ -23,7 +29,16 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        Helper::removeDirectory(TESTS_TMP_PATH);
+        //Helper::removeDirectory(TESTS_TMP_PATH);
+    }
+
+    /**
+     *
+     * @return Git\GitBinary
+     */
+    protected function getGit()
+    {
+        return new Git\GitBinary(GIT_BINARY);
     }
 
     /**
@@ -31,7 +46,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testRepositoryOpenOnNonExistantPath()
     {
-        $c  = Git\Repository::open('/does/not/exist');
+        $c  = Git\Repository::open('/does/not/exist', $this->getGit());
     }
 
     /**
@@ -39,7 +54,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testRepositoryOpenOnFile()
     {
-        $c  = Git\Repository::open(__FILE__);
+        $c  = Git\Repository::open(__FILE__, $this->getGit());
     }
 
     /**
@@ -47,12 +62,12 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testRepositoryOpenOnNonRepositoryPath()
     {
-        $c  = Git\Repository::open('/usr');
+        $c  = Git\Repository::open('/usr', $this->getGit());
     }
 
     public function testRepositoryOpenOnRepositoryPath()
     {
-        $c  = Git\Repository::open(PROJECT_PATH);
+        $c  = Git\Repository::open(TESTS_REPO_PATH_1, $this->getGit());
     }
 
     /**
@@ -60,7 +75,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testRepositoryCreateOnExistingRepositoryPath()
     {
-        $c  = Git\Repository::create(PROJECT_PATH);
+        $c  = Git\Repository::create(TESTS_REPO_PATH_1, $this->getGit());
     }
 
     /**
@@ -68,17 +83,23 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
      */
     public function testRepositoryCreateOnFile()
     {
-        $c  = Git\Repository::create(__FILE__);
+        $c  = Git\Repository::create(__FILE__, 0755, $this->getGit());
     }
 
     public function testRepositoryCreateOnExistingPath()
     {
-        $c  = Git\Repository::create(TESTS_TMP_PATH);
+        $c  = Git\Repository::create(TESTS_REPO_PATH_2, 0755, $this->getGit());
     }
 
     public function testRepositoryCreateOnCreateablePath()
     {
-        $c  = Git\Repository::create(TESTS_REPO_PATH);
+        $c  = Git\Repository::create(TESTS_REPO_PATH_3, 0755, $this->getGit());
+    }
+
+    public function testAddFile()
+    {
+        $c  = Git\Repository::open(TESTS_REPO_PATH_1, $this->getGit());
+        $c->addFile('test.txt', 'Test');
     }
 }
 
