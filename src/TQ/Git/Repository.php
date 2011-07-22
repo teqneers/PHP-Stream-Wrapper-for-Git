@@ -5,9 +5,9 @@ class Repository
 {
     /**
      *
-     * @var GitBinary
+     * @var Binary
      */
-    protected $gitBinary;
+    protected $Binary;
 
     /**
      *
@@ -17,13 +17,31 @@ class Repository
 
     /**
      *
+     * @var integer
+     */
+    protected $defaultFileCreationMode  = 0644;
+
+    /**
+     *
+     * @var integer
+     */
+    protected $defaultDirectoryCreationMode = 0755;
+
+    /**
+     *
+     * @var string
+     */
+    protected $defaultAuthor;
+
+    /**
+     *
      * @param   string          $repositoryPath
-     * @param   GitBinary|null  $gitBinary
+     * @param   Binary|null  $Binary
      * @return  Repository
      */
-    public static function open($repositoryPath, GitBinary $gitBinary = null)
+    public static function open($repositoryPath, Binary $Binary = null)
     {
-        $gitBinary  = self::ensureGitBinary($gitBinary);
+        $Binary  = self::ensureBinary($Binary);
 
         if (   !is_string($repositoryPath)
             || !file_exists($repositoryPath)
@@ -33,25 +51,27 @@ class Repository
                 '"%s" is not a valid path', $repositoryPath
             ));
         }
-        if (!self::isRepository($gitBinary, $repositoryPath)) {
+
+        $repositoryRoot = self::findRepositoryRoot($repositoryPath);
+        if ($repositoryRoot === null) {
             throw new \InvalidArgumentException(sprintf(
                 '"%s" is not a valid Git repository', $repositoryPath
             ));
         }
 
-        return new static($repositoryPath, $gitBinary);
+        return new static($repositoryRoot, $Binary);
     }
 
     /**
      *
      * @param   string          $repositoryPath
      * @param   integer         $mode
-     * @param   GitBinary|null  $gitBinary
+     * @param   Binary|null  $Binary
      * @return  Repository
      */
-    public static function create($repositoryPath, $mode = 0755, GitBinary $gitBinary = null)
+    public static function create($repositoryPath, $mode = 0755, Binary $Binary = null)
     {
-        $gitBinary  = self::ensureGitBinary($gitBinary);
+        $Binary  = self::ensureBinary($Binary);
 
         if (!is_string($repositoryPath)) {
             throw new \InvalidArgumentException(sprintf(
@@ -63,75 +83,88 @@ class Repository
             throw new \InvalidArgumentException(sprintf(
                 '"%s" does not exist and cannot be created', $repositoryPath
             ));
-        } else if (self::isRepository($gitBinary, $repositoryPath)) {
+        } else if (self::findRepositoryRoot($repositoryPath) !== null) {
             throw new \InvalidArgumentException(sprintf(
                 '"%s" is already a Git repository', $repositoryPath
             ));
         }
 
-        if (!self::initRepository($gitBinary, $repositoryPath)) {
+        if (!self::initRepository($Binary, $repositoryPath)) {
             throw new \InvalidArgumentException(sprintf(
                 'Cannot initialize a Git repository in "%s"', $repositoryPath
             ));
         }
-        return new static($repositoryPath, $gitBinary);
+        return new static($repositoryPath, $Binary);
     }
 
     /**
      *
-     * @param   GitBinary $gitBinary
-     * @return  GitBinary
+     * @param   Binary $Binary
+     * @return  Binary
      */
-    protected static function ensureGitBinary(GitBinary $gitBinary = null)
+    protected static function ensureBinary(Binary $Binary = null)
     {
-        if (!$gitBinary) {
-            $gitBinary  = new GitBinary();
+        if (!$Binary) {
+            $Binary  = new Binary();
         }
-        return $gitBinary;
+        return $Binary;
     }
 
     /**
      *
-     * @param   GitBinary   $gitBinary
+     * @param   Binary   $Binary
      * @param   string      $path
      * @return  boolean
      */
-    protected static function isRepository(GitBinary $gitBinary, $path)
+    protected static function initRepository(Binary $Binary, $path)
     {
-        $result = $gitBinary->status($path, '-s');
+        $result = $Binary->init($path);
         return $result->getReturnCode() == 0;
     }
 
     /**
      *
-     * @param   GitBinary   $gitBinary
      * @param   string      $path
-     * @return  boolean
+     * @return  string|null
      */
-    protected static function initRepository(GitBinary $gitBinary, $path)
+    public static function findRepositoryRoot($path)
     {
-        $result = $gitBinary->init($path);
-        return $result->getReturnCode() == 0;
+        $found      = null;
+        $path       = realpath($path);
+        if (!$path) {
+            return $found;
+        }
+
+        $pathParts  = explode(DIRECTORY_SEPARATOR, $path);
+        while (count($pathParts) > 0 && $found === null) {
+            $path   = implode(DIRECTORY_SEPARATOR, $pathParts);
+            $gitDir = $path.'/.git';
+            if (file_exists($gitDir) && is_dir($gitDir)) {
+                $found  = $path;
+            }
+            array_pop($pathParts);
+        }
+        return $found;
     }
 
     /**
      *
      * @param   string     $repositoryPath
-     * @param   GitBinary  $gitBinary
+     * @param   Binary  $Binary
      */
-    protected function __construct($repositoryPath, GitBinary $gitBinary)
+    protected function __construct($repositoryPath, Binary $Binary)
     {
-        $this->gitBinary        = $gitBinary;
+        $this->Binary        = $Binary;
         $this->repositoryPath   = rtrim($repositoryPath, DIRECTORY_SEPARATOR.'/');
     }
 
     /**
      *
-     * @return  GitBinary
+     * @return  Binary
      */
-    public function getGitBinary()
+    public function getBinary()
     {
-        return $this->gitBinary;
+        return $this->Binary;
     }
 
     /**
@@ -141,6 +174,66 @@ class Repository
     public function getRepositoryPath()
     {
         return $this->repositoryPath;
+    }
+
+    /**
+     *
+     * @return  integer
+     */
+    public function getDefaultFileCreationMode()
+    {
+        return $this->defaultFileCreationMode;
+    }
+
+    /**
+     *
+     * @param   integer     $defaultFileCreationMode
+     * @return  Repository
+     */
+    public function setDefaultFileCreationMode($defaultFileCreationMode)
+    {
+        $this->defaultFileCreationMode  = (int)$defaultFileCreationMode;
+        return $this;
+    }
+
+    /**
+     *
+     * @return  integer
+     */
+    public function getDefaultDirectoryCreationMode()
+    {
+        return $this->defaultDirectoryCreationMode;
+    }
+
+    /**
+     *
+     * @param   integer     $defaultDirectoryCreationMode
+     * @return  Repository
+     */
+    public function setDefaultDirectoryCreationMode($defaultDirectoryCreationMode)
+    {
+        $this->defaultDirectoryCreationMode  = (int)$defaultDirectoryCreationMode;
+        return $this;
+    }
+
+    /**
+     *
+     * @return  string
+     */
+    public function getDefaultAuthor()
+    {
+        return $this->defaultAuthor;
+    }
+
+    /**
+     *
+     * @param   integer     $defaultAuthor
+     * @return  Repository
+     */
+    public function setDefaultAuthor($defaultAuthor)
+    {
+        $this->defaultAuthor  = (string)$defaultAuthor;
+        return $this;
     }
 
     /**
@@ -159,30 +252,49 @@ class Repository
      * @param   string          $path
      * @param   scalar|array    $data
      * @param   string|null     $commitMsg
-     * @param   integer         $fileMode
-     * @param   integer         $dirMode
+     * @param   string|null     $author
+     * @param   integer|null    $fileMode
+     * @param   integer|null    $dirMode
      */
-    public function addFile($path, $data, $commitMsg = null, $fileMode = 0644, $dirMode = 0755)
+    public function writeFile($path, $data, $commitMsg = null, $author = null, $fileMode = null, $dirMode = null)
     {
-        $file   = $this->resolvePath($path);
-        if (file_exists($file)) {
-            throw new \InvalidArgumentException(sprintf('"%s" already exists', $file));
-        }
+        $file       = $this->resolvePath($path);
+
+        $fileMode   = ($fileMode === null) ? $this->getDefaultFileCreationMode() : (int)$fileMode;
+        $dirMode    = ($dirMode === null) ? $this->getDefaultDirectoryCreationMode() : (int)$dirMode;
+        $author     = ($author === null) ? $this->getDefaultAuthor() : (string)$author;
 
         $directory  = dirname($file);
         if (!file_exists($directory) && !mkdir($directory, $dirMode, true)) {
             throw new \InvalidArgumentException(sprintf('Cannot create "%s"', $directory));
+        } else if (!file_exists($file)) {
+            if (!touch($file)) {
+                throw new \InvalidArgumentException(sprintf('Cannot create "%s"', $file));
+            }
+            if (!chmod($file, $fileMode)) {
+                throw new \InvalidArgumentException(sprintf('Cannot chmod "%s" to %d', $file, $fileMode));
+            }
         }
 
         if (!file_put_contents($file, $data)) {
             throw new \InvalidArgumentException(sprintf('Cannot write to "%s"', $file));
         }
-        if (!chmod($file, $fileMode)) {
-            throw new \InvalidArgumentException(sprintf('Cannot chmod "%s" to %d', $file, $fileMode));
+
+        $result = $this->getBinary()->add($this->getRepositoryPath(), $file);
+
+        if ($commitMsg === null) {
+            $commitMsg  = sprintf('%s created or changed file "%s"', __CLASS__, $path);
         }
 
-        $result = $this->getGitBinary()->add($this->getRepositoryPath(), $file);
-        print_r($result);
+        $args   = array(
+            'message'   => $commitMsg
+        );
+        if ($author === null) {
+            $args['s']  = null;
+        } else {
+            $args['author']  = $author;
+        }
+        $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
     }
 }
 

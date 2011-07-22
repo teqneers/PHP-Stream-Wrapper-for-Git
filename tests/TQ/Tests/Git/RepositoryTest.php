@@ -34,11 +34,11 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      *
-     * @return Git\GitBinary
+     * @return Git\Binary
      */
     protected function getGit()
     {
-        return new Git\GitBinary(GIT_BINARY);
+        return new Git\Binary(GIT_BINARY);
     }
 
     /**
@@ -99,7 +99,8 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     public function testAddFile()
     {
         $c  = Git\Repository::open(TESTS_REPO_PATH_1, $this->getGit());
-        $c->addFile('test.txt', 'Test');
+        $c->setDefaultAuthor('Test <test@example.com>');
+        $c->writeFile('test.txt', 'Test');
     }
 }
 

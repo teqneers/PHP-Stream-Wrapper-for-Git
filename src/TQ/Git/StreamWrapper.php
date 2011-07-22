@@ -5,28 +5,28 @@ class StreamWrapper
 {
     /**
      *
-     * @var GitBinary
+     * @var Binary
      */
-    protected static $gitBinary;
+    protected static $Binary;
 
     /**
      *
      * @param   string              $protocol
-     * @param   GitBinary|string    $gitBinary
+     * @param   Binary|string    $Binary
      */
-    public static function register($protocol, $gitBinary = null)
+    public static function register($protocol, $Binary = null)
     {
-        if ($gitBinary === null || is_string($gitBinary)) {
-            $gitBinary  = new GitBinary($gitBinary);
+        if ($Binary === null || is_string($Binary)) {
+            $Binary  = new Binary($Binary);
         }
-        if (!($gitBinary instanceof GitBinary)) {
-            throw new \InvalidArgumentException(sprintf('The $gitBinary argument must either
-                be a TQ\Git\GitBinary instance or a path to the Git binary (%s given)',
-                (is_object($gitBinary)) ? get_class($gitBinary) : gettype($gitBinary)
+        if (!($Binary instanceof Binary)) {
+            throw new \InvalidArgumentException(sprintf('The $Binary argument must either
+                be a TQ\Git\Binary instance or a path to the Git binary (%s given)',
+                (is_object($Binary)) ? get_class($Binary) : gettype($Binary)
             ));
         }
 
-        self::$gitBinary    = $gitBinary;
+        self::$Binary    = $Binary;
         if (!stream_wrapper_register($protocol, __CLASS__)) {
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
@@ -44,11 +44,11 @@ class StreamWrapper
 
     /**
      *
-     * @return  GitBinary
+     * @return  Binary
      */
-    protected function getGitBinary()
+    protected function getBinary()
     {
-        return self::$gitBinary;
+        return self::$Binary;
     }
 }
 
