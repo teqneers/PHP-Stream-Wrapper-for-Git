@@ -1,6 +1,8 @@
 <?php
 namespace TQ\Git;
 
+use TQ\Git\Cli\CallException;
+
 class Repository
 {
     /**
@@ -116,7 +118,7 @@ class Repository
     {
         $result = $binary->init($path);
         if ($result->getReturnCode() > 0) {
-            throw new GitCallException(
+            throw new CallException(
                 sprintf('Cannot initialize a Git repository in "%s"', $path),
                 $result
             );
@@ -257,7 +259,7 @@ class Repository
      * @param   integer|null    $fileMode
      * @param   integer|null    $dirMode
      */
-    public function writeFile($path, $data, $commitMsg = null, $author = null, $fileMode = null, $dirMode = null)
+    public function commitFile($path, $data, $commitMsg = null, $author = null, $fileMode = null, $dirMode = null)
     {
         $file       = $this->resolvePath($path);
 
@@ -283,7 +285,7 @@ class Repository
 
         $result = $this->getBinary()->add($this->getRepositoryPath(), $file);
         if ($result->getReturnCode() > 0) {
-            throw new GitCallException(
+            throw new CallException(
                 sprintf('Cannot add "%s" to "%s"', $file, $this->getRepositoryPath()),
                 $result
             );
@@ -297,17 +299,39 @@ class Repository
             '--message'   => $commitMsg
         );
         if ($author === null) {
-            $args['-s']  = null;
+            $args[]  = '--signoff';
         } else {
             $args['--author']  = $author;
         }
+
         $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
         if ($result->getReturnCode() > 0) {
-            throw new GitCallException(
+            throw new CallException(
                 sprintf('Cannot commit "%s" to "%s"', $file, $this->getRepositoryPath()),
                 $result
             );
         }
+    }
+
+    /**
+     *
+     * @return  string
+     */
+    public function showLog()
+    {
+        $args   = array(
+            '--format'   => 'fuller',
+            '--graph'
+        );
+
+        $result = $this->getBinary()->log($this->getRepositoryPath(), $args);
+        if ($result->getReturnCode() > 0) {
+            throw new CallException(
+                sprintf('Cannot retrieve log from "%s"', $this->getRepositoryPath()),
+                $result
+            );
+        }
+        return $result->getStdOut();
     }
 }
 

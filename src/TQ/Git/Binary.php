@@ -54,28 +54,36 @@ class Binary
      */
     protected function createGitCall($path, $command, array $arguments)
     {
+        $handleArg  = function($key, $value) {
+            if ($key == '--') {
+                return '--';
+            } else if (strpos($key, '-') === 0) {
+                $key  = ltrim($key, '-');
+                if (strlen($key) == 1) {
+                    $arg = sprintf('-%s', escapeshellarg($key));
+                    if ($value !== null) {
+                        $arg    .= ' '.escapeshellarg($value);
+                    }
+                } else {
+                    $arg = sprintf('--%s', escapeshellarg($key));
+                    if ($value !== null) {
+                        $arg    .= '='.escapeshellarg($value);
+                    }
+                }
+                return $arg;
+            } else {
+                return escapeshellarg($key);
+            }
+        };
+
         $cmd        = escapeshellcmd($this->path);
         $command    = escapeshellarg($command);
         $args       = array();
-        array_walk($arguments, function($v, $k) use(&$args) {
+        array_walk($arguments, function($v, $k) use(&$args, $handleArg) {
             if (is_int($k)) {
-                $args[] = escapeshellarg($v);
+                $args[] = $handleArg($v, null);
             } else {
-                $k  = ltrim($k, '-');
-                $k  = escapeshellarg($k);
-                if (strlen($k) == 1) {
-                    if ($v === null) {
-                        $args[] = sprintf('-%s', $k);
-                    } else {
-                        $args[] = sprintf('-%s %s', $k, escapeshellarg($v));
-                    }
-                } else {
-                    if ($v === null) {
-                        $args[] = sprintf('--%s', $k);
-                    } else {
-                        $args[] = sprintf('--%s=%s', $k, escapeshellarg($v));
-                    }
-                }
+                $args[] = $handleArg($k, $v);
             }
         });
 

@@ -1,22 +1,20 @@
 <?php
-namespace TQ\Git;
+namespace TQ\Git\Cli;
 
-use TQ\Git\Cli;
-
-class GitCallException extends \RuntimeException implements Exception
+class CallException extends \RuntimeException implements Exception
 {
     /**
      *
-     * @var Cli\CallResult
+     * @var CallResult
      */
     protected $cliCallResult;
 
     /**
      *
-     * @param string            $message
-     * @param Cli\CallResult    $cliCallResult
+     * @param string        $message
+     * @param CallResult    $cliCallResult
      */
-    public function __construct($message, Cli\CallResult $cliCallResult)
+    public function __construct($message, CallResult $cliCallResult)
     {
         $this->cliCallResult    = $cliCallResult;
 
