@@ -1,6 +1,8 @@
 <?php
 namespace TQ\Git\Cli;
 
+use TQ\Git\Exception;
+
 class CallException extends \RuntimeException implements Exception
 {
     /**
