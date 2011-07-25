@@ -110,16 +110,16 @@ class Repository
     /**
      *
      * @param   Binary   $binary
-     * @param   string      $path
-     * @return  boolean
+     * @param   string   $path
      */
     protected static function initRepository(Binary $binary, $path)
     {
         $result = $binary->init($path);
         if ($result->getReturnCode() > 0) {
-            throw new \RuntimeException(sprintf(
-                'Cannot initialize a Git repository in "%s"', $path
-            ));
+            throw new GitCallException(
+                sprintf('Cannot initialize a Git repository in "%s"', $path),
+                $result
+            );
         }
     }
 
@@ -283,9 +283,10 @@ class Repository
 
         $result = $this->getBinary()->add($this->getRepositoryPath(), $file);
         if ($result->getReturnCode() > 0) {
-            throw new \RuntimeException(sprintf(
-                'Cannot add "%s" to "%s" [%s]', $file, $this->getRepositoryPath(), $result->getStdErr()
-            ));
+            throw new GitCallException(
+                sprintf('Cannot add "%s" to "%s"', $file, $this->getRepositoryPath()),
+                $result
+            );
         }
 
         if ($commitMsg === null) {
@@ -302,9 +303,10 @@ class Repository
         }
         $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
         if ($result->getReturnCode() > 0) {
-            throw new \RuntimeException(sprintf(
-                'Cannot commit "%s" to "%s" [%s]', $file, $this->getRepositoryPath(), $result->getStdErr()
-            ));
+            throw new GitCallException(
+                sprintf('Cannot commit "%s" to "%s"', $file, $this->getRepositoryPath()),
+                $result
+            );
         }
     }
 }
