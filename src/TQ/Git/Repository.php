@@ -1,6 +1,7 @@
 <?php
 namespace TQ\Git;
 
+use TQ\Git\Cli\CallResult;
 use TQ\Git\Cli\CallException;
 
 class Repository
@@ -21,19 +22,19 @@ class Repository
      *
      * @var integer
      */
-    protected $defaultFileCreationMode  = 0644;
+    protected $fileCreationMode  = 0644;
 
     /**
      *
      * @var integer
      */
-    protected $defaultDirectoryCreationMode = 0755;
+    protected $directoryCreationMode = 0755;
 
     /**
      *
      * @var string
      */
-    protected $defaultAuthor;
+    protected $author;
 
     /**
      *
@@ -117,12 +118,7 @@ class Repository
     protected static function initRepository(Binary $binary, $path)
     {
         $result = $binary->init($path);
-        if ($result->getReturnCode() > 0) {
-            throw new CallException(
-                sprintf('Cannot initialize a Git repository in "%s"', $path),
-                $result
-            );
-        }
+        self::throwIfError($result, sprintf('Cannot initialize a Git repository in "%s"', $path));
     }
 
     /**
@@ -141,7 +137,7 @@ class Repository
         $pathParts  = explode(DIRECTORY_SEPARATOR, $path);
         while (count($pathParts) > 0 && $found === null) {
             $path   = implode(DIRECTORY_SEPARATOR, $pathParts);
-            $gitDir = $path.'/.git';
+            $gitDir = $path.DIRECTORY_SEPARATOR.'.git';
             if (file_exists($gitDir) && is_dir($gitDir)) {
                 $found  = $path;
             }
@@ -183,19 +179,19 @@ class Repository
      *
      * @return  integer
      */
-    public function getDefaultFileCreationMode()
+    public function getFileCreationMode()
     {
-        return $this->defaultFileCreationMode;
+        return $this->fileCreationMode;
     }
 
     /**
      *
-     * @param   integer     $defaultFileCreationMode
+     * @param   integer     $fileCreationMode
      * @return  Repository
      */
-    public function setDefaultFileCreationMode($defaultFileCreationMode)
+    public function setFileCreationMode($fileCreationMode)
     {
-        $this->defaultFileCreationMode  = (int)$defaultFileCreationMode;
+        $this->fileCreationMode  = (int)$fileCreationMode;
         return $this;
     }
 
@@ -203,19 +199,19 @@ class Repository
      *
      * @return  integer
      */
-    public function getDefaultDirectoryCreationMode()
+    public function getDirectoryCreationMode()
     {
-        return $this->defaultDirectoryCreationMode;
+        return $this->directoryCreationMode;
     }
 
     /**
      *
-     * @param   integer     $defaultDirectoryCreationMode
+     * @param   integer     $directoryCreationMode
      * @return  Repository
      */
-    public function setDefaultDirectoryCreationMode($defaultDirectoryCreationMode)
+    public function setDirectoryCreationMode($directoryCreationMode)
     {
-        $this->defaultDirectoryCreationMode  = (int)$defaultDirectoryCreationMode;
+        $this->directoryCreationMode  = (int)$directoryCreationMode;
         return $this;
     }
 
@@ -223,19 +219,19 @@ class Repository
      *
      * @return  string
      */
-    public function getDefaultAuthor()
+    public function getAuthor()
     {
-        return $this->defaultAuthor;
+        return $this->author;
     }
 
     /**
      *
-     * @param   integer     $defaultAuthor
+     * @param   string     $author
      * @return  Repository
      */
-    public function setDefaultAuthor($defaultAuthor)
+    public function setAuthor($author)
     {
-        $this->defaultAuthor  = (string)$defaultAuthor;
+        $this->author  = (string)$author;
         return $this;
     }
 
@@ -252,20 +248,53 @@ class Repository
 
     /**
      *
+     * @return  string
+     */
+    public function getCurrentCommit()
+    {
+        $result = $this->getBinary()->{'rev-parse'}($this->getRepositoryPath(), array(
+             '--verify',
+            'HEAD'
+        ));
+        self::throwIfError($result, sprintf('Cannot rev-parse "%s"', $this->getRepositoryPath()));
+        return $result->getStdOut();
+    }
+
+    /**
+     *
+     * @param   string          $commitMsg
+     * @param   string|null     $file
+     */
+    protected function commit($commitMsg, $file = null)
+    {
+        $author = $this->getAuthor();
+        $args   = array(
+            '--message'   => $commitMsg
+        );
+        if ($author !== null) {
+            $args['--author']  = $author;
+        }
+        if ($file !== null) {
+            $args[]  = $file;
+        }
+
+        $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
+        self::throwIfError($result, sprintf('Cannot commit "to "%s"', $this->getRepositoryPath()));
+    }
+
+    /**
+     *
      * @param   string          $path
      * @param   scalar|array    $data
      * @param   string|null     $commitMsg
-     * @param   string|null     $author
-     * @param   integer|null    $fileMode
-     * @param   integer|null    $dirMode
+     * @return  string
      */
-    public function commitFile($path, $data, $commitMsg = null, $author = null, $fileMode = null, $dirMode = null)
+    public function writeFile($path, $data, $commitMsg = null)
     {
         $file       = $this->resolvePath($path);
 
-        $fileMode   = ($fileMode === null) ? $this->getDefaultFileCreationMode() : (int)$fileMode;
-        $dirMode    = ($dirMode === null) ? $this->getDefaultDirectoryCreationMode() : (int)$dirMode;
-        $author     = ($author === null) ? $this->getDefaultAuthor() : (string)$author;
+        $fileMode   = $this->getFileCreationMode();
+        $dirMode    = $this->getDirectoryCreationMode();
 
         $directory  = dirname($file);
         if (!file_exists($directory) && !mkdir($directory, $dirMode, true)) {
@@ -284,33 +313,52 @@ class Repository
         }
 
         $result = $this->getBinary()->add($this->getRepositoryPath(), $file);
-        if ($result->getReturnCode() > 0) {
-            throw new CallException(
-                sprintf('Cannot add "%s" to "%s"', $file, $this->getRepositoryPath()),
-                $result
-            );
-        }
+        self::throwIfError($result, sprintf('Cannot add "%s" to "%s"',
+            $file, $this->getRepositoryPath()
+        ));
 
         if ($commitMsg === null) {
             $commitMsg  = sprintf('%s created or changed file "%s"', __CLASS__, $path);
         }
 
-        $args   = array(
-            '--message'   => $commitMsg
-        );
-        if ($author === null) {
-            $args[]  = '--signoff';
-        } else {
-            $args['--author']  = $author;
+        $this->commit($commitMsg, $file);
+
+        return $this->getCurrentCommit();
+    }
+
+    /**
+     *
+     * @param   string          $path
+     * @param   string|null     $commitMsg
+     * @param   boolean         $recursive
+     * @param   boolean         $force
+     * @return  string
+     */
+    public function removeFile($path, $commitMsg = null, $recursive = false, $force = false)
+    {
+        $file   = $this->resolvePath($path);
+
+        $args   = array();
+        if ($recursive) {
+            $args[] = '-r';
+        }
+        if ($force) {
+            $args[] = '--force';
+        }
+        $args[]  = $file;
+
+        $result = $this->getBinary()->rm($this->getRepositoryPath(), $args);
+        self::throwIfError($result, sprintf('Cannot remove "%s" from "%s"',
+            $file, $this->getRepositoryPath()
+        ));
+
+        if ($commitMsg === null) {
+            $commitMsg  = sprintf('%s deleted file "%s"', __CLASS__, $path);
         }
 
-        $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
-        if ($result->getReturnCode() > 0) {
-            throw new CallException(
-                sprintf('Cannot commit "%s" to "%s"', $file, $this->getRepositoryPath()),
-                $result
-            );
-        }
+        $this->commit($commitMsg, $file);
+
+        return $this->getCurrentCommit();
     }
 
     /**
@@ -319,19 +367,43 @@ class Repository
      */
     public function showLog()
     {
-        $args   = array(
+        $result = $this->getBinary()->log($this->getRepositoryPath(), array(
             '--format'   => 'fuller',
             '--graph'
-        );
-
-        $result = $this->getBinary()->log($this->getRepositoryPath(), $args);
-        if ($result->getReturnCode() > 0) {
-            throw new CallException(
-                sprintf('Cannot retrieve log from "%s"', $this->getRepositoryPath()),
-                $result
-            );
-        }
+        ));
+        self::throwIfError($result, sprintf('Cannot retrieve log from "%s"',
+            $this->getRepositoryPath()
+        ));
         return $result->getStdOut();
+    }
+
+    /**
+     *
+     * @return  string  $hash
+     * @return  string
+     */
+    public function showCommit($hash)
+    {
+        $result = $this->getBinary()->show($this->getRepositoryPath(), array(
+            $hash
+        ));
+        self::throwIfError($result, sprintf('Cannot retrieve commit "%s" from "%s"',
+            $hash, $this->getRepositoryPath()
+        ));
+
+        return $result->getStdOut();
+    }
+
+    /**
+     *
+     * @param   CallResult  $result
+     * @param   string      $message
+     */
+    protected static function throwIfError(CallResult $result, $message)
+    {
+        if ($result->getReturnCode() > 0) {
+            throw new CallException($message, $result);
+        }
     }
 }
 
