@@ -1,11 +1,13 @@
 <?php
 namespace TQ\Git;
 
+use TQ\Git\Cli;
+
 /**
- * @method  SystemCall  status(string $path, mixed $args...)
- * @method  SystemCall  init(string $path, mixed $args...)
- * @method  SystemCall  add(string $path, mixed $args...)
- * @method  SystemCall  commit(string $path, mixed $args...)
+ * @method  Cli\Call  status(string $path, mixed $args...)
+ * @method  Cli\Call  init(string $path, mixed $args...)
+ * @method  Cli\Call  add(string $path, mixed $args...)
+ * @method  Cli\Call  commit(string $path, mixed $args...)
  */
 class Binary
 {
@@ -22,7 +24,7 @@ class Binary
     public static function locateBinary()
     {
         if (PHP_OS != 'Windows') {
-            $result = SystemCall::create('which git')->execute();
+            $result = Cli\Call::create('which git')->execute();
             return $result->getStdOut();
         }
         return '';
@@ -48,7 +50,7 @@ class Binary
      * @param   string  $path
      * @param   string  $command
      * @param   array   $arguments
-     * @return  SystemCall
+     * @return  Cli\Call
      */
     protected function createGitCall($path, $command, array $arguments)
     {
@@ -58,24 +60,26 @@ class Binary
         array_walk($arguments, function($v, $k) use(&$args) {
             if (is_int($k)) {
                 $args[] = escapeshellarg($v);
-            } else if (strlen($k) == 1) {
-                $k  = escapeshellarg($k);
-                if ($v === null) {
-                    $args[] = sprintf('-%s', $k);
-                } else {
-                    $args[] = sprintf('-%s %s', $k, escapeshellarg($v));
-                }
             } else {
+                $k  = ltrim($k, '-');
                 $k  = escapeshellarg($k);
-                if ($v === null) {
-                    $args[] = sprintf('--%s', $k);
+                if (strlen($k) == 1) {
+                    if ($v === null) {
+                        $args[] = sprintf('-%s', $k);
+                    } else {
+                        $args[] = sprintf('-%s %s', $k, escapeshellarg($v));
+                    }
                 } else {
-                    $args[] = sprintf('--%s=%s', $k, escapeshellarg($v));
+                    if ($v === null) {
+                        $args[] = sprintf('--%s', $k);
+                    } else {
+                        $args[] = sprintf('--%s=%s', $k, escapeshellarg($v));
+                    }
                 }
             }
         });
 
-        $call   = SystemCall::create(sprintf('%s %s %s', $cmd, $command, implode(' ', $args)), $path);
+        $call   = Cli\Call::create(sprintf('%s %s %s', $cmd, $command, implode(' ', $args)), $path);
 
         return $call;
     }
@@ -84,7 +88,7 @@ class Binary
      *
      * @param   string  $method
      * @param   array   $arguments
-     * @return  SystemCallResult
+     * @return  Cli\CallResult
      */
     public function __call($method, array $arguments)
     {

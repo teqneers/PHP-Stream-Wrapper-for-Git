@@ -1,7 +1,7 @@
 <?php
-namespace TQ\Git;
+namespace TQ\Git\Cli;
 
-class SystemCallResult
+class CallResult
 {
     /**
      *
@@ -21,15 +21,32 @@ class SystemCallResult
 
     /**
      *
-     * @param string $stdOut
-     * @param string $stdErr
-     * @param integer $returnCode
+     * @var Call
      */
-    public function __construct($stdOut, $stdErr, $returnCode)
+    protected $cliCall;
+
+    /**
+     *
+     * @param Call       $cliCall
+     * @param string     $stdOut
+     * @param string     $stdErr
+     * @param integer    $returnCode
+     */
+    public function __construct(Call $cliCall, $stdOut, $stdErr, $returnCode)
     {
+        $this->cliCall      = $cliCall;
         $this->stdOut       = trim((string)$stdOut);
         $this->stdErr       = trim((string)$stdErr);
         $this->returnCode   = (int)$returnCode;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function cliCall()
+    {
+        return $this->cliCall;
     }
 
     /**

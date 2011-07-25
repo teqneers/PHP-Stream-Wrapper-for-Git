@@ -1,7 +1,7 @@
 <?php
-namespace TQ\Git;
+namespace TQ\Git\Cli;
 
-class SystemCall
+class Call
 {
     /**
      *
@@ -26,7 +26,7 @@ class SystemCall
      * @param   string      $cmd
      * @param   string|null $cwd
      * @param   array|null  $env
-     * @return  SystemCall
+     * @return  Call
      */
     public static function create($cmd, $cwd = null, array $env = null) {
         return new static($cmd, $cwd, $env);
@@ -57,7 +57,7 @@ class SystemCall
     /**
      *
      * @param   string  $cmd
-     * @return  SystemCall
+     * @return  Call
      */
     public function setCmd($cmd)
     {
@@ -77,7 +77,7 @@ class SystemCall
     /**
      *
      * @param   string|null  $cwd
-     * @return  SystemCall
+     * @return  Call
      */
     public function setCwd($cwd)
     {
@@ -102,7 +102,7 @@ class SystemCall
     /**
      *
      * @param   array|null  $env
-     * @return  SystemCall
+     * @return  Call
      */
     public function setEnv(array $env = null)
     {
@@ -113,7 +113,7 @@ class SystemCall
     /**
      *
      * @param   string|null  $stdIn
-     * @return  SystemCallResult
+     * @return  CallResult
      */
     public function execute($stdIn = null)
     {
@@ -143,7 +143,7 @@ class SystemCall
             fclose($pipes[2]);
 
             $returnCode = proc_close($process);
-            return new SystemCallResult($stdOut, $stdErr, $returnCode);
+            return new CallResult($this, $stdOut, $stdErr, $returnCode);
         }
         throw new \RuntimeException(sprintf('Cannot execute "%s"', $cmd));
     }

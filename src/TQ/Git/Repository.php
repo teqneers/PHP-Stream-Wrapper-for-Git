@@ -7,7 +7,7 @@ class Repository
      *
      * @var Binary
      */
-    protected $Binary;
+    protected $binary;
 
     /**
      *
@@ -36,12 +36,12 @@ class Repository
     /**
      *
      * @param   string          $repositoryPath
-     * @param   Binary|null  $Binary
+     * @param   Binary|null  $binary
      * @return  Repository
      */
-    public static function open($repositoryPath, Binary $Binary = null)
+    public static function open($repositoryPath, Binary $binary = null)
     {
-        $Binary  = self::ensureBinary($Binary);
+        $binary  = self::ensureBinary($binary);
 
         if (   !is_string($repositoryPath)
             || !file_exists($repositoryPath)
@@ -59,19 +59,19 @@ class Repository
             ));
         }
 
-        return new static($repositoryRoot, $Binary);
+        return new static($repositoryRoot, $binary);
     }
 
     /**
      *
      * @param   string          $repositoryPath
      * @param   integer         $mode
-     * @param   Binary|null  $Binary
+     * @param   Binary|null  $binary
      * @return  Repository
      */
-    public static function create($repositoryPath, $mode = 0755, Binary $Binary = null)
+    public static function create($repositoryPath, $mode = 0755, Binary $binary = null)
     {
-        $Binary  = self::ensureBinary($Binary);
+        $binary  = self::ensureBinary($binary);
 
         if (!is_string($repositoryPath)) {
             throw new \InvalidArgumentException(sprintf(
@@ -80,7 +80,7 @@ class Repository
         }
 
         if (!file_exists($repositoryPath) && !mkdir($repositoryPath, $mode, true)) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new \RuntimeException(sprintf(
                 '"%s" does not exist and cannot be created', $repositoryPath
             ));
         } else if (self::findRepositoryRoot($repositoryPath) !== null) {
@@ -89,37 +89,38 @@ class Repository
             ));
         }
 
-        if (!self::initRepository($Binary, $repositoryPath)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Cannot initialize a Git repository in "%s"', $repositoryPath
-            ));
-        }
-        return new static($repositoryPath, $Binary);
+        self::initRepository($binary, $repositoryPath);
+
+        return new static($repositoryPath, $binary);
     }
 
     /**
      *
-     * @param   Binary $Binary
+     * @param   Binary $binary
      * @return  Binary
      */
-    protected static function ensureBinary(Binary $Binary = null)
+    protected static function ensureBinary(Binary $binary = null)
     {
-        if (!$Binary) {
-            $Binary  = new Binary();
+        if (!$binary) {
+            $binary  = new Binary();
         }
-        return $Binary;
+        return $binary;
     }
 
     /**
      *
-     * @param   Binary   $Binary
+     * @param   Binary   $binary
      * @param   string      $path
      * @return  boolean
      */
-    protected static function initRepository(Binary $Binary, $path)
+    protected static function initRepository(Binary $binary, $path)
     {
-        $result = $Binary->init($path);
-        return $result->getReturnCode() == 0;
+        $result = $binary->init($path);
+        if ($result->getReturnCode() > 0) {
+            throw new \RuntimeException(sprintf(
+                'Cannot initialize a Git repository in "%s"', $path
+            ));
+        }
     }
 
     /**
@@ -150,11 +151,11 @@ class Repository
     /**
      *
      * @param   string     $repositoryPath
-     * @param   Binary  $Binary
+     * @param   Binary  $binary
      */
-    protected function __construct($repositoryPath, Binary $Binary)
+    protected function __construct($repositoryPath, Binary $binary)
     {
-        $this->Binary        = $Binary;
+        $this->binary           = $binary;
         $this->repositoryPath   = rtrim($repositoryPath, DIRECTORY_SEPARATOR.'/');
     }
 
@@ -164,7 +165,7 @@ class Repository
      */
     public function getBinary()
     {
-        return $this->Binary;
+        return $this->binary;
     }
 
     /**
@@ -266,35 +267,45 @@ class Repository
 
         $directory  = dirname($file);
         if (!file_exists($directory) && !mkdir($directory, $dirMode, true)) {
-            throw new \InvalidArgumentException(sprintf('Cannot create "%s"', $directory));
+            throw new \RuntimeException(sprintf('Cannot create "%s"', $directory));
         } else if (!file_exists($file)) {
             if (!touch($file)) {
-                throw new \InvalidArgumentException(sprintf('Cannot create "%s"', $file));
+                throw new \RuntimeException(sprintf('Cannot create "%s"', $file));
             }
             if (!chmod($file, $fileMode)) {
-                throw new \InvalidArgumentException(sprintf('Cannot chmod "%s" to %d', $file, $fileMode));
+                throw new \RuntimeException(sprintf('Cannot chmod "%s" to %d', $file, $fileMode));
             }
         }
 
         if (!file_put_contents($file, $data)) {
-            throw new \InvalidArgumentException(sprintf('Cannot write to "%s"', $file));
+            throw new \RuntimeException(sprintf('Cannot write to "%s"', $file));
         }
 
         $result = $this->getBinary()->add($this->getRepositoryPath(), $file);
+        if ($result->getReturnCode() > 0) {
+            throw new \RuntimeException(sprintf(
+                'Cannot add "%s" to "%s" [%s]', $file, $this->getRepositoryPath(), $result->getStdErr()
+            ));
+        }
 
         if ($commitMsg === null) {
             $commitMsg  = sprintf('%s created or changed file "%s"', __CLASS__, $path);
         }
 
         $args   = array(
-            'message'   => $commitMsg
+            '--message'   => $commitMsg
         );
         if ($author === null) {
-            $args['s']  = null;
+            $args['-s']  = null;
         } else {
-            $args['author']  = $author;
+            $args['--author']  = $author;
         }
         $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
+        if ($result->getReturnCode() > 0) {
+            throw new \RuntimeException(sprintf(
+                'Cannot commit "%s" to "%s" [%s]', $file, $this->getRepositoryPath(), $result->getStdErr()
+            ));
+        }
     }
 }
 

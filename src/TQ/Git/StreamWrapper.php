@@ -7,26 +7,26 @@ class StreamWrapper
      *
      * @var Binary
      */
-    protected static $Binary;
+    protected static $binary;
 
     /**
      *
      * @param   string              $protocol
-     * @param   Binary|string    $Binary
+     * @param   Binary|string    $binary
      */
-    public static function register($protocol, $Binary = null)
+    public static function register($protocol, $binary = null)
     {
-        if ($Binary === null || is_string($Binary)) {
-            $Binary  = new Binary($Binary);
+        if ($binary === null || is_string($binary)) {
+            $binary  = new Binary($binary);
         }
-        if (!($Binary instanceof Binary)) {
-            throw new \InvalidArgumentException(sprintf('The $Binary argument must either
+        if (!($binary instanceof Binary)) {
+            throw new \InvalidArgumentException(sprintf('The $binary argument must either
                 be a TQ\Git\Binary instance or a path to the Git binary (%s given)',
-                (is_object($Binary)) ? get_class($Binary) : gettype($Binary)
+                (is_object($binary)) ? get_class($binary) : gettype($binary)
             ));
         }
 
-        self::$Binary    = $Binary;
+        self::$binary    = $binary;
         if (!stream_wrapper_register($protocol, __CLASS__)) {
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
@@ -48,7 +48,7 @@ class StreamWrapper
      */
     protected function getBinary()
     {
-        return self::$Binary;
+        return self::$binary;
     }
 }
 
