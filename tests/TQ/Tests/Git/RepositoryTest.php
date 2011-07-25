@@ -21,6 +21,22 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
             escapeshellarg(TESTS_REPO_PATH_1),
             escapeshellcmd(GIT_BINARY)
         ));
+
+        for ($i = 0; $i < 10; $i++) {
+            $file   = sprintf('file_%d.txt', $i);
+            $path   = TESTS_REPO_PATH_1.'/'.$file;
+            file_put_contents($path, sprintf('File %d', $i));
+            exec(sprintf('cd %s && %s add %s',
+                escapeshellarg(TESTS_REPO_PATH_1),
+                escapeshellcmd(GIT_BINARY),
+                escapeshellarg($file)
+            ));
+        }
+        exec(sprintf('cd %s && %s commit --message=%s',
+            escapeshellarg(TESTS_REPO_PATH_1),
+            escapeshellcmd(GIT_BINARY),
+            escapeshellarg('Initial commit')
+        ));
     }
 
     /**
