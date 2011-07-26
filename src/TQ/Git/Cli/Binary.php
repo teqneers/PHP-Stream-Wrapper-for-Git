@@ -73,10 +73,10 @@ class Binary
         $args       = array();
         $files      = array();
         $fileMode   = false;
-        array_walk($arguments, function($v, $k) use(&$args, &$files, &$fileMode, $handleArg) {
+        foreach ($arguments as $k => $v) {
             if ($v === '--' || $k === '--') {
                 $fileMode   = true;
-                return;
+                continue;
             }
             if (is_int($k)) {
                 if (strpos($v, '-') === 0) {
@@ -91,7 +91,7 @@ class Binary
                     $args[] = $handleArg($k, $v);
                 }
             }
-        });
+        }
 
         $cmd    = trim(sprintf('%s %s %s', $binary, $command, implode(' ', $args)));
         if (count($files) > 0) {
