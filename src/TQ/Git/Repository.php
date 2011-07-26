@@ -238,13 +238,24 @@ class Repository
 
     /**
      *
-     * @param   string  $localPath
+     * @param   string|array  $localPath
      * @return  string
      */
     public function resolvePath($localPath)
     {
-        $localPath  = ltrim($localPath, DIRECTORY_SEPARATOR.'/');
-        return $this->getRepositoryPath().'/'.$localPath;
+        if (is_array($localPath)) {
+            $paths  = array();
+            foreach ($localPath as $f) {
+                $paths[]    = $this->resolvePath($f);
+            }
+            return $paths;
+        } else {
+            if (strpos($localPath, $this->getRepositoryPath()) === 0) {
+                return $localPath;
+            }
+            $localPath  = ltrim($localPath, DIRECTORY_SEPARATOR.'/');
+            return $this->getRepositoryPath().'/'.$localPath;
+        }
     }
 
     /**
@@ -263,10 +274,10 @@ class Repository
 
     /**
      *
-     * @param   string          $commitMsg
-     * @param   string|null     $file
+     * @param   string       $commitMsg
+     * @param   array|null   $file
      */
-    protected function commit($commitMsg, $file = null)
+    protected function commit($commitMsg, array $file = null)
     {
         $author = $this->getAuthor();
         $args   = array(
@@ -276,11 +287,55 @@ class Repository
             $args['--author']  = $author;
         }
         if ($file !== null) {
-            $args[]  = $file;
+            $args   = array_merge($args, $this->resolvePath($file));
         }
 
         $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
-        self::throwIfError($result, sprintf('Cannot commit "to "%s"', $this->getRepositoryPath()));
+        self::throwIfError($result, sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
+    }
+
+    /**
+     *
+     * @param   array   $file
+     * @param   boolean $force
+     * @return  string
+     */
+    protected function add(array $file, $force = false)
+    {
+        $args   = array();
+        if ($force) {
+            $args[]  = '--force';
+        }
+        $args   = array_merge($args, $this->resolvePath($file));
+
+        $result = $this->getBinary()->add($this->getRepositoryPath(), $args);
+        self::throwIfError($result, sprintf('Cannot add "%s" to "%s"',
+            implode(', ', $file), $this->getRepositoryPath()
+        ));
+    }
+
+    /**
+     *
+     * @param   array   $file
+     * @param   boolean $recursive
+     * @param   boolean $force
+     * @return  string
+     */
+    protected function remove(array $file, $recursive = false, $force = false)
+    {
+        $args   = array();
+        if ($recursive) {
+            $args[] = '-r';
+        }
+        if ($force) {
+            $args[] = '--force';
+        }
+        $args   = array_merge($args, $this->resolvePath($file));
+
+        $result = $this->getBinary()->rm($this->getRepositoryPath(), $args);
+        self::throwIfError($result, sprintf('Cannot remove "%s" from "%s"',
+            implode(', ', $file), $this->getRepositoryPath()
+        ));
     }
 
     /**
@@ -313,16 +368,13 @@ class Repository
             throw new \RuntimeException(sprintf('Cannot write to "%s"', $file));
         }
 
-        $result = $this->getBinary()->add($this->getRepositoryPath(), $file);
-        self::throwIfError($result, sprintf('Cannot add "%s" to "%s"',
-            $file, $this->getRepositoryPath()
-        ));
+        $this->add(array($file));
 
         if ($commitMsg === null) {
             $commitMsg  = sprintf('%s created or changed file "%s"', __CLASS__, $path);
         }
 
-        $this->commit($commitMsg, $file);
+        $this->commit($commitMsg, array($file));
 
         return $this->getCurrentCommit();
     }
@@ -337,27 +389,13 @@ class Repository
      */
     public function removeFile($path, $commitMsg = null, $recursive = false, $force = false)
     {
-        $file   = $this->resolvePath($path);
-
-        $args   = array();
-        if ($recursive) {
-            $args[] = '-r';
-        }
-        if ($force) {
-            $args[] = '--force';
-        }
-        $args[]  = $file;
-
-        $result = $this->getBinary()->rm($this->getRepositoryPath(), $args);
-        self::throwIfError($result, sprintf('Cannot remove "%s" from "%s"',
-            $file, $this->getRepositoryPath()
-        ));
+        $this->remove(array($path), $recursive, $force);
 
         if ($commitMsg === null) {
             $commitMsg  = sprintf('%s deleted file "%s"', __CLASS__, $path);
         }
 
-        $this->commit($commitMsg, $file);
+        $this->commit($commitMsg, array($path));
 
         return $this->getCurrentCommit();
     }
