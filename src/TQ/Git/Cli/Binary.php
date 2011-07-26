@@ -72,14 +72,16 @@ class Binary
         $command    = escapeshellarg($command);
         $args       = array();
         $files      = array();
-        array_walk($arguments, function($v, $k) use(&$args, &$files, $handleArg) {
+        $fileMode   = false;
+        array_walk($arguments, function($v, $k) use(&$args, &$files, &$fileMode, $handleArg) {
             if ($v === '--' || $k === '--') {
+                $fileMode   = true;
                 return;
             }
             if (is_int($k)) {
                 if (strpos($v, '-') === 0) {
                     $args[]  = $handleArg($v, null);
-                } else if (strpos($v, '/') !== false) {
+                } else if ($fileMode || strpos($v, '/') === 0) {
                     $files[] = escapeshellarg($v);
                 } else {
                     $args[]  = escapeshellarg($v);
@@ -91,7 +93,7 @@ class Binary
             }
         });
 
-        $cmd    = sprintf('%s %s %s', $binary, $command, implode(' ', $args));
+        $cmd    = trim(sprintf('%s %s %s', $binary, $command, implode(' ', $args)));
         if (count($files) > 0) {
             $cmd    .= ' -- '.implode(' ', $files);
         }
