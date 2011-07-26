@@ -1,13 +1,11 @@
 <?php
-namespace TQ\Git;
-
-use TQ\Git\Cli;
+namespace TQ\Git\Cli;
 
 /**
- * @method  Cli\Call  status(string $path, mixed $args...)
- * @method  Cli\Call  init(string $path, mixed $args...)
- * @method  Cli\Call  add(string $path, mixed $args...)
- * @method  Cli\Call  commit(string $path, mixed $args...)
+ * @method  Call  status(string $path, mixed $args...)
+ * @method  Call  init(string $path, mixed $args...)
+ * @method  Call  add(string $path, mixed $args...)
+ * @method  Call  commit(string $path, mixed $args...)
  */
 class Binary
 {
@@ -24,7 +22,7 @@ class Binary
     public static function locateBinary()
     {
         if (PHP_OS != 'Windows') {
-            $result = Cli\Call::create('which git')->execute();
+            $result = Call::create('which git')->execute();
             return $result->getStdOut();
         }
         return '';
@@ -50,9 +48,9 @@ class Binary
      * @param   string  $path
      * @param   string  $command
      * @param   array   $arguments
-     * @return  Cli\Call
+     * @return  Call
      */
-    protected function createGitCall($path, $command, array $arguments)
+    public function createGitCall($path, $command, array $arguments)
     {
         $handleArg  = function($key, $value) {
             $key  = ltrim($key, '-');
@@ -98,7 +96,7 @@ class Binary
             $cmd    .= ' -- '.implode(' ', $files);
         }
 
-        $call   = Cli\Call::create($cmd, $path);
+        $call   = Call::create($cmd, $path);
         return $call;
     }
 
@@ -106,7 +104,7 @@ class Binary
      *
      * @param   string  $method
      * @param   array   $arguments
-     * @return  Cli\CallResult
+     * @return  CallResult
      */
     public function __call($method, array $arguments)
     {

@@ -1,7 +1,8 @@
 <?php
 namespace TQ\Tests\Git;
 
-use TQ\Git;
+use TQ\Git\Cli\Binary;
+use TQ\Git\Repository;
 use TQ\Tests\Helper;
 
 class RepositoryTest extends \PHPUnit_Framework_TestCase
@@ -50,25 +51,25 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
     /**
      *
-     * @return Git\Binary
+     * @return Binary
      */
     protected function getGit()
     {
-        return new Git\Binary(GIT_BINARY);
+        return new Binary(GIT_BINARY);
     }
 
     /**
      *
      * @param   string          $path
      * @paran   boolean|integer $create
-     * @return  Git\Repository
+     * @return  Repository
      */
     protected function getRepository($path, $create = false)
     {
         if ($create) {
-            return Git\Repository::create($path, $create, $this->getGit());
+            return Repository::create($path, $create, $this->getGit());
         } else {
-            return Git\Repository::open($path, $this->getGit());
+            return Repository::open($path, $this->getGit());
         }
     }
 

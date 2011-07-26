@@ -1,6 +1,7 @@
 <?php
 namespace TQ\Git;
 
+use TQ\Git\Cli\Binary;
 use TQ\Git\Cli\CallResult;
 use TQ\Git\Cli\CallException;
 
