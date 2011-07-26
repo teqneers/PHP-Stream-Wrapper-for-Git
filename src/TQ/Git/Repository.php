@@ -276,17 +276,21 @@ class Repository
      * @param   boolean $force
      * @return  string
      */
-    protected function add(array $file, $force = false)
+    protected function add(array $file = null, $force = false)
     {
         $args   = array();
         if ($force) {
             $args[]  = '--force';
         }
-        $args   = array_merge($args, $this->resolvePath($file));
+        if ($file !== null) {
+            $args   = array_merge($args, $this->resolvePath($file));
+        } else {
+            $args[] = '--all';
+        }
 
         $result = $this->getBinary()->add($this->getRepositoryPath(), $args);
         self::throwIfError($result, sprintf('Cannot add "%s" to "%s"',
-            implode(', ', $file), $this->getRepositoryPath()
+            ($file !== null) ? implode(', ', $file) : '*', $this->getRepositoryPath()
         ));
     }
 
