@@ -411,6 +411,46 @@ class Repository
 
     /**
      *
+     * @param   string  $file
+     * @param   string  $ref
+     */
+    public function showFile($file, $ref = 'HEAD')
+    {
+        $result = $this->getBinary()->show($this->getRepositoryPath(), array(
+            sprintf('%s:%s', $ref, $file)
+        ));
+        self::throwIfError($result, sprintf('Cannot lshow "%s" at "%s" from "%s"',
+            $file, $ref, $this->getRepositoryPath()
+        ));
+
+        return $result->getStdOut();
+    }
+
+    /**
+     *
+     * @param   string  $ref
+     * @param   string  $directory
+     * @return  string
+     */
+    public function listDirectory($ref = 'HEAD', $directory = '.')
+    {
+        $result = $this->getBinary()->{'ls-tree'}($this->getRepositoryPath(), array(
+            '-r',
+            '-t',
+            '--long',
+            '--full-tree',
+            $ref,
+            $this->resolvePath($directory)
+        ));
+        self::throwIfError($result, sprintf('Cannot list directory "%s" at "%s" from "%s"',
+            $directory, $ref, $this->getRepositoryPath()
+        ));
+
+        return $result->getStdOut();
+    }
+
+    /**
+     *
      * @param   CallResult  $result
      * @param   string      $message
      */
