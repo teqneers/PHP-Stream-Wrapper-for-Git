@@ -55,40 +55,50 @@ class Binary
     protected function createGitCall($path, $command, array $arguments)
     {
         $handleArg  = function($key, $value) {
-            if ($key == '--') {
-                return '--';
-            } else if (strpos($key, '-') === 0) {
-                $key  = ltrim($key, '-');
-                if (strlen($key) == 1) {
-                    $arg = sprintf('-%s', escapeshellarg($key));
-                    if ($value !== null) {
-                        $arg    .= ' '.escapeshellarg($value);
-                    }
-                } else {
-                    $arg = sprintf('--%s', escapeshellarg($key));
-                    if ($value !== null) {
-                        $arg    .= '='.escapeshellarg($value);
-                    }
+            $key  = ltrim($key, '-');
+            if (strlen($key) == 1) {
+                $arg = sprintf('-%s', escapeshellarg($key));
+                if ($value !== null) {
+                    $arg    .= ' '.escapeshellarg($value);
                 }
-                return $arg;
             } else {
-                return escapeshellarg($key);
+                $arg = sprintf('--%s', escapeshellarg($key));
+                if ($value !== null) {
+                    $arg    .= '='.escapeshellarg($value);
+                }
             }
+            return $arg;
         };
 
-        $cmd        = escapeshellcmd($this->path);
+        $binary     = escapeshellcmd($this->path);
         $command    = escapeshellarg($command);
         $args       = array();
-        array_walk($arguments, function($v, $k) use(&$args, $handleArg) {
+        $files      = array();
+        array_walk($arguments, function($v, $k) use(&$args, &$files, $handleArg) {
+            if ($v === '--' || $k === '--') {
+                return;
+            }
             if (is_int($k)) {
-                $args[] = $handleArg($v, null);
+                if (strpos($v, '-') === 0) {
+                    $args[]  = $handleArg($v, null);
+                } else if (strpos($v, '/') !== false) {
+                    $files[] = escapeshellarg($v);
+                } else {
+                    $args[]  = escapeshellarg($v);
+                }
             } else {
-                $args[] = $handleArg($k, $v);
+                if (strpos($k, '-') === 0) {
+                    $args[] = $handleArg($k, $v);
+                }
             }
         });
 
-        $call   = Cli\Call::create(sprintf('%s %s %s', $cmd, $command, implode(' ', $args)), $path);
+        $cmd    = sprintf('%s %s %s', $binary, $command, implode(' ', $args));
+        if (count($files) > 0) {
+            $cmd    .= ' -- '.implode(' ', $files);
+        }
 
+        $call   = Cli\Call::create($cmd, $path);
         return $call;
     }
 
