@@ -45,7 +45,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        //Helper::removeDirectory(TESTS_TMP_PATH);
+        Helper::removeDirectory(TESTS_TMP_PATH);
     }
 
     /**

@@ -30,7 +30,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
      */
     protected function tearDown()
     {
-        //Helper::removeDirectory(TESTS_TMP_PATH);
+        Helper::removeDirectory(TESTS_TMP_PATH);
     }
 
     /**
@@ -41,11 +41,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
      */
     protected function getRepository($path, $create = false)
     {
-        if ($create) {
-            return Repository::create($path, $create, new Binary(GIT_BINARY));
-        } else {
-            return Repository::open($path, new Binary(GIT_BINARY));
-        }
+        return Repository::open($path, new Binary(GIT_BINARY), $create);
     }
 
     /**
@@ -78,12 +74,10 @@ class SetupTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('TQ\Git\Repository', $c);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testRepositoryCreateOnExistingRepositoryPath()
     {
         $c  = $this->getRepository(TESTS_REPO_PATH_1, 0755);
+        $this->assertInstanceOf('TQ\Git\Repository', $c);
     }
 
     /**

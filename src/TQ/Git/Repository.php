@@ -40,20 +40,41 @@ class Repository
     /**
      *
      * @param   string          $repositoryPath
-     * @param   Binary|null  $binary
+     * @param   Binary|null     $binary
+     * @param   boolean|integer $createIfNotExists
      * @return  Repository
      */
-    public static function open($repositoryPath, Binary $binary = null)
+    public static function open($repositoryPath, Binary $binary = null, $createIfNotExists = false)
     {
-        $binary  = self::ensureBinary($binary);
+        if (!$binary) {
+            $binary  = new Binary();
+        }
 
-        if (   !is_string($repositoryPath)
-            || !file_exists($repositoryPath)
-            || !is_dir($repositoryPath))
-        {
+        if (!is_string($repositoryPath)) {
             throw new \InvalidArgumentException(sprintf(
                 '"%s" is not a valid path', $repositoryPath
             ));
+        }
+
+        if (   !$createIfNotExists
+            && (!file_exists($repositoryPath) || !is_dir($repositoryPath))
+        ) {
+            throw new \InvalidArgumentException(sprintf(
+                '"%s" is not a valid path', $repositoryPath
+            ));
+        }
+
+        if ($createIfNotExists) {
+            if (!file_exists($repositoryPath) && !mkdir($repositoryPath, $createIfNotExists, true)) {
+                throw new \RuntimeException(sprintf(
+                    '"%s" cannot be created', $repositoryPath
+                ));
+            } else if (!is_dir($repositoryPath)) {
+                throw new \InvalidArgumentException(sprintf(
+                    '"%s" is not a valid path', $repositoryPath
+                ));
+            }
+            self::initRepository($binary, $repositoryPath);
         }
 
         $repositoryRoot = self::findRepositoryRoot($repositoryPath);
@@ -64,51 +85,6 @@ class Repository
         }
 
         return new static($repositoryRoot, $binary);
-    }
-
-    /**
-     *
-     * @param   string          $repositoryPath
-     * @param   integer         $mode
-     * @param   Binary|null  $binary
-     * @return  Repository
-     */
-    public static function create($repositoryPath, $mode = 0755, Binary $binary = null)
-    {
-        $binary  = self::ensureBinary($binary);
-
-        if (!is_string($repositoryPath)) {
-            throw new \InvalidArgumentException(sprintf(
-                '"%s" is not a valid path', $repositoryPath
-            ));
-        }
-
-        if (!file_exists($repositoryPath) && !mkdir($repositoryPath, $mode, true)) {
-            throw new \RuntimeException(sprintf(
-                '"%s" does not exist and cannot be created', $repositoryPath
-            ));
-        } else if (self::findRepositoryRoot($repositoryPath) !== null) {
-            throw new \InvalidArgumentException(sprintf(
-                '"%s" is already a Git repository', $repositoryPath
-            ));
-        }
-
-        self::initRepository($binary, $repositoryPath);
-
-        return new static($repositoryPath, $binary);
-    }
-
-    /**
-     *
-     * @param   Binary $binary
-     * @return  Binary
-     */
-    protected static function ensureBinary(Binary $binary = null)
-    {
-        if (!$binary) {
-            $binary  = new Binary();
-        }
-        return $binary;
     }
 
     /**
