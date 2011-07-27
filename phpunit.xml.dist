@@ -11,6 +11,9 @@
          syntaxCheck="false"
          bootstrap="tests/bootstrap.php"
 >
+    <php>
+        <const name="GIT_BINARY" value="/usr/bin/git"/>
+    </php>
     <testsuites>
         <testsuite name="TEQneers Git Streamwrapper Test Suite">
             <directory>./tests/TQ/</directory>

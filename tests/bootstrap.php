@@ -7,10 +7,6 @@ if (file_exists($file = __DIR__.'/../autoload.php')) {
     require_once $file;
 }
 
-if (!defined('GIT_BINARY')) {
-    define('GIT_BINARY',        '/opt/local/bin/git');
-}
-
 define('PROJECT_PATH',      dirname(__DIR__));
 define('SOURCE_PATH',       PROJECT_PATH.'/src');
 define('TESTS_PATH',        __DIR__);
