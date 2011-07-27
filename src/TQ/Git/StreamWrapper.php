@@ -1,6 +1,9 @@
 <?php
 namespace TQ\Git;
 
+use TQ\Git\Cli\Binary;
+use TQ\Git\Repository;
+
 class StreamWrapper
 {
     /**
@@ -11,9 +14,21 @@ class StreamWrapper
 
     /**
      *
+     * @var string
+     */
+    protected static $protocol;
+
+    /**
+     *
      * @var resource
      */
     public $context;
+
+    /**
+     *
+     * @var array
+     */
+    protected $dirBuffer;
 
     /**
      *
@@ -37,6 +52,18 @@ class StreamWrapper
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
         }
+        self::$protocol = $protocol;
+    }
+
+    /**
+     *
+     */
+    public static function unregister()
+    {
+        if (!stream_wrapper_unregister(self::$protocol)) {
+            throw new \RuntimeException(sprintf('The protocol "%s" cannot be unregistered
+                from the runtime', self::$protocol));
+        }
     }
 
     /**
@@ -57,10 +84,33 @@ class StreamWrapper
 
     /**
      *
+     * @param   string   $path
+     * @return  Repository
+     */
+    protected function getRepository($path)
+    {
+        return Repository::open($path, $this->getBinary(), false);
+    }
+
+    /**
+     *
+     * @param   string  $streamUrl
+     * @return  string
+     */
+    protected function getPath($streamUrl)
+    {
+        $path   = ltrim(substr($streamUrl, strlen(self::$protocol) + 3), DIRECTORY_SEPARATOR.'/');
+        return DIRECTORY_SEPARATOR.$path;
+    }
+
+    /**
+     *
      * @return  boolean
      */
     public function dir_closedir()
     {
+        $this->dirBuffer    = null;
+        return true;
     }
 
     /**
@@ -71,14 +121,32 @@ class StreamWrapper
      */
     public function dir_opendir($path, $options)
     {
+        try {
+            $path       = $this->getPath($path);
+            $repo       = $this->getRepository($path);
+            $listing    = $repo->listDirectory($repo->resolveLocalPath($path), 'HEAD');
+            $this->dirBuffer    = array_map(function($f) {
+                return trim($f);
+            }, explode("\n", $listing));
+            reset($this->dirBuffer);
+            return true;
+        } catch (Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
     }
 
     /**
      *
-     * @return  string
+     * @return  string|false
      */
     public function dir_readdir()
     {
+        $file   = current($this->dirBuffer);
+        if ($file) {
+            next($this->dirBuffer);
+        }
+        return $file;
     }
 
     /**
@@ -87,6 +155,8 @@ class StreamWrapper
      */
     public function dir_rewinddir()
     {
+        reset($this->dirBuffer);
+        return true;
     }
 
     /**
