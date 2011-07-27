@@ -284,6 +284,7 @@ class Repository
             $args['--author']  = $author;
         }
         if ($file !== null) {
+            $args[] = '--';
             $args   = array_merge($args, $this->resolveLocalPath($file));
         }
 
@@ -303,6 +304,7 @@ class Repository
             $args[]  = '--force';
         }
         if ($file !== null) {
+            $args[] = '--';
             $args   = array_merge($args, $this->resolveLocalPath($file));
         } else {
             $args[] = '--all';
@@ -329,6 +331,7 @@ class Repository
         if ($force) {
             $args[] = '--force';
         }
+        $args[] = '--';
         $args   = array_merge($args, $this->resolveLocalPath($file));
 
         $result = $this->getBinary()->rm($this->getRepositoryPath(), $args);
@@ -499,11 +502,9 @@ class Repository
      */
     public function listDirectory($ref = 'HEAD', $directory = '.')
     {
-        $result = $this->getBinary()->{'ls-tree'}($this->getRepositoryPath(), array(
-            '-r',
-            '-t',
-            '--long',
-            '--full-tree',
+        $directory  = rtrim($directory, DIRECTORY_SEPARATOR.'/').DIRECTORY_SEPARATOR;
+        $result     = $this->getBinary()->{'ls-tree'}($this->getRepositoryPath(), array(
+            '--name-only',
             $ref,
             $this->resolveLocalPath($directory)
         ));

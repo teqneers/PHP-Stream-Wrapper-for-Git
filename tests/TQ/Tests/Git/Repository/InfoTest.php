@@ -87,7 +87,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('file_4.txt', $list);
         $this->assertNotContains('test.txt', $list);
 
-        $hash   = $c->writeFile('test.txt', 'Test');
+        $c->writeFile('test.txt', 'Test');
         $list   = $c->listDirectory();
         $this->assertContains('file_0.txt', $list);
         $this->assertContains('file_1.txt', $list);
@@ -120,6 +120,13 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('file_3.txt', $list);
         $this->assertContains('file_4.txt', $list);
         $this->assertContains('test.txt', $list);
+
+        $c->writeFile('directory/test.txt', 'Test');
+        $list   = $c->listDirectory('HEAD', 'directory/');
+        $this->assertContains('directory/test.txt', $list);
+
+        $list   = $c->listDirectory('HEAD', 'directory');
+        $this->assertContains('directory/test.txt', $list);
     }
 
     public function testShowFile()
