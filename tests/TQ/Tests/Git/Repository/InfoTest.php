@@ -105,7 +105,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('file_4.txt', $list);
         $this->assertNotContains('test.txt', $list);
 
-        $list   = $c->listDirectory('HEAD^^');
+        $list   = $c->listDirectory('.', 'HEAD^^');
         $this->assertContains('file_0.txt', $list);
         $this->assertContains('file_1.txt', $list);
         $this->assertContains('file_2.txt', $list);
@@ -113,7 +113,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('file_4.txt', $list);
         $this->assertNotContains('test.txt', $list);
 
-        $list   = $c->listDirectory('HEAD^');
+        $list   = $c->listDirectory('.', 'HEAD^');
         $this->assertContains('file_0.txt', $list);
         $this->assertContains('file_1.txt', $list);
         $this->assertContains('file_2.txt', $list);
@@ -122,11 +122,11 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('test.txt', $list);
 
         $c->writeFile('directory/test.txt', 'Test');
-        $list   = $c->listDirectory('HEAD', 'directory/');
-        $this->assertContains('directory/test.txt', $list);
+        $list   = $c->listDirectory('directory/', 'HEAD');
+        $this->assertContains('test.txt', $list);
 
-        $list   = $c->listDirectory('HEAD', 'directory');
-        $this->assertContains('directory/test.txt', $list);
+        $list   = $c->listDirectory('directory', 'HEAD');
+        $this->assertContains('test.txt', $list);
     }
 
     public function testShowFile()

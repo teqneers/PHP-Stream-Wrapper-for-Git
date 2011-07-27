@@ -500,13 +500,13 @@ class Repository
      * @param   string  $directory
      * @return  string
      */
-    public function listDirectory($ref = 'HEAD', $directory = '.')
+    public function listDirectory($directory = '.', $ref = 'HEAD')
     {
         $directory  = rtrim($directory, DIRECTORY_SEPARATOR.'/').DIRECTORY_SEPARATOR;
-        $result     = $this->getBinary()->{'ls-tree'}($this->getRepositoryPath(), array(
+        $path       = $this->getRepositoryPath().DIRECTORY_SEPARATOR.$this->resolveLocalPath($directory);
+        $result     = $this->getBinary()->{'ls-tree'}($path, array(
             '--name-only',
-            $ref,
-            $this->resolveLocalPath($directory)
+            $ref
         ));
         self::throwIfError($result, sprintf('Cannot list directory "%s" at "%s" from "%s"',
             $directory, $ref, $this->getRepositoryPath()
