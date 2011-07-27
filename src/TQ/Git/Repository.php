@@ -214,23 +214,44 @@ class Repository
 
     /**
      *
-     * @param   string|array  $localPath
+     * @param   string|array  $path
      * @return  string
      */
-    public function resolvePath($localPath)
+    public function resolveLocalPath($path)
     {
-        if (is_array($localPath)) {
+        if (is_array($path)) {
             $paths  = array();
-            foreach ($localPath as $f) {
-                $paths[]    = $this->resolvePath($f);
+            foreach ($path as $p) {
+                $paths[]    = $this->resolveLocalPath($p);
             }
             return $paths;
         } else {
-            if (strpos($localPath, $this->getRepositoryPath()) === 0) {
-                return $localPath;
+            if (strpos($path, $this->getRepositoryPath()) === 0) {
+                $path  = substr($path, strlen($this->getRepositoryPath()));
             }
-            $localPath  = ltrim($localPath, DIRECTORY_SEPARATOR.'/');
-            return $this->getRepositoryPath().'/'.$localPath;
+            return ltrim($path, DIRECTORY_SEPARATOR.'/');
+        }
+    }
+
+    /**
+     *
+     * @param   string|array  $path
+     * @return  string
+     */
+    public function resolveFullPath($path)
+    {
+        if (is_array($path)) {
+            $paths  = array();
+            foreach ($path as $p) {
+                $paths[]    = $this->resolveFullPath($p);
+            }
+            return $paths;
+        } else {
+            if (strpos($path, $this->getRepositoryPath()) === 0) {
+                return $path;
+            }
+            $path  = ltrim($path, DIRECTORY_SEPARATOR.'/');
+            return $this->getRepositoryPath().'/'.$path;
         }
     }
 
@@ -263,7 +284,7 @@ class Repository
             $args['--author']  = $author;
         }
         if ($file !== null) {
-            $args   = array_merge($args, $this->resolvePath($file));
+            $args   = array_merge($args, $this->resolveLocalPath($file));
         }
 
         $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
@@ -274,7 +295,6 @@ class Repository
      *
      * @param   array   $file
      * @param   boolean $force
-     * @return  string
      */
     protected function add(array $file = null, $force = false)
     {
@@ -283,7 +303,7 @@ class Repository
             $args[]  = '--force';
         }
         if ($file !== null) {
-            $args   = array_merge($args, $this->resolvePath($file));
+            $args   = array_merge($args, $this->resolveLocalPath($file));
         } else {
             $args[] = '--all';
         }
@@ -299,7 +319,6 @@ class Repository
      * @param   array   $file
      * @param   boolean $recursive
      * @param   boolean $force
-     * @return  string
      */
     protected function remove(array $file, $recursive = false, $force = false)
     {
@@ -310,11 +329,32 @@ class Repository
         if ($force) {
             $args[] = '--force';
         }
-        $args   = array_merge($args, $this->resolvePath($file));
+        $args   = array_merge($args, $this->resolveLocalPath($file));
 
         $result = $this->getBinary()->rm($this->getRepositoryPath(), $args);
         self::throwIfError($result, sprintf('Cannot remove "%s" from "%s"',
             implode(', ', $file), $this->getRepositoryPath()
+        ));
+    }
+
+    /**
+     *
+     * @param   string  $fromPath
+     * @param   string  $toPath
+     * @param   boolean $force
+     */
+    protected function move($fromPath, $toPath, $force = false)
+    {
+        $args   = array();
+        if ($force) {
+            $args[] = '--force';
+        }
+        $args[] = $this->resolveLocalPath($fromPath);
+        $args[] = $this->resolveLocalPath($toPath);
+
+        $result = $this->getBinary()->mv($this->getRepositoryPath(), $args);
+        self::throwIfError($result, sprintf('Cannot move "%s" to "%s" in "%s"',
+            $fromPath, $toPath, $this->getRepositoryPath()
         ));
     }
 
@@ -327,7 +367,7 @@ class Repository
      */
     public function writeFile($path, $data, $commitMsg = null)
     {
-        $file       = $this->resolvePath($path);
+        $file       = $this->resolveFullPath($path);
 
         $fileMode   = $this->getFileCreationMode();
         $dirMode    = $this->getDirectoryCreationMode();
@@ -376,6 +416,27 @@ class Repository
         }
 
         $this->commit($commitMsg, array($path));
+
+        return $this->getCurrentCommit();
+    }
+
+    /**
+     *
+     * @param   string          $fromPath
+     * @param   string          $toPath
+     * @param   string|null     $commitMsg
+     * @param   boolean         $force
+     * @return  string
+     */
+    public function renameFile($fromPath, $toPath, $commitMsg = null, $force = false)
+    {
+        $this->move($fromPath, $toPath, $force);
+
+        if ($commitMsg === null) {
+            $commitMsg  = sprintf('%s renamed/moved file "%s" to "%s"', __CLASS__, $fromPath, $toPath);
+        }
+
+        $this->commit($commitMsg, array($fromPath, $toPath));
 
         return $this->getCurrentCommit();
     }
@@ -444,7 +505,7 @@ class Repository
             '--long',
             '--full-tree',
             $ref,
-            $this->resolvePath($directory)
+            $this->resolveLocalPath($directory)
         ));
         self::throwIfError($result, sprintf('Cannot list directory "%s" at "%s" from "%s"',
             $directory, $ref, $this->getRepositoryPath()

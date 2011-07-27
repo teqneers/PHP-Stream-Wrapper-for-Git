@@ -65,6 +65,9 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
         $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
+
+        $commit = $c->showCommit($hash);
+        $this->assertContains('+++ b/test.txt', $commit);
     }
 
     public function testAddFileInSubdirectory()
@@ -75,6 +78,9 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFileExists(TESTS_REPO_PATH_1.'/directory/test.txt');
         $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/directory/test.txt'));
+
+        $commit = $c->showCommit($hash);
+        $this->assertContains('+++ b/directory/test.txt', $commit);
     }
 
     public function testAddMultipleFiles()
@@ -83,6 +89,8 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         for ($i = 0; $i < 5; $i++) {
             $hash   = $c->writeFile(sprintf('test_%s.txt', $i), $i);
             $this->assertEquals(40, strlen($hash));
+            $commit = $c->showCommit($hash);
+            $this->assertContains(sprintf('+++ b/test_%d.txt', $i), $commit);
         }
 
         for ($i = 0; $i < 5; $i++) {
@@ -98,6 +106,9 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(40, strlen($hash));
 
         $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+
+        $commit = $c->showCommit($hash);
+        $this->assertContains('--- a/file_0.txt', $commit);
     }
 
     public function testRemoveMultipleFiles()
@@ -106,10 +117,12 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         for ($i = 0; $i < 5; $i++) {
             $hash   = $c->removeFile(sprintf('file_%s.txt', $i), $i);
             $this->assertEquals(40, strlen($hash));
+            $commit = $c->showCommit($hash);
+            $this->assertContains(sprintf('--- a/file_%d.txt', $i), $commit);
         }
 
         for ($i = 0; $i < 5; $i++) {
-            $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%s.txt', $i));
+            $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
         }
     }
 
@@ -120,8 +133,29 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(40, strlen($hash));
 
         for ($i = 0; $i < 5; $i++) {
-            $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%s.txt', $i));
+            $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
         }
+
+        $commit = $c->showCommit($hash);
+        $this->assertContains('--- a/file_0.txt', $commit);
+        $this->assertContains('--- a/file_1.txt', $commit);
+        $this->assertContains('--- a/file_2.txt', $commit);
+        $this->assertContains('--- a/file_3.txt', $commit);
+        $this->assertContains('--- a/file_4.txt', $commit);
+    }
+
+    public function testMoveFile()
+    {
+        $c      = $this->getRepository();
+        $hash   = $c->renameFile('file_0.txt', 'test.txt');
+        $this->assertEquals(40, strlen($hash));
+
+        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
+
+        $commit = $c->showCommit($hash);
+        $this->assertContains('--- a/file_0.txt', $commit);
+        $this->assertContains('+++ b/test.txt', $commit);
     }
 }
 
