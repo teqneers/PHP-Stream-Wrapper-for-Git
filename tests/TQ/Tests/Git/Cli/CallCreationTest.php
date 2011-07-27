@@ -59,13 +59,13 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("/usr/bin/git 'command' 'option'", $call->getCmd());
     }
 
-    public function testFilePathArgumentDetection()
+    public function testFilePathAsArgument()
     {
         $binary = new Binary('/usr/bin/git');
         $call   = $binary->createGitCall('/', 'command', array(
             '/path/to/file'
         ));
-        $this->assertEquals("/usr/bin/git 'command' -- '/path/to/file'", $call->getCmd());
+        $this->assertEquals("/usr/bin/git 'command' '/path/to/file'", $call->getCmd());
     }
 
     public function testFileModeSwitch()
@@ -88,7 +88,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
             '--',
             'path/to/file'
         ));
-        $this->assertEquals("/usr/bin/git 'command' 'option' -- '/path/to/file' 'path/to/file'", $call->getCmd());
+        $this->assertEquals("/usr/bin/git 'command' 'option' '/path/to/file' -- 'path/to/file'", $call->getCmd());
     }
 }
 

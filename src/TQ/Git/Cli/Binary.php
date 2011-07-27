@@ -81,7 +81,7 @@ class Binary
             if (is_int($k)) {
                 if (strpos($v, '-') === 0) {
                     $args[]  = $handleArg($v, null);
-                } else if ($fileMode || strpos($v, '/') === 0) {
+                } else if ($fileMode) {
                     $files[] = escapeshellarg($v);
                 } else {
                     $args[]  = escapeshellarg($v);
