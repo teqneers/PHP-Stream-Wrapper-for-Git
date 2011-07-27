@@ -105,12 +105,7 @@ class Repository
      */
     public static function findRepositoryRoot($path)
     {
-        $found      = null;
-        $path       = realpath($path);
-        if (!$path) {
-            return $found;
-        }
-
+        $found  = null;
         $pathParts  = explode(DIRECTORY_SEPARATOR, $path);
         while (count($pathParts) > 0 && $found === null) {
             $path   = implode(DIRECTORY_SEPARATOR, $pathParts);
