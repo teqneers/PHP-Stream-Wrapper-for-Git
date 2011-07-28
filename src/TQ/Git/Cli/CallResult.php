@@ -42,7 +42,7 @@ class CallResult
 
     /**
      *
-     * @return string
+     * @return Call
      */
     public function cliCall()
     {
