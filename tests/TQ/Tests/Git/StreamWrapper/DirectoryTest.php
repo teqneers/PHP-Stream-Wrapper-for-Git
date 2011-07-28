@@ -66,6 +66,15 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         StreamWrapper::unregister();
     }
 
+    /**
+     *
+     * @return  Repository
+     */
+    protected function getRepository()
+    {
+        return Repository::open(TESTS_REPO_PATH_1, new Binary(GIT_BINARY));
+    }
+
     public function testListDirectory()
     {
         $dir    = opendir('git://'.TESTS_REPO_PATH_1);
@@ -92,6 +101,71 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         closedir($dir);
         $this->assertEquals(1, $i);
+    }
+
+    public function testListDirectoryWithRef()
+    {
+        $c  = $this->getRepository();
+        $firstCommit   = $c->writeFile('test_0.txt', 'Test 0');
+        $c->writeFile('test_1.txt', 'Test 1');
+
+        $dir    = opendir('git://'.TESTS_REPO_PATH_1);
+        $i      = 0;
+        while ($f = readdir($dir)) {
+            if ($i < 5) {
+                $this->assertEquals(sprintf('dir_%d', $i), $f);
+            } else if ($i < 10) {
+                $this->assertEquals(sprintf('file_%d.txt', $i % 5), $f);
+            } else {
+                $this->assertEquals(sprintf('test_%d.txt', $i % 10), $f);
+            }
+            $i++;
+        }
+        closedir($dir);
+        $this->assertEquals(12, $i);
+
+        $dir    = opendir('git://'.TESTS_REPO_PATH_1.'#HEAD^');
+        $i      = 0;
+        while ($f = readdir($dir)) {
+            if ($i < 5) {
+                $this->assertEquals(sprintf('dir_%d', $i), $f);
+            } else if ($i < 10) {
+                $this->assertEquals(sprintf('file_%d.txt', $i % 5), $f);
+            } else {
+                $this->assertEquals(sprintf('test_%d.txt', $i % 10), $f);
+            }
+            $i++;
+        }
+        closedir($dir);
+        $this->assertEquals(11, $i);
+
+        $dir    = opendir('git://'.TESTS_REPO_PATH_1.'#HEAD^^');
+        $i      = 0;
+        while ($f = readdir($dir)) {
+            if ($i < 5) {
+                $this->assertEquals(sprintf('dir_%d', $i), $f);
+            } else {
+                $this->assertEquals(sprintf('file_%d.txt', $i % 5), $f);
+            }
+            $i++;
+        }
+        closedir($dir);
+        $this->assertEquals(10, $i);
+
+        $dir    = opendir('git://'.TESTS_REPO_PATH_1.'#'.$firstCommit);
+        $i      = 0;
+        while ($f = readdir($dir)) {
+            if ($i < 5) {
+                $this->assertEquals(sprintf('dir_%d', $i), $f);
+            } else if ($i < 10) {
+                $this->assertEquals(sprintf('file_%d.txt', $i % 5), $f);
+            } else {
+                $this->assertEquals(sprintf('test_%d.txt', $i % 10), $f);
+            }
+            $i++;
+        }
+        closedir($dir);
+        $this->assertEquals(11, $i);
     }
 
 }

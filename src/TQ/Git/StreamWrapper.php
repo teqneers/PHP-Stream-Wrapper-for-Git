@@ -3,6 +3,7 @@ namespace TQ\Git;
 
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository;
+use TQ\Git\StreamWrapper\PathInformation;
 
 class StreamWrapper
 {
@@ -75,32 +76,14 @@ class StreamWrapper
 
     /**
      *
-     * @return  Binary
-     */
-    protected function getBinary()
-    {
-        return self::$binary;
-    }
-
-    /**
-     *
-     * @param   string   $path
-     * @return  Repository
-     */
-    protected function getRepository($path)
-    {
-        return Repository::open($path, $this->getBinary(), false);
-    }
-
-    /**
-     *
      * @param   string  $streamUrl
-     * @return  string
+     * @return  PathInformation
      */
     protected function getPath($streamUrl)
     {
         $path   = ltrim(substr($streamUrl, strlen(self::$protocol) + 3), DIRECTORY_SEPARATOR.'/');
-        return DIRECTORY_SEPARATOR.$path;
+        $url    = parse_url(self::$protocol.'://'.$path);
+        return new PathInformation(self::$binary, $url);
     }
 
     /**
@@ -122,9 +105,9 @@ class StreamWrapper
     public function dir_opendir($path, $options)
     {
         try {
-            $path       = $this->getPath($path);
-            $repo       = $this->getRepository($path);
-            $listing    = $repo->listDirectory($repo->resolveLocalPath($path), 'HEAD');
+            $path               = $this->getPath($path);
+            $repo               = $path->getRepository();
+            $listing            = $repo->listDirectory($path->getLocalPath(), $path->getRef());
             $this->dirBuffer    = array_map(function($f) {
                 return trim($f);
             }, explode("\n", $listing));
