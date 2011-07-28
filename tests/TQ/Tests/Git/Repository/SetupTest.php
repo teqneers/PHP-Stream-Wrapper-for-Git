@@ -2,7 +2,7 @@
 namespace TQ\Tests\Git\Repository;
 
 use TQ\Git\Cli\Binary;
-use TQ\Git\Repository;
+use TQ\Git\Repository\Repository;
 use TQ\Tests\Helper;
 
 class SetupTest extends \PHPUnit_Framework_TestCase
@@ -71,13 +71,13 @@ class SetupTest extends \PHPUnit_Framework_TestCase
     public function testRepositoryOpenOnRepositoryPath()
     {
         $c  = $this->getRepository(TESTS_REPO_PATH_1, false);
-        $this->assertInstanceOf('TQ\Git\Repository', $c);
+        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
     }
 
     public function testRepositoryCreateOnExistingRepositoryPath()
     {
         $c  = $this->getRepository(TESTS_REPO_PATH_1, 0755);
-        $this->assertInstanceOf('TQ\Git\Repository', $c);
+        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
     }
 
     /**
@@ -91,13 +91,13 @@ class SetupTest extends \PHPUnit_Framework_TestCase
     public function testRepositoryCreateOnExistingPath()
     {
         $c  = $this->getRepository(TESTS_REPO_PATH_2, 0755);
-        $this->assertInstanceOf('TQ\Git\Repository', $c);
+        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
     }
 
     public function testRepositoryCreateOnCreateablePath()
     {
         $c  = $this->getRepository(TESTS_REPO_PATH_3, 0755);
-        $this->assertInstanceOf('TQ\Git\Repository', $c);
+        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
     }
 }
 

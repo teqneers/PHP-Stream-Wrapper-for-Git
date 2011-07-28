@@ -2,7 +2,7 @@
 namespace TQ\Tests\Git\Repository;
 
 use TQ\Git\Cli\Binary;
-use TQ\Git\Repository;
+use TQ\Git\Repository\Repository;
 use TQ\Tests\Helper;
 
 class InfoTest extends \PHPUnit_Framework_TestCase
@@ -55,6 +55,32 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     protected function getRepository()
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(GIT_BINARY));
+    }
+
+    public function testGetCurrentBranch()
+    {
+        $c  = $this->getRepository();
+        $this->assertEquals('master', $c->getCurrentBranch());
+    }
+
+    public function testGetStatus()
+    {
+        $c  = $this->getRepository();
+        $this->assertFalse($c->isDirty());
+
+        $file   = TESTS_REPO_PATH_1.'/test.txt';
+        file_put_contents($file, 'Test');
+        $this->assertTrue($c->isDirty());
+        $status = $c->getStatus();
+        $this->assertEquals('?? test.txt', $status[0]);
+
+        $c->add(array('test.txt'));
+        $this->assertTrue($c->isDirty());
+        $status = $c->getStatus();
+        $this->assertEquals('A  test.txt', $status[0]);
+
+        $c->commit('Commt file', array('test.txt'));
+        $this->assertFalse($c->isDirty());
     }
 
     public function testShowLog()

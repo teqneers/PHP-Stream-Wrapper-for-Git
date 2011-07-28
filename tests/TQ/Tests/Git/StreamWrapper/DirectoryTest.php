@@ -2,8 +2,8 @@
 namespace TQ\Tests\Git\StreamWrapper;
 
 use TQ\Git\Cli\Binary;
-use TQ\Git\Repository;
-use TQ\Git\StreamWrapper;
+use TQ\Git\Repository\Repository;
+use TQ\Git\StreamWrapper\StreamWrapper;
 use TQ\Tests\Helper;
 
 class DirectoryTest extends \PHPUnit_Framework_TestCase

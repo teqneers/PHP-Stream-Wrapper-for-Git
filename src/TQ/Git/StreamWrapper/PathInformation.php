@@ -1,7 +1,7 @@
 <?php
 namespace TQ\Git\StreamWrapper;
 
-use TQ\Git\Repository;
+use TQ\Git\Repository\Repository;
 use TQ\Git\Cli\Binary;
 
 class PathInformation

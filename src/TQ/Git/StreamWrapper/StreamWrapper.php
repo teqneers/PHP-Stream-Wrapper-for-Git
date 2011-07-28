@@ -1,9 +1,8 @@
 <?php
-namespace TQ\Git;
+namespace TQ\Git\StreamWrapper;
 
 use TQ\Git\Cli\Binary;
-use TQ\Git\Repository;
-use TQ\Git\StreamWrapper\PathInformation;
+use TQ\Git\Repository\Repository;
 
 class StreamWrapper
 {
@@ -107,10 +106,7 @@ class StreamWrapper
         try {
             $path               = $this->getPath($path);
             $repo               = $path->getRepository();
-            $listing            = $repo->listDirectory($path->getLocalPath(), $path->getRef());
-            $this->dirBuffer    = array_map(function($f) {
-                return trim($f);
-            }, explode("\n", $listing));
+            $this->dirBuffer    = $repo->listDirectory($path->getLocalPath(), $path->getRef());
             reset($this->dirBuffer);
             return true;
         } catch (Exception $e) {

@@ -1,5 +1,5 @@
 <?php
-namespace TQ\Git;
+namespace TQ\Git\Repository;
 
 use TQ\Git\Cli\Binary;
 use TQ\Git\Cli\CallResult;
@@ -269,7 +269,7 @@ class Repository
      * @param   string       $commitMsg
      * @param   array|null   $file
      */
-    protected function commit($commitMsg, array $file = null)
+    public function commit($commitMsg, array $file = null)
     {
         $author = $this->getAuthor();
         $args   = array(
@@ -289,10 +289,25 @@ class Repository
 
     /**
      *
+     */
+    public function reset()
+    {
+        $result = $this->getBinary()->reset($this->getRepositoryPath(), array('--hard'));
+        self::throwIfError($result, sprintf('Cannot reset "%s"', $this->getRepositoryPath()));
+        $result = $this->getBinary()->clean($this->getRepositoryPath(), array(
+            '--force',
+            '-x',
+            '-d'
+        ));
+        self::throwIfError($result, sprintf('Cannot clean "%s"', $this->getRepositoryPath()));
+    }
+
+    /**
+     *
      * @param   array   $file
      * @param   boolean $force
      */
-    protected function add(array $file = null, $force = false)
+    public function add(array $file = null, $force = false)
     {
         $args   = array();
         if ($force) {
@@ -317,7 +332,7 @@ class Repository
      * @param   boolean $recursive
      * @param   boolean $force
      */
-    protected function remove(array $file, $recursive = false, $force = false)
+    public function remove(array $file, $recursive = false, $force = false)
     {
         $args   = array();
         if ($recursive) {
@@ -341,7 +356,7 @@ class Repository
      * @param   string  $toPath
      * @param   boolean $force
      */
-    protected function move($fromPath, $toPath, $force = false)
+    public function move($fromPath, $toPath, $force = false)
     {
         $args   = array();
         if ($force) {
@@ -482,7 +497,7 @@ class Repository
         $result = $this->getBinary()->show($this->getRepositoryPath(), array(
             sprintf('%s:%s', $ref, $file)
         ));
-        self::throwIfError($result, sprintf('Cannot lshow "%s" at "%s" from "%s"',
+        self::throwIfError($result, sprintf('Cannot show "%s" at "%s" from "%s"',
             $file, $ref, $this->getRepositoryPath()
         ));
 
@@ -491,9 +506,9 @@ class Repository
 
     /**
      *
-     * @param   string  $ref
      * @param   string  $directory
-     * @return  string
+     * @param   string  $ref
+     * @return  array
      */
     public function listDirectory($directory = '.', $ref = 'HEAD')
     {
@@ -501,13 +516,101 @@ class Repository
         $path       = $this->getRepositoryPath().DIRECTORY_SEPARATOR.$this->resolveLocalPath($directory);
         $result     = $this->getBinary()->{'ls-tree'}($path, array(
             '--name-only',
+            '-z',
             $ref
         ));
         self::throwIfError($result, sprintf('Cannot list directory "%s" at "%s" from "%s"',
             $directory, $ref, $this->getRepositoryPath()
         ));
 
+        $output     = $result->getStdOut();
+        $listing    = array_map(function($f) {
+            return trim($f);
+        }, explode("\x0", $output));
+        return $listing;
+    }
+
+    /**
+     *
+     * @return  array
+     */
+    public function getStatus()
+    {
+        $result = $this->getBinary()->status($this->getRepositoryPath(), array(
+            '--short',
+            '-z'
+        ));
+        self::throwIfError($result,
+            sprintf('Cannot retrieve status from "%s"', $this->getRepositoryPath())
+        );
+
+        $output = trim($result->getStdOut());
+        if (empty($output)) {
+            return array();
+        }
+
+        $status = array_map(function($f) {
+            return trim($f);
+        }, explode("\x0", $output));
+        return $status;
+    }
+
+    /**
+     *
+     * @return  boolean
+     */
+    public function isDirty()
+    {
+        $status = $this->getStatus();
+        return !empty($status);
+    }
+
+    /**
+     *
+     * @return  string
+     */
+    public function getCurrentBranch()
+    {
+        $result = $this->getBinary()->{'name-rev'}($this->getRepositoryPath(), array(
+            '--name-only',
+            'HEAD'
+        ));
+        self::throwIfError($result,
+            sprintf('Cannot retrieve current branch from "%s"', $this->getRepositoryPath())
+        );
+
         return $result->getStdOut();
+    }
+
+    /**
+     *
+     * @param   \Closure   $function
+     * @return  Transaction
+     */
+    public function transactional(\Closure $function)
+    {
+        try {
+            $transaction    = new Transaction($this);
+            $result         = $function($transaction);
+            $this->add(null);
+
+            $commitMsg  = $transaction->getCommitMsg();
+            if (empty($commitMsg)) {
+                $commitMsg  = sprintf(
+                    '%s did a transactional commit in "%s"',
+                    __CLASS__,
+                    $this->getRepositoryPath()
+                );
+            }
+            $this->commit($commitMsg, null);
+            $commitHash  = $this->getCurrentCommit();
+            $transaction->setCommitHash($commitHash);
+            $transaction->setResult($result);
+            return $transaction;
+        } catch (\Exception $e) {
+            $this->reset();
+            throw $e;
+        }
     }
 
     /**
