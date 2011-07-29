@@ -93,13 +93,16 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($c->isDirty());
     }
 
-    public function testShowLog()
+    public function testGetLog()
     {
-        $c  = $this->getRepository();
-        $this->assertContains('Initial commit', $c->showLog());
+        $c      = $this->getRepository();
+        $log    = $c->getLog();
+        $this->assertContains('Initial commit', $log[0]);
 
         $hash   = $c->writeFile('/directory/test.txt', 'Test');
-        $this->assertContains($hash, $c->showLog());
+        $log    = $c->getLog();
+        $this->assertContains($hash, $log[0]);
+        $this->assertContains('Initial commit', $log[1]);
     }
 
     public function testShowCommit()

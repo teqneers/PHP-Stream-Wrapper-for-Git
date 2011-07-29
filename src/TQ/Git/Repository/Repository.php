@@ -469,16 +469,23 @@ class Repository
      *
      * @return  string
      */
-    public function showLog()
+    public function getLog()
     {
         $result = $this->getBinary()->log($this->getRepositoryPath(), array(
             '--format'   => 'fuller',
-            '--graph'
+            '--summary',
+            '-z'
         ));
         self::throwIfError($result, sprintf('Cannot retrieve log from "%s"',
             $this->getRepositoryPath()
         ));
-        return $result->getStdOut();
+
+        $output     = $result->getStdOut();
+        $log        = array_map(function($f) {
+            return trim($f);
+        }, explode("\x0", $output));
+
+        return $log;
     }
 
     /**
