@@ -561,7 +561,18 @@ class Repository
         }
 
         $status = array_map(function($f) {
-            return trim($f);
+            $line   = trim($f);
+
+            $parts  = array();
+            preg_match('/^(?<x>.)(?<y>.)\s(?<f>.+)(?:\s->\s(?<f2>.+))?$/', $line, $parts);
+
+            $status = array(
+                'file'      => $parts['f'],
+                'x'         => trim($parts['x']),
+                'y'         => trim($parts['y']),
+                'renamed'   => (array_key_exists('f2', $parts)) ? $parts['f2'] : null
+            );
+            return $status;
         }, explode("\x0", $output));
         return $status;
     }

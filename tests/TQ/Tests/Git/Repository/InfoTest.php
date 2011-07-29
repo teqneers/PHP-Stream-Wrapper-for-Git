@@ -72,12 +72,22 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         file_put_contents($file, 'Test');
         $this->assertTrue($c->isDirty());
         $status = $c->getStatus();
-        $this->assertEquals('?? test.txt', $status[0]);
+        $this->assertEquals(array(
+            'file'      => 'test.txt',
+            'x'         => '?',
+            'y'         => '?',
+            'renamed'   => null
+        ), $status[0]);
 
         $c->add(array('test.txt'));
         $this->assertTrue($c->isDirty());
         $status = $c->getStatus();
-        $this->assertEquals('A  test.txt', $status[0]);
+        $this->assertEquals(array(
+            'file'      => 'test.txt',
+            'x'         => 'A',
+            'y'         => '',
+            'renamed'   => null
+        ), $status[0]);
 
         $c->commit('Commt file', array('test.txt'));
         $this->assertFalse($c->isDirty());
