@@ -496,6 +496,7 @@ class Repository
     public function showCommit($hash)
     {
         $result = $this->getBinary()->show($this->getRepositoryPath(), array(
+            '--format' => 'fuller',
             $hash
         ));
         self::throwIfError($result, sprintf('Cannot retrieve commit "%s" from "%s"',
