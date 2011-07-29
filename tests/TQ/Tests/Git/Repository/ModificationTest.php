@@ -167,7 +167,6 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $file   = TESTS_REPO_PATH_1.'/test.txt';
         file_put_contents($file, 'Test');
         $this->assertTrue($c->isDirty());
-
         $c->reset();
         $this->assertFalse($c->isDirty());
         $this->assertFileNotExists($file);
@@ -175,6 +174,22 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         file_put_contents($file, 'Test');
         $c->add(array('test.txt'));
         $c->reset();
+        $this->assertFalse($c->isDirty());
+        $this->assertFileNotExists($file);
+
+        file_put_contents($file, 'Test');
+        $this->assertTrue($c->isDirty());
+        $c->reset(Repository::RESET_WORKING);
+        $this->assertFalse($c->isDirty());
+        $this->assertFileNotExists($file);
+
+        file_put_contents($file, 'Test');
+        $c->add(array('test.txt'));
+        $this->assertTrue($c->isDirty());
+        $c->reset(Repository::RESET_WORKING);
+        $this->assertTrue($c->isDirty());
+        $this->assertFileExists($file);
+        $c->reset(Repository::RESET_STAGED);
         $this->assertFalse($c->isDirty());
         $this->assertFileNotExists($file);
     }

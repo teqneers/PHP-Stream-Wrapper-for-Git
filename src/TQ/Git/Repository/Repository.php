@@ -7,6 +7,10 @@ use TQ\Git\Cli\CallException;
 
 class Repository
 {
+    const RESET_STAGED  = 1;
+    const RESET_WORKING = 2;
+    const RESET_ALL     = 3;
+
     /**
      *
      * @var Binary
@@ -289,17 +293,24 @@ class Repository
 
     /**
      *
+     * @param   integer     $what
      */
-    public function reset()
+    public function reset($what = self::RESET_ALL)
     {
-        $result = $this->getBinary()->reset($this->getRepositoryPath(), array('--hard'));
-        self::throwIfError($result, sprintf('Cannot reset "%s"', $this->getRepositoryPath()));
-        $result = $this->getBinary()->clean($this->getRepositoryPath(), array(
-            '--force',
-            '-x',
-            '-d'
-        ));
-        self::throwIfError($result, sprintf('Cannot clean "%s"', $this->getRepositoryPath()));
+        $what   = (int)$what;
+        if (($what & self::RESET_STAGED) == self::RESET_STAGED) {
+            $result = $this->getBinary()->reset($this->getRepositoryPath(), array('--hard'));
+            self::throwIfError($result, sprintf('Cannot reset "%s"', $this->getRepositoryPath()));
+        }
+
+        if (($what & self::RESET_WORKING) == self::RESET_WORKING) {
+            $result = $this->getBinary()->clean($this->getRepositoryPath(), array(
+                '--force',
+                '-x',
+                '-d'
+            ));
+            self::throwIfError($result, sprintf('Cannot clean "%s"', $this->getRepositoryPath()));
+        }
     }
 
     /**
