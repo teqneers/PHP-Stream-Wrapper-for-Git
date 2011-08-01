@@ -251,5 +251,35 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
             $this->assertFalse($c->isDirty());
         }
     }
+
+    public function testTransactionalChangesRenameAndDelete()
+    {
+        $c  = $this->getRepository();
+
+        $result = $c->transactional(function(Transaction $t) {
+            unlink($t->resolvePath('file_0.txt'));
+            rename($t->resolvePath('file_1.txt'), $t->resolvePath('test.txt'));
+            $t->setCommitMsg('Hello World');
+            return 'This is the return value';
+        });
+
+        $this->assertEquals('This is the return value', $result->getResult());
+
+        $this->assertFalse($c->isDirty());
+
+        $list   = $c->listDirectory();
+        $this->assertNotContains('file_0.txt', $list);
+        $this->assertNotContains('file_1.txt', $list);
+        $this->assertContains('test.txt', $list);
+        $this->assertContains('file_2.txt', $list);
+        $this->assertContains('file_3.txt', $list);
+        $this->assertContains('file_4.txt', $list);
+
+        $commit = $c->showCommit($result->getCommitHash());
+        $this->assertContains($result->getCommitMsg(), $commit);
+        $this->assertContains('--- a/file_0.txt', $commit);
+        $this->assertContains('--- a/file_1.txt', $commit);
+        $this->assertContains('+++ b/test.txt', $commit);
+    }
 }
 
