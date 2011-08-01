@@ -56,6 +56,16 @@ class Transaction
 
     /**
      *
+     * @param   string  $path
+     * @return  string
+     */
+    public function resolvePath($path)
+    {
+        return $this->getRepository()->resolveFullPath($path);
+    }
+
+    /**
+     *
      * @return  string|null
      */
     public function getCommitMsg()
