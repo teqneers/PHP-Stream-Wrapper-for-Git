@@ -231,6 +231,17 @@ class StreamWrapper
      */
     public function stream_open($path, $mode, $options, &$opened_path)
     {
+        try {
+            $path               = $this->getPath($path);
+            $repo               = $path->getRepository();
+
+            //print_r(func_get_args());
+
+            return true;
+        } catch (Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
     }
 
     /**
