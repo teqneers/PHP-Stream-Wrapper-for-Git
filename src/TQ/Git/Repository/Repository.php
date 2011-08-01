@@ -60,6 +60,10 @@ class Repository
             ));
         }
 
+        if (file_exists($repositoryPath) && is_file($repositoryPath)) {
+            $repositoryPath = dirname($repositoryPath);
+        }
+
         if (   !$createIfNotExists
             && (!file_exists($repositoryPath) || !is_dir($repositoryPath))
         ) {

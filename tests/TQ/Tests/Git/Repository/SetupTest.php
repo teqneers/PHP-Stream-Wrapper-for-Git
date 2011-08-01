@@ -52,12 +52,11 @@ class SetupTest extends \PHPUnit_Framework_TestCase
         $c  = $this->getRepository('/does/not/exist', false);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testRepositoryOpenOnFile()
     {
         $c  = $this->getRepository(__FILE__, false);
+        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
+        $this->assertEquals(__DIR__, $c->getRepositoryPath());
     }
 
     /**
@@ -80,12 +79,11 @@ class SetupTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testRepositoryCreateOnFile()
     {
         $c  = $this->getRepository(__FILE__, 0755);
+        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
+        $this->assertEquals(__DIR__, $c->getRepositoryPath());
     }
 
     public function testRepositoryCreateOnExistingPath()
