@@ -556,23 +556,21 @@ class Repository
     public function getStatus()
     {
         $result = $this->getBinary()->status($this->getRepositoryPath(), array(
-            '--short',
-            '-z'
+            '--short'
         ));
         self::throwIfError($result,
             sprintf('Cannot retrieve status from "%s"', $this->getRepositoryPath())
         );
 
-        $output = trim($result->getStdOut());
+        $output = rtrim($result->getStdOut());
         if (empty($output)) {
             return array();
         }
 
         $status = array_map(function($f) {
-            $line   = trim($f);
-
+            $line   = rtrim($f);
             $parts  = array();
-            preg_match('/^(?<x>.)(?<y>.)\s(?<f>.+)(?:\s->\s(?<f2>.+))?$/', $line, $parts);
+            preg_match('/^(?<x>.)(?<y>.)\s(?<f>.+?)(?:\s->\s(?<f2>.+))?$/', $line, $parts);
 
             $status = array(
                 'file'      => $parts['f'],
@@ -581,7 +579,7 @@ class Repository
                 'renamed'   => (array_key_exists('f2', $parts)) ? $parts['f2'] : null
             );
             return $status;
-        }, explode("\x0", $output));
+        }, explode("\n", $output));
         return $status;
     }
 
