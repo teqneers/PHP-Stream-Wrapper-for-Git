@@ -32,6 +32,24 @@ class StreamWrapper
 
     /**
      *
+     * @var string
+     */
+    protected $fileBuffer;
+
+    /**
+     *
+     * @var integer
+     */
+    protected $fileBufferPos;
+
+    /**
+     *
+     * @var integer
+     */
+    protected $fileBufferLength;
+
+    /**
+     *
      * @param   string              $protocol
      * @param   Binary|string    $binary
      */
@@ -174,15 +192,19 @@ class StreamWrapper
      * @param   integer  $cast_as
      * @return  resource
      */
+/*
     public function stream_cast($cast_as)
     {
     }
+*/
 
     /**
      *
      */
     public function stream_close()
     {
+        $this->fileBuffer       = null;
+        $this->fileBufferPos    = 0;
     }
 
     /**
@@ -191,24 +213,29 @@ class StreamWrapper
      */
     public function stream_eof()
     {
+        return ($this->fileBufferPos >= $this->fileBufferLength);
     }
 
     /**
      *
      * @return  boolean
      */
+/*
     public function stream_flush()
     {
     }
+*/
 
     /**
      *
      * @param   integer  $operation
      * @return  boolean
      */
+/*
     public function stream_lock($operation)
     {
     }
+*/
 
     /**
      *
@@ -217,9 +244,11 @@ class StreamWrapper
      * @param   integer  $var
      * @return  boolean
      */
+/*
     public function stream_metadata($path, $option, $var)
     {
     }
+*/
 
     /**
      *
@@ -232,11 +261,11 @@ class StreamWrapper
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         try {
-            $path               = $this->getPath($path);
-            $repo               = $path->getRepository();
-
-            //print_r(func_get_args());
-
+            $path                   = $this->getPath($path);
+            $repo                   = $path->getRepository();
+            $this->fileBuffer       = $repo->showFile($path->getLocalPath(), $path->getRef());
+            $this->fileBufferPos    = 0;
+            $this->fileBufferLength = strlen($this->fileBuffer);
             return true;
         } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -251,6 +280,12 @@ class StreamWrapper
      */
     public function stream_read($count)
     {
+        if ($this->fileBufferPos >= $this->fileBufferLength) {
+            return false;
+        }
+        $buffer                 = substr($this->fileBuffer, $this->fileBufferPos, $count);
+        $this->fileBufferPos    += $count;
+        return $buffer;
     }
 
     /**
@@ -261,6 +296,28 @@ class StreamWrapper
      */
     public function stream_seek($offset, $whence = SEEK_SET)
     {
+        switch ($whence) {
+            case SEEK_SET:
+                $this->fileBufferPos    = $offset;
+                break;
+            case SEEK_CUR:
+                $this->fileBufferPos    += $offset;
+                break;
+            case SEEK_END:
+                $this->fileBufferPos    = $this->fileBufferLength + $offset;
+                break;
+            default:
+                return false;
+        }
+        if ($this->fileBufferPos >= $this->fileBufferLength) {
+            $this->fileBufferPos    = 0;
+            return false;
+        } else if ($this->fileBufferPos > $this->fileBufferLength) {
+            $this->fileBufferPos    = $this->fileBufferLength;
+            return false;
+        } else {
+            return true;
+        }
     }
 
     /**
@@ -270,9 +327,11 @@ class StreamWrapper
      * @param   integer  $arg2
      * @return  boolean
      */
+/*
     public function stream_set_option($option, $arg1, $arg2)
     {
     }
+*/
 
     /**
      *
@@ -288,6 +347,7 @@ class StreamWrapper
      */
     public function stream_tell()
     {
+        return $this->fileBufferPos;
     }
 
     /**
@@ -314,8 +374,10 @@ class StreamWrapper
      * @param   integer $flags
      * @return  array
      */
+/*
     public function url_stat($path, $flags)
     {
     }
+*/
 }
 
