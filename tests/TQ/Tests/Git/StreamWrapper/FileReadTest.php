@@ -95,6 +95,7 @@ class FileReadTest extends \PHPUnit_Framework_TestCase
 
         fseek($file, -1, SEEK_END);
         $this->assertEquals('0', fgetc($file));
+        $this->assertEquals(6, ftell($file));
         $this->assertTrue(feof($file));
 
         fseek($file, 0, SEEK_SET);
