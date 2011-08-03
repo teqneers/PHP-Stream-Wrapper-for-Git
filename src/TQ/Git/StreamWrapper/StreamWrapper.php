@@ -246,10 +246,22 @@ class StreamWrapper
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         try {
-            $path               = $this->getPath($path);
-            $repo               = $path->getRepository();
+            $path   = $this->getPath($path);
+            $repo   = $path->getRepository();
 
-            $buffer             = $repo->showFile($path->getLocalPath(), $path->getRef());
+            if ($path->hasArgument('ref')) {
+                $buffer = $repo->showCommit($path->getArgument('ref'));
+            } else if ($path->hasArgument('log')) {
+                $buffer = implode(
+                    str_repeat(PHP_EOL, 3),
+                    $repo->getLog(
+                        $path->getArgument('limit'),
+                        $path->getArgument('skip')
+                    )
+                );
+            } else {
+                $buffer = $repo->showFile($path->getLocalPath(), $path->getRef());
+            }
             $this->fileBuffer   = new FileBuffer($buffer);
             return true;
         } catch (Exception $e) {
