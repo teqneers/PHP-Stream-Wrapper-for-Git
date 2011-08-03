@@ -34,6 +34,15 @@ class FileBuffer
 
     /**
      *
+     * @return  string
+     */
+    public function getBuffer()
+    {
+        return $this->buffer;
+    }
+
+    /**
+     *
      * @return  boolean
      */
     public function isEof()
@@ -54,6 +63,20 @@ class FileBuffer
         $buffer         = substr($this->buffer, $this->position, $count);
         $this->position += $count;
         return $buffer;
+    }
+
+    /**
+     *
+     * @param   string  $data
+     * @return  integer
+     */
+    public function write($data)
+    {
+        $dataLength     = strlen($data);
+        $start          = substr($this->buffer, 0, $this->position);
+        $end            = substr($this->buffer, $this->position + $dataLength);
+        $this->buffer   = $start.$data.$end;
+        return $dataLength;
     }
 
     /**
