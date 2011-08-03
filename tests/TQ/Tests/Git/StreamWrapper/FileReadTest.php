@@ -159,5 +159,43 @@ class FileReadTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test 1', file_get_contents($file.'#HEAD^^'));
         $this->assertEquals('Test 1', file_get_contents($file.'#'.$commit1));
     }
+
+    public function testGetContentsOfDirectory()
+    {
+        $c      = $this->getRepository();
+
+        $dir    = sprintf('git://%s', TESTS_REPO_PATH_1);
+        $this->assertEquals("tree HEAD:
+
+file_0.txt
+file_1.txt
+file_2.txt
+file_3.txt
+file_4.txt", file_get_contents($dir));
+
+        $c->removeFile('file_0.txt');
+        $c->renameFile('file_1.txt', 'file_x.txt');
+        $this->assertEquals("tree HEAD:
+
+file_2.txt
+file_3.txt
+file_4.txt
+file_x.txt", file_get_contents($dir));
+
+        $this->assertEquals("tree HEAD^:
+
+file_1.txt
+file_2.txt
+file_3.txt
+file_4.txt", file_get_contents($dir.'#HEAD^'));
+
+        $this->assertEquals("tree HEAD^^:
+
+file_0.txt
+file_1.txt
+file_2.txt
+file_3.txt
+file_4.txt", file_get_contents($dir.'#HEAD^^'));
+    }
 }
 
