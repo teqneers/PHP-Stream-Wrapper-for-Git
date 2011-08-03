@@ -97,12 +97,22 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     {
         $c      = $this->getRepository();
         $log    = $c->getLog();
+        $this->assertEquals(1, count($log));
         $this->assertContains('Initial commit', $log[0]);
 
         $hash   = $c->writeFile('/directory/test.txt', 'Test');
         $log    = $c->getLog();
+        $this->assertEquals(2, count($log));
         $this->assertContains($hash, $log[0]);
         $this->assertContains('Initial commit', $log[1]);
+
+        $log    = $c->getLog(1);
+        $this->assertEquals(1, count($log));
+        $this->assertContains($hash, $log[0]);
+
+        $log    = $c->getLog(1, 1);
+        $this->assertEquals(1, count($log));
+        $this->assertContains('Initial commit', $log[0]);
     }
 
     public function testShowCommit()

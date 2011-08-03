@@ -471,15 +471,26 @@ class Repository
 
     /**
      *
+     * @param   integer|null    $limit
+     * @param   integer|null    $skip
      * @return  string
      */
-    public function getLog()
+    public function getLog($limit = null, $skip = null)
     {
-        $result = $this->getBinary()->log($this->getRepositoryPath(), array(
+        $arguments  = array(
             '--format'   => 'fuller',
             '--summary',
             '-z'
-        ));
+        );
+
+        if ($limit !== null) {
+            $arguments[]    = sprintf('-%d', $limit);
+        }
+        if ($skip !== null) {
+            $arguments['--skip']    = (int)$skip;
+        }
+
+        $result = $this->getBinary()->log($this->getRepositoryPath(), $arguments);
         self::throwIfError($result, sprintf('Cannot retrieve log from "%s"',
             $this->getRepositoryPath()
         ));
@@ -523,6 +534,7 @@ class Repository
         self::throwIfError($result, sprintf('Cannot show "%s" at "%s" from "%s"',
             $file, $ref, $this->getRepositoryPath()
         ));
+
 
         return $result->getStdOut();
     }
