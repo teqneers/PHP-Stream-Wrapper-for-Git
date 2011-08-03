@@ -95,5 +95,14 @@ class FileBufferTest extends \PHPUnit_Framework_TestCase
         $actual     = $buffer->getBuffer();
         $this->assertEquals($expected, $actual);
     }
+
+    public function testWriteInEmptyBuffer()
+    {
+        $buffer     = new FileBuffer('');
+        $expected   = '1234567890';
+        $buffer->write('1234567890');
+        $actual     = $buffer->getBuffer();
+        $this->assertEquals($expected, $actual);
+    }
 }
 
