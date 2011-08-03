@@ -26,27 +26,15 @@ class StreamWrapper
 
     /**
      *
-     * @var array
+     * @var DirectoryBuffer
      */
     protected $dirBuffer;
 
     /**
      *
-     * @var string
+     * @var FileReadBuffer
      */
     protected $fileBuffer;
-
-    /**
-     *
-     * @var integer
-     */
-    protected $fileBufferPos;
-
-    /**
-     *
-     * @var integer
-     */
-    protected $fileBufferLength;
 
     /**
      *
@@ -124,8 +112,8 @@ class StreamWrapper
         try {
             $path               = $this->getPath($path);
             $repo               = $path->getRepository();
-            $this->dirBuffer    = $repo->listDirectory($path->getLocalPath(), $path->getRef());
-            reset($this->dirBuffer);
+            $listing            = $repo->listDirectory($path->getLocalPath(), $path->getRef());
+            $this->dirBuffer    = new DirectoryBuffer($listing);
             return true;
         } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -139,10 +127,8 @@ class StreamWrapper
      */
     public function dir_readdir()
     {
-        $file   = current($this->dirBuffer);
-        if ($file) {
-            next($this->dirBuffer);
-        }
+        $file   = $this->dirBuffer->current();
+        $this->dirBuffer->next();
         return $file;
     }
 
@@ -152,7 +138,7 @@ class StreamWrapper
      */
     public function dir_rewinddir()
     {
-        reset($this->dirBuffer);
+        $this->dirBuffer->rewind();
         return true;
     }
 
@@ -203,8 +189,7 @@ class StreamWrapper
      */
     public function stream_close()
     {
-        $this->fileBuffer       = null;
-        $this->fileBufferPos    = 0;
+        $this->fileBuffer   = null;
     }
 
     /**
@@ -213,7 +198,7 @@ class StreamWrapper
      */
     public function stream_eof()
     {
-        return ($this->fileBufferPos >= $this->fileBufferLength);
+        return $this->fileBuffer->isEof();
     }
 
     /**
@@ -261,11 +246,11 @@ class StreamWrapper
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         try {
-            $path                   = $this->getPath($path);
-            $repo                   = $path->getRepository();
-            $this->fileBuffer       = $repo->showFile($path->getLocalPath(), $path->getRef());
-            $this->fileBufferPos    = 0;
-            $this->fileBufferLength = strlen($this->fileBuffer);
+            $path               = $this->getPath($path);
+            $repo               = $path->getRepository();
+
+            $buffer             = $repo->showFile($path->getLocalPath(), $path->getRef());
+            $this->fileBuffer   = new FileReadBuffer($buffer);
             return true;
         } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -280,11 +265,10 @@ class StreamWrapper
      */
     public function stream_read($count)
     {
-        if ($this->fileBufferPos >= $this->fileBufferLength) {
+        $buffer = $this->fileBuffer->read($count);
+        if ($buffer === null) {
             return false;
         }
-        $buffer                 = substr($this->fileBuffer, $this->fileBufferPos, $count);
-        $this->fileBufferPos    += $count;
         return $buffer;
     }
 
@@ -296,28 +280,7 @@ class StreamWrapper
      */
     public function stream_seek($offset, $whence = SEEK_SET)
     {
-        switch ($whence) {
-            case SEEK_SET:
-                $this->fileBufferPos    = $offset;
-                break;
-            case SEEK_CUR:
-                $this->fileBufferPos    += $offset;
-                break;
-            case SEEK_END:
-                $this->fileBufferPos    = $this->fileBufferLength + $offset;
-                break;
-            default:
-                return false;
-        }
-        if ($this->fileBufferPos >= $this->fileBufferLength) {
-            $this->fileBufferPos    = 0;
-            return false;
-        } else if ($this->fileBufferPos > $this->fileBufferLength) {
-            $this->fileBufferPos    = $this->fileBufferLength;
-            return false;
-        } else {
-            return true;
-        }
+        return $this->fileBuffer->setPosition($offset, $whence);
     }
 
     /**
@@ -347,7 +310,7 @@ class StreamWrapper
      */
     public function stream_tell()
     {
-        return $this->fileBufferPos;
+        return $this->fileBuffer->getPosition();
     }
 
     /**
