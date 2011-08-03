@@ -32,7 +32,7 @@ class StreamWrapper
 
     /**
      *
-     * @var FileReadBuffer
+     * @var FileBuffer
      */
     protected $fileBuffer;
 
@@ -250,7 +250,7 @@ class StreamWrapper
             $repo               = $path->getRepository();
 
             $buffer             = $repo->showFile($path->getLocalPath(), $path->getRef());
-            $this->fileBuffer   = new FileReadBuffer($buffer);
+            $this->fileBuffer   = new FileBuffer($buffer);
             return true;
         } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);

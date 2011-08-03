@@ -1,7 +1,7 @@
 <?php
 namespace TQ\Git\StreamWrapper;
 
-class FileReadBuffer
+class FileBuffer
 {
     /**
      *
