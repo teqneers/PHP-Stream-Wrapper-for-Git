@@ -8,10 +8,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,25 +20,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
+
+/**
+ * Git Streamwrapper for PHP
+ *
+ * @category   TQ
+ * @package    TQ_Git
+ * @subpackage Cli
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
+
+/**
+ * @namespace
+ */
 namespace TQ\Git\Cli;
 
 /**
- * @method  Call  status(string $path, mixed $args...)
- * @method  Call  init(string $path, mixed $args...)
- * @method  Call  add(string $path, mixed $args...)
- * @method  Call  commit(string $path, mixed $args...)
+ * Encapsulates access to th Git command line binary
+ *
+ * @author     Stefan Gehrig <gehrigteqneers.de>
+ * @category   TQ
+ * @package    TQ_Git
+ * @subpackage Cli
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 class Binary
 {
     /**
+     * The file system path to the Git binary
      *
      * @var string
      */
     protected $path;
 
     /**
+     * Try to find the Git binary on the system
      *
+     * @todo    implement platform independant searching strategies
      * @return  string
      */
     public static function locateBinary()
@@ -51,8 +69,12 @@ class Binary
     }
 
     /**
+     * Creates a Git binary interface
      *
-     * @param   string|null $path
+     * If no path is given the class tries to find the correct
+     * binary {@see locateBinary()}
+     *
+     * @param   string|null $path   The path to the Git binary or NULL to auto-detect
      */
     public function __construct($path = null)
     {
@@ -66,10 +88,11 @@ class Binary
     }
 
     /**
+     * Create a call to the Git binary for later execution
      *
-     * @param   string  $path
-     * @param   string  $command
-     * @param   array   $arguments
+     * @param   string  $path           The full path to the Git repository
+     * @param   string  $command        The Git command, e.g. show, commit or add
+     * @param   array   $arguments      The command arguments
      * @return  Call
      */
     public function createGitCall($path, $command, array $arguments)
@@ -125,9 +148,11 @@ class Binary
     }
 
     /**
+     * Method overloading - allows calling Git commands directly as class methods
      *
-     * @param   string  $method
-     * @param   array   $arguments
+     * @param   string  $method     The Git command, e.g. show, commit or add
+     * @param   array   $arguments  The command arguments with the path to the Git
+     *                              repository beeing the first argument
      * @return  CallResult
      */
     public function __call($method, array $arguments)

@@ -8,10 +8,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,34 +20,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
+
+/**
+ * Git Streamwrapper for PHP
+ *
+ * @category   TQ
+ * @package    TQ_Git
+ * @subpackage Cli
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
+
+/**
+ * @namespace
+ */
 namespace TQ\Git\Cli;
 
+/**
+ * Represents a single CLI call
+ *
+ * @author     Stefan Gehrig <gehrigteqneers.de>
+ * @category   TQ
+ * @package    TQ_Git
+ * @subpackage Cli
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
 class Call
 {
     /**
+     * The CLI command to execute
      *
      * @var string
      */
     protected $cmd;
 
     /**
+     * The working directory in which the call will be executed
      *
      * @var string|null
      */
     protected $cwd;
 
     /**
+     * Environment variables - defaults to the current environment
      *
      * @var array|null
      */
     protected $env;
 
     /**
+     * Factory method to create a call
      *
-     * @param   string      $cmd
-     * @param   string|null $cwd
-     * @param   array|null  $env
+     * @param   string      $cmd    The CLI command to execute
+     * @param   string|null $cwd    The working directory in which the call will be executed
+     * @param   array|null  $env    Environment variables - defaults to the current environment
      * @return  Call
      */
     public static function create($cmd, $cwd = null, array $env = null) {
@@ -55,10 +80,11 @@ class Call
     }
 
     /**
+     * Creates a new instance of a CLI call
      *
-     * @param   string      $cmd
-     * @param   string|null $cwd
-     * @param   array|null  $env
+     * @param   string      $cmd    The CLI command to execute
+     * @param   string|null $cwd    The working directory in which the call will be executed
+     * @param   array|null  $env    Environment variables - defaults to the current environment
      */
     public function __construct($cmd, $cwd = null, array $env = null)
     {
@@ -68,6 +94,7 @@ class Call
     }
 
     /**
+     * Returns the CLI command
      *
      * @return  string
      */
@@ -77,8 +104,9 @@ class Call
     }
 
     /**
+     * Sets the CLI command
      *
-     * @param   string  $cmd
+     * @param   string  $cmd    The CLI command to execute
      * @return  Call
      */
     public function setCmd($cmd)
@@ -88,6 +116,7 @@ class Call
     }
 
     /**
+     * Returns the working directory for the call
      *
      * @return  string|null
      */
@@ -97,8 +126,9 @@ class Call
     }
 
     /**
+     * Sets the working directory for the call
      *
-     * @param   string|null  $cwd
+     * @param   string|null  $cwd   The working directory in which the call will be executed
      * @return  Call
      */
     public function setCwd($cwd)
@@ -113,6 +143,7 @@ class Call
     }
 
     /**
+     * Returns the environment variables for the call - if overridden
      *
      * @return  array|null
      */
@@ -122,8 +153,9 @@ class Call
     }
 
     /**
+     * Sets the environment variables for the call
      *
-     * @param   array|null  $env
+     * @param   array|null  $env    Environment variables - defaults to the current environment
      * @return  Call
      */
     public function setEnv(array $env = null)
@@ -133,8 +165,9 @@ class Call
     }
 
     /**
+     * Executes the call usign the preconfigured command
      *
-     * @param   string|null  $stdIn
+     * @param   string|null  $stdIn     Content that will be piped to the command
      * @return  CallResult
      */
     public function execute($stdIn = null)

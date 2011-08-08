@@ -8,10 +8,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,39 +20,67 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
+
+/**
+ * Git Streamwrapper for PHP
+ *
+ * @category   TQ
+ * @package    TQ_Git
+ * @subpackage Cli
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
+
+/**
+ * @namespace
+ */
 namespace TQ\Git\Cli;
 
+/**
+ * The result of a CLI call - provides access to stdout, stderror and the return code
+ *
+ * @author     Stefan Gehrig <gehrigteqneers.de>
+ * @category   TQ
+ * @package    TQ_Git
+ * @subpackage Cli
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
 class CallResult
 {
     /**
+     * The contents of stdout
      *
      * @var string
      */
     protected $stdOut;
+
     /**
+     * The contents of stderr
      *
      * @var string
      */
     protected $stdErr;
+
     /**
+     * The return code
      *
      * @var integer
      */
     protected $returnCode;
 
     /**
+     * Reference to the call that resulted in this result
      *
      * @var Call
      */
     protected $cliCall;
 
     /**
+     * Creates a new result container for a CLI call
      *
-     * @param Call       $cliCall
-     * @param string     $stdOut
-     * @param string     $stdErr
-     * @param integer    $returnCode
+     * @param Call       $cliCall       Reference to the call that resulted in this result
+     * @param string     $stdOut        The contents of stdout
+     * @param string     $stdErr        The contents of stderr
+     * @param integer    $returnCode    The return code
      */
     public function __construct(Call $cliCall, $stdOut, $stdErr, $returnCode)
     {
@@ -63,6 +91,7 @@ class CallResult
     }
 
     /**
+     * Returns the reference to the call that resulted in this result
      *
      * @return Call
      */
@@ -72,6 +101,7 @@ class CallResult
     }
 
     /**
+     * Returns the contents of stdout
      *
      * @return string
      */
@@ -81,6 +111,7 @@ class CallResult
     }
 
     /**
+     * Returns true if the call resulted in stdout to be populated
      *
      * @return  boolean
      */
@@ -90,6 +121,7 @@ class CallResult
     }
 
     /**
+     * Returns the contents of stderr
      *
      * @return string
      */
@@ -99,6 +131,7 @@ class CallResult
     }
 
     /**
+     * Returns true if the call resulted in stderr to be populated
      *
      * @return  boolean
      */
@@ -108,6 +141,7 @@ class CallResult
     }
 
     /**
+     * Returns the return code
      *
      * @return integer
      */

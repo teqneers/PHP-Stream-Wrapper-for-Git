@@ -8,10 +8,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,38 +20,64 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
+
+/**
+ * Git Streamwrapper for PHP
+ *
+ * @category   TQ
+ * @package    TQ_Git
+ * @subpackage Repository
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
+
+/**
+ * @namespace
+ */
 namespace TQ\Git\Repository;
 
+/**
+ * Encapsulates arguments passed to and from a transactional piece of coce
+ *
+ * @author     Stefan Gehrig <gehrigteqneers.de>
+ * @category   TQ
+ * @package    TQ_Git
+ * @subpackage Repository
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
 class Transaction
 {
     /**
+     * The Git repository
      *
      * @var Repository
      */
     protected $repository;
 
     /**
+     * The commit message
      *
      * @var string|null
      */
     protected $commitMsg;
 
     /**
+     * The return value of the transactional callback
      *
      * @var mixed
      */
     protected $result;
 
     /**
+     * The commit hash
      *
      * @var string|null
      */
     protected $commitHash;
 
     /**
+     * Creates a new transactional parameter
      *
-     * @param   Repository  $binary
+     * @param   Repository  $binary The Git repository
      */
     public function __construct(Repository $repository)
     {
