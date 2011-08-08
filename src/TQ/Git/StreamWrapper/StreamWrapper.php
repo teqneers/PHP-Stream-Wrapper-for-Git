@@ -44,7 +44,8 @@ use TQ\Git\Repository\Repository;
  * @uses       TQ\Git\Repository\Repository;
  * @uses       TQ\Git\StreamWrapper\PathInformation
  * @uses       TQ\Git\StreamWrapper\DirectoryBuffer
- * @uses       TQ\Git\StreamWrapper\FileBuffer
+ * @uses       TQ\Git\StreamWrapper\FileRevsionBuffer
+ * @uses       TQ\Git\StreamWrapper\FileStreamBuffer
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Git
@@ -354,9 +355,20 @@ class StreamWrapper
                     )
                 );
             } else {
-                $buffer = $repo->showFile($path->getLocalPath(), $path->getRef());
+                if (   $path->getRef() == 'HEAD'
+                    && file_exists($path->getFullPath())
+                    && is_file($path->getFullPath())
+                ) {
+                    $buffer = new FileStreamBuffer($path->getFullPath());
+                } else {
+                    $buffer = $repo->showFile($path->getLocalPath(), $path->getRef());
+                }
             }
-            $this->fileBuffer   = new FileBuffer($buffer);
+
+            if (!($buffer instanceof FileBuffer)) {
+                $buffer = new FileStringBuffer($buffer);
+            }
+            $this->fileBuffer   = $buffer;
             return true;
         } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
