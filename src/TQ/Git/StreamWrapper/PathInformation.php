@@ -49,39 +49,45 @@ use TQ\Git\Cli\Binary;
 class PathInformation
 {
     /**
+     * The Git repository
      *
      * @var Repository
      */
     protected $repository;
 
     /**
+     * The absolute path to the resource
      *
      * @var string
      */
     protected $fullPath;
 
     /**
+     * The relative path to the reosurce based on the repository path
      *
      * @var string
      */
     protected $localPath;
 
     /**
+     * The version ref 
      *
      * @var string
      */
     protected $ref;
 
     /**
+     * Additional arguments
      *
      * @var array
      */
     protected $arguments;
 
     /**
+     * Creates a new path information instance from a given URL
      *
-     * @param   Binary  $binary
-     * @param   array   $url
+     * @param   Binary  $binary     The git binary
+     * @param   array   $url        The URL
      */
     public function __construct(Binary $binary, array $url)
     {
@@ -98,6 +104,7 @@ class PathInformation
     }
 
     /**
+     * Returns the Git repository instance
      *
      * @return  Repository
      */
@@ -107,6 +114,7 @@ class PathInformation
     }
 
     /**
+     * Returns the absolute repository path
      *
      * @return  string
      */
@@ -116,6 +124,7 @@ class PathInformation
     }
 
     /**
+     * Returns the absolute path to the resource
      *
      * @return  string
      */
@@ -125,6 +134,7 @@ class PathInformation
     }
 
     /**
+     * Returns the relative path to the resource based on the repository path
      *
      * @return  string
      */
@@ -134,6 +144,7 @@ class PathInformation
     }
 
     /**
+     * Returns the version ref 
      *
      * @return  string
      */
@@ -143,6 +154,7 @@ class PathInformation
     }
 
     /**
+     * Returns the additional arguments given
      *
      * @return  array
      */
@@ -152,8 +164,9 @@ class PathInformation
     }
 
     /**
+     * Checks if the given argument exists
      *
-     * @param   string  $argument
+     * @param   string  $argument   The argument name
      * @return  boolean
      */
     public function hasArgument($argument)
@@ -162,9 +175,10 @@ class PathInformation
     }
 
     /**
+     * Returns the given argument from the argument collection
      *
-     * @param   string  $argument
-     * @return  string|null
+     * @param   string  $argument   The argument name
+     * @return  string|null         The argument value or NULL if the argument does not exist
      */
     public function getArgument($argument)
     {

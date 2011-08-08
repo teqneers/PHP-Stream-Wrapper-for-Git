@@ -55,40 +55,48 @@ class Repository
     const RESET_ALL     = 3;
 
     /**
+     * The Git binary
      *
      * @var Binary
      */
     protected $binary;
 
     /**
-     *
+     * The repository path
+     * 
      * @var string
      */
     protected $repositoryPath;
 
     /**
+     * The mode used to create files when requested
      *
      * @var integer
      */
     protected $fileCreationMode  = 0644;
 
     /**
+     * The mode used to create directories when requested
      *
      * @var integer
      */
     protected $directoryCreationMode = 0755;
 
     /**
+     * The author used when committing changes
      *
      * @var string
      */
     protected $author;
 
     /**
+     * Opens a Git repository on the file system, optionally creates and inits a new repository
      *
-     * @param   string          $repositoryPath
-     * @param   Binary|null     $binary
-     * @param   boolean|integer $createIfNotExists
+     * @param   string          $repositoryPath         The full path to the repository
+     * @param   Binary|null     $binary                 The Git binary
+     * @param   boolean|integer $createIfNotExists      False to fail on non-existing repositories, directory
+     *                                                  creation mode, such as 0755  if the command
+     *                                                  should create the directory and init the repository instead
      * @return  Repository
      */
     public static function open($repositoryPath, Binary $binary = null, $createIfNotExists = false)
@@ -139,9 +147,10 @@ class Repository
     }
 
     /**
-     *
-     * @param   Binary   $binary
-     * @param   string   $path
+     * Inits a path to be used as a Git repository
+     * 
+     * @param   Binary   $binary        The Git binary
+     * @param   string   $path          The repository path
      */
     protected static function initRepository(Binary $binary, $path)
     {
@@ -150,9 +159,10 @@ class Repository
     }
 
     /**
+     * Tries to find the root directory for a given repository path
      *
-     * @param   string      $path
-     * @return  string|null
+     * @param   string      $path       The file system path
+     * @return  string|null             NULL if the root cannot be found, the root path otherwise
      */
     public static function findRepositoryRoot($path)
     {
@@ -170,6 +180,7 @@ class Repository
     }
 
     /**
+     * Creates a new repository instance - use {@see open()} instead
      *
      * @param   string     $repositoryPath
      * @param   Binary  $binary
@@ -181,6 +192,7 @@ class Repository
     }
 
     /**
+     * Returns the Git binary
      *
      * @return  Binary
      */
@@ -190,7 +202,8 @@ class Repository
     }
 
     /**
-     *
+     * Returns the full file system path to the repository
+     * 
      * @return  string
      */
     public function getRepositoryPath()
@@ -199,6 +212,7 @@ class Repository
     }
 
     /**
+     * Returns the mode used to create files when requested
      *
      * @return  integer
      */
@@ -208,8 +222,9 @@ class Repository
     }
 
     /**
+     * Sets the mode used to create files when requested
      *
-     * @param   integer     $fileCreationMode
+     * @param   integer     $fileCreationMode   The mode, e.g. 644
      * @return  Repository
      */
     public function setFileCreationMode($fileCreationMode)
@@ -219,6 +234,7 @@ class Repository
     }
 
     /**
+     * Returns the mode used to create directories when requested
      *
      * @return  integer
      */
@@ -228,8 +244,9 @@ class Repository
     }
 
     /**
+     * Sets the mode used to create directories when requested
      *
-     * @param   integer     $directoryCreationMode
+     * @param   integer     $directoryCreationMode   The mode, e.g. 755
      * @return  Repository
      */
     public function setDirectoryCreationMode($directoryCreationMode)
@@ -239,6 +256,7 @@ class Repository
     }
 
     /**
+     * Returns the author used when committing changes
      *
      * @return  string
      */
@@ -248,8 +266,9 @@ class Repository
     }
 
     /**
+     * Sets the author used when committing changes
      *
-     * @param   string     $author
+     * @param   string     $author      The author used when committing changes
      * @return  Repository
      */
     public function setAuthor($author)
@@ -259,8 +278,9 @@ class Repository
     }
 
     /**
+     * Resolves an absolute path into a path relative to the repository path
      *
-     * @param   string|array  $path
+     * @param   string|array  $path         A file system path (or an array of paths)
      * @return  string
      */
     public function resolveLocalPath($path)
@@ -280,8 +300,9 @@ class Repository
     }
 
     /**
+     * Resolves a path relative to the repository into an absolute path
      *
-     * @param   string|array  $path
+     * @param   string|array  $path     A local path (or an array of paths)
      * @return  string
      */
     public function resolveFullPath($path)
@@ -302,6 +323,7 @@ class Repository
     }
 
     /**
+     * Returns the current commit hash
      *
      * @return  string
      */
@@ -316,9 +338,10 @@ class Repository
     }
 
     /**
+     * Commits the currently staged changes into the repository
      *
-     * @param   string       $commitMsg
-     * @param   array|null   $file
+     * @param   string       $commitMsg         The commit message
+     * @param   array|null   $file              Restrict commit to the given files or NULL to commit all staged changes
      */
     public function commit($commitMsg, array $file = null)
     {
@@ -339,8 +362,9 @@ class Repository
     }
 
     /**
+     * Resets the working directory and/or the staging area and discards all changes
      *
-     * @param   integer     $what
+     * @param   integer     $what       Bit mask to indicate which parts should be resetted
      */
     public function reset($what = self::RESET_ALL)
     {
@@ -361,8 +385,9 @@ class Repository
     }
 
     /**
-     *
-     * @param   array   $file
+     * Adds one or more files to the staging area
+     * 
+     * @param   array   $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
      * @param   boolean $force
      */
     public function add(array $file = null, $force = false)
@@ -385,10 +410,11 @@ class Repository
     }
 
     /**
+     * Removes one or more files from the repository but does not commit the changes
      *
-     * @param   array   $file
-     * @param   boolean $recursive
-     * @param   boolean $force
+     * @param   array   $file           The file(s) to be removed
+     * @param   boolean $recursive      True to recursively remove subdirectories
+     * @param   boolean $force          True to continue even though Git reports a possible conflict
      */
     public function remove(array $file, $recursive = false, $force = false)
     {
@@ -409,10 +435,11 @@ class Repository
     }
 
     /**
+     * Renames a file but does not commit the changes
      *
-     * @param   string  $fromPath
-     * @param   string  $toPath
-     * @param   boolean $force
+     * @param   string  $fromPath   The source path
+     * @param   string  $toPath     The destination path
+     * @param   boolean $force      True to continue even though Git reports a possible conflict
      */
     public function move($fromPath, $toPath, $force = false)
     {
@@ -430,11 +457,12 @@ class Repository
     }
 
     /**
+     * Writes data to a file and commit the changes immediately
      *
-     * @param   string          $path
-     * @param   scalar|array    $data
-     * @param   string|null     $commitMsg
-     * @return  string
+     * @param   string          $path           The file path
+     * @param   scalar|array    $data           The data to write to the file
+     * @param   string|null     $commitMsg      The commit message used when committing the changes
+     * @return  string                          The current commit hash
      */
     public function writeFile($path, $data, $commitMsg = null)
     {
@@ -471,12 +499,13 @@ class Repository
     }
 
     /**
+     * Removes a file and commit the changes immediately
      *
-     * @param   string          $path
-     * @param   string|null     $commitMsg
-     * @param   boolean         $recursive
-     * @param   boolean         $force
-     * @return  string
+     * @param   string          $path           The file path
+     * @param   string|null     $commitMsg      The commit message used when committing the changes
+     * @param   boolean         $recursive      True to recursively remove subdirectories
+     * @param   boolean         $force          True to continue even though Git reports a possible conflict
+     * @return  string                          The current commit hash
      */
     public function removeFile($path, $commitMsg = null, $recursive = false, $force = false)
     {
@@ -492,12 +521,13 @@ class Repository
     }
 
     /**
+     * Renames a file and commit the changes immediately
      *
-     * @param   string          $fromPath
-     * @param   string          $toPath
-     * @param   string|null     $commitMsg
-     * @param   boolean         $force
-     * @return  string
+     * @param   string          $fromPath       The source path
+     * @param   string          $toPath         The destination path
+     * @param   string|null     $commitMsg      The commit message used when committing the changes
+     * @param   boolean         $force          True to continue even though Git reports a possible conflict
+     * @return  string                          The current commit hash
      */
     public function renameFile($fromPath, $toPath, $commitMsg = null, $force = false)
     {
@@ -513,9 +543,10 @@ class Repository
     }
 
     /**
+     * Returns the current repository log
      *
-     * @param   integer|null    $limit
-     * @param   integer|null    $skip
+     * @param   integer|null    $limit      The maximum number of log entries returned
+     * @param   integer|null    $skip       Number of log entries that are skipped from the beginning
      * @return  string
      */
     public function getLog($limit = null, $skip = null)
@@ -547,8 +578,9 @@ class Repository
     }
 
     /**
+     * Returns a string containing information about the given commit
      *
-     * @return  string  $hash
+     * @return  string  $hash       The commit ref
      * @return  string
      */
     public function showCommit($hash)
@@ -565,9 +597,10 @@ class Repository
     }
 
     /**
+     * Returns the content of a file at a given version
      *
-     * @param   string  $file
-     * @param   string  $ref
+     * @param   string  $file       The path to the file
+     * @param   string  $ref        The version ref
      */
     public function showFile($file, $ref = 'HEAD')
     {
@@ -583,9 +616,10 @@ class Repository
     }
 
     /**
+     * List the directory at a given version
      *
-     * @param   string  $directory
-     * @param   string  $ref
+     * @param   string  $directory      The path ot the directory
+     * @param   string  $ref            The version ref
      * @return  array
      */
     public function listDirectory($directory = '.', $ref = 'HEAD')
@@ -609,6 +643,15 @@ class Repository
     }
 
     /**
+     * Returns the current status of the working directory and the stagin area
+     *
+     * The returned array structure is
+     *      array(
+     *          'file'      => '...',
+     *          'x'         => '.',
+     *          'y'         => '.',
+     *          'renamed'   => null/'...'
+     *      )
      *
      * @return  array
      */
@@ -643,7 +686,8 @@ class Repository
     }
 
     /**
-     *
+     * Returns true if there are uncommitted changes in the working directory and/or the staging area
+     * 
      * @return  boolean
      */
     public function isDirty()
@@ -653,6 +697,7 @@ class Repository
     }
 
     /**
+     * Returns the name of the current branch
      *
      * @return  string
      */
@@ -670,6 +715,10 @@ class Repository
     }
 
     /**
+     * Runs $function in a transactional scope committing all changes to the repository on success,
+     * but rolling back all changes in the event of an Exception beeing thrown in the closure
+     *
+     * The closure $function will be called with a {@see TQ\Git\Repository\Transaction} as its only argument
      *
      * @param   \Closure   $function
      * @return  Transaction
@@ -701,9 +750,10 @@ class Repository
     }
 
     /**
+     * Internal method that checks if the CLI call has succeeded and throws an Excetion otherwise
      *
-     * @param   CallResult  $result
-     * @param   string      $message
+     * @param   CallResult  $result         The CLI result
+     * @param   string      $message        The exception message
      */
     protected static function throwIfError(CallResult $result, $message)
     {

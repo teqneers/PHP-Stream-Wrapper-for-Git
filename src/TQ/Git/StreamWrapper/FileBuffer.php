@@ -47,26 +47,30 @@ namespace TQ\Git\StreamWrapper;
 class FileBuffer
 {
     /**
+     * The buffer contents
      *
      * @var string
      */
     protected $buffer;
 
     /**
+     * The buffer length
      *
      * @var integer
      */
     protected $length;
 
     /**
-     *
+     * The current pointer position
+     * 
      * @var integer
      */
     protected $position;
 
     /**
+     * Creates a neww file buffer with the given contents
      *
-     * @param   string  $content
+     * @param   string  $content    The contents
      */
     public function __construct($buffer)
     {
@@ -76,6 +80,7 @@ class FileBuffer
     }
 
     /**
+     * Returns the complete contents of the buffer
      *
      * @return  string
      */
@@ -85,6 +90,7 @@ class FileBuffer
     }
 
     /**
+     * Returns true if the pointer is at the end of the buffer
      *
      * @return  boolean
      */
@@ -94,8 +100,9 @@ class FileBuffer
     }
 
     /**
+     * Reads $count bytes from the buffer
      *
-     * @param   integer     $count
+     * @param   integer     $count      The number of bytes to read
      * @return  string|null
      */
     public function read($count)
@@ -109,9 +116,10 @@ class FileBuffer
     }
 
     /**
+     * Writes the given date into the buffer at the current pointer position
      *
-     * @param   string  $data
-     * @return  integer
+     * @param   string  $data       The data to write
+     * @return  integer             The number of bytes written
      */
     public function write($data)
     {
@@ -123,6 +131,7 @@ class FileBuffer
     }
 
     /**
+     * Returns the current pointer position
      *
      * @return integer
      */
@@ -132,10 +141,11 @@ class FileBuffer
     }
 
     /**
+     * Sets the pointer position
      *
-     * @param   integer $position
-     * @param   integer  $whence
-     * @return  boolean
+     * @param   integer     $position   The position in bytes
+     * @param   integer     $whence     The reference from where to measure $position (SEEK_SET, SEEK_CUR or SEEK_END)
+     * @return  boolean                 True if the position could be set
      */
     public function setPosition($position, $whence)
     {

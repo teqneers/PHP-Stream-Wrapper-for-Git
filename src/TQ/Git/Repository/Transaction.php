@@ -85,6 +85,7 @@ class Transaction
     }
 
     /**
+     * Returns the Git repository
      *
      * @return  Repository
      */
@@ -94,6 +95,7 @@ class Transaction
     }
 
     /**
+     * Returns the full file system path to the Git repository
      *
      * @return  string
      */
@@ -103,8 +105,9 @@ class Transaction
     }
 
     /**
+     * Resolves a path relative to the repository into an absolute path
      *
-     * @param   string  $path
+     * @param   string  $path   The relative path to convert to an absolute  path
      * @return  string
      */
     public function resolvePath($path)
@@ -113,6 +116,7 @@ class Transaction
     }
 
     /**
+     * Returns the commit message that will be used when comitting the transaction
      *
      * @return  string|null
      */
@@ -122,8 +126,10 @@ class Transaction
     }
 
     /**
+     * Sets  the commit message that will be used when comitting the transaction
      *
-     * @param   string|null $commitMsg
+     * @param   string|null $commitMsg      The commit message
+     * @return  Transaction
      */
     public function setCommitMsg($commitMsg)
     {
@@ -132,10 +138,12 @@ class Transaction
         } else {
             $this->commitMsg    = (string)$commitMsg;
         }
+        return $this;
     }
 
     /**
-     *
+     * Returns the return value of the closure executed in the transactional scope
+     * 
      * @return  mixed
      */
     public function getResult()
@@ -144,16 +152,20 @@ class Transaction
     }
 
     /**
+     * Sets the return value of the closure executed in the transactional scope
      *
-     * @param   mixed $result
+     * @param   mixed $result       The return value
+     * @return  Transaction
      */
     public function setResult($result)
     {
         $this->result   = $result;
+        return $this;
     }
 
     /**
-     *
+     * Returns the hash identifiying the commit
+     * 
      * @return  string|null
      */
     public function getCommitHash()
@@ -162,11 +174,14 @@ class Transaction
     }
 
     /**
+     * Sets the hash identifiying the commit
      *
      * @param   string $result
+     * @return  Transaction
      */
     public function setCommitHash($commitHash)
     {
         $this->commitHash   = $commitHash;
+        return $this;
     }
 }

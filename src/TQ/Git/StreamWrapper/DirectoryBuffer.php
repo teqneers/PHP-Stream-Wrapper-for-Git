@@ -47,14 +47,16 @@ namespace TQ\Git\StreamWrapper;
 class DirectoryBuffer implements \Iterator
 {
     /**
-     *
+     * The directory listing
+     * 
      * @var array
      */
     protected $listing;
 
     /**
+     * Creates a directory buffer from an array
      *
-     * @param   array   $listing
+     * @param   array   $listing    The directory listing
      */
     public function __construct(array $listing)
     {
@@ -63,10 +65,10 @@ class DirectoryBuffer implements \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Return the current element
-     * @link http://php.net/manual/en/iterator.current.php
-     * @return mixed Can return any type.
+     * Implements Iterator
+     *
+     * @link    http://php.net/manual/en/iterator.current.php
+     * @return  string
      */
     public function current()
     {
@@ -74,10 +76,9 @@ class DirectoryBuffer implements \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Move forward to next element
-     * @link http://php.net/manual/en/iterator.next.php
-     * @return void Any returned value is ignored.
+     * Implements Iterator
+     *
+     * @link    http://php.net/manual/en/iterator.next.php
      */
     public function next()
     {
@@ -85,11 +86,10 @@ class DirectoryBuffer implements \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Return the key of the current element
-     * @link http://php.net/manual/en/iterator.key.php
-     * @return scalar scalar on success, integer
-     * 0 on failure.
+     * Implements Iterator
+     *
+     * @link    http://php.net/manual/en/iterator.key.php
+     * @return  integer|boolean     False on failure
      */
     public function key()
     {
@@ -97,11 +97,10 @@ class DirectoryBuffer implements \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Checks if current position is valid
-     * @link http://php.net/manual/en/iterator.valid.php
-     * @return boolean The return value will be casted to boolean and then evaluated.
-     * Returns true on success or false on failure.
+     * Implements Iterator
+     *
+     * @link    http://php.net/manual/en/iterator.valid.php
+     * @return  boolean
      */
     public function valid()
     {
@@ -109,10 +108,9 @@ class DirectoryBuffer implements \Iterator
     }
 
     /**
-     * (PHP 5 &gt;= 5.1.0)<br/>
-     * Rewind the Iterator to the first element
-     * @link http://php.net/manual/en/iterator.rewind.php
-     * @return void Any returned value is ignored.
+     * Implements Iterator
+     *
+     * @link    http://php.net/manual/en/iterator.rewind.php
      */
     public function rewind()
     {
