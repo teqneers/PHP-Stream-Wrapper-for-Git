@@ -344,7 +344,7 @@ class StreamWrapper
             $path   = $this->getPath($path);
             $repo   = $path->getRepository();
 
-            if ($path->hasArgument('ref')) {
+            if ($path->hasArgument('commit')) {
                 $buffer = $repo->showCommit($path->getArgument('ref'));
             } else if ($path->hasArgument('log')) {
                 $buffer = implode(
