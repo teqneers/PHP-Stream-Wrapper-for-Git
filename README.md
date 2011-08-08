@@ -23,9 +23,6 @@ Examples
     // get current branch
     $branch = $git->getCurrentBranch();
 
-    // get current branch
-    $git->getCurrentBranch();
-
     // get status of working directory
     $status = $git->getStatus();
     // are there uncommitted changes in the staging area or in the working directory
