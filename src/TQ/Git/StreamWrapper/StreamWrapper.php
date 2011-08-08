@@ -355,9 +355,20 @@ class StreamWrapper
                     )
                 );
             } else {
-                $buffer = $repo->showFile($path->getLocalPath(), $path->getRef());
+                if (   $path->getRef() == 'HEAD'
+                    && file_exists($path->getFullPath())
+                    && is_file($path->getFullPath())
+                ) {
+                    $buffer = new FileStreamBuffer($path->getFullPath());
+                } else {
+                    $buffer = $repo->showFile($path->getLocalPath(), $path->getRef());
+                }
             }
-            $this->fileBuffer   = new FileRevisionBuffer($buffer);
+
+            if (!($buffer instanceof FileBuffer)) {
+                $buffer = new FileStringBuffer($buffer);
+            }
+            $this->fileBuffer   = $buffer;
             return true;
         } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);

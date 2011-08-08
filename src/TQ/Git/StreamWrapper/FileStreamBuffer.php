@@ -138,6 +138,6 @@ class FileStreamBuffer implements FileBuffer
      */
     public function setPosition($position, $whence)
     {
-        return fseek($this->stream, $position, $whence);
+        return (fseek($this->stream, $position, $whence) == 0);
     }
 }

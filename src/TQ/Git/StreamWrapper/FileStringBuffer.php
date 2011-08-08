@@ -44,7 +44,7 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class FileRevisionBuffer implements FileBuffer
+class FileStringBuffer implements FileBuffer
 {
     /**
      * The buffer contents

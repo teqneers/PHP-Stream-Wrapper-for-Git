@@ -23,14 +23,14 @@
 
 namespace TQ\Tests\Git\StreamWrapper;
 
-use TQ\Git\StreamWrapper\FileRevisionBuffer;
+use TQ\Git\StreamWrapper\FileStringBuffer;
 
-class FileRevisionBufferTest extends \PHPUnit_Framework_TestCase
+class FileStringBufferTest extends \PHPUnit_Framework_TestCase
 {
     public function testReadByByte()
     {
         $expected   = 'File 0';
-        $buffer     = new FileRevisionBuffer($expected);
+        $buffer     = new FileStringBuffer($expected);
         $expLength  = strlen($expected);
         for ($i = 0; $i < $expLength; $i++) {
             $this->assertEquals($i, $buffer->getPosition());
@@ -43,7 +43,7 @@ class FileRevisionBufferTest extends \PHPUnit_Framework_TestCase
     public function testSeek()
     {
         $expected   = 'File 0';
-        $buffer     = new FileRevisionBuffer($expected);
+        $buffer     = new FileStringBuffer($expected);
 
         $buffer->setPosition(-1, SEEK_END);
         $this->assertEquals('0', $buffer->read(1));
@@ -67,7 +67,7 @@ class FileRevisionBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testReadInReverse()
     {
-        $buffer     = new FileRevisionBuffer('File 0');
+        $buffer     = new FileStringBuffer('File 0');
         $expected   = '0 eliF';
         $actual     = '';
 
@@ -82,7 +82,7 @@ class FileRevisionBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteInMiddle()
     {
-        $buffer     = new FileRevisionBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $buffer     = new FileStringBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
         $expected   = 'ABC1234567890NOPQRSTUVWXYZ';
         $buffer->setPosition(3, SEEK_SET);
         $buffer->write('1234567890');
@@ -92,7 +92,7 @@ class FileRevisionBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteAtStart()
     {
-        $buffer     = new FileRevisionBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $buffer     = new FileStringBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
         $expected   = '1234567890KLMNOPQRSTUVWXYZ';
         $buffer->setPosition(0, SEEK_SET);
         $buffer->write('1234567890');
@@ -102,7 +102,7 @@ class FileRevisionBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteAtEnd()
     {
-        $buffer     = new FileRevisionBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $buffer     = new FileStringBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
         $expected   = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
         $buffer->setPosition(0, SEEK_END);
         $buffer->write('1234567890');
@@ -112,7 +112,7 @@ class FileRevisionBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteOverlappingEnd()
     {
-        $buffer     = new FileRevisionBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $buffer     = new FileStringBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
         $expected   = 'ABCDEFGHIJKLMNOPQRSTUVW1234567890';
         $buffer->setPosition(-3, SEEK_END);
         $buffer->write('1234567890');
@@ -122,7 +122,7 @@ class FileRevisionBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testWriteInEmptyBuffer()
     {
-        $buffer     = new FileRevisionBuffer('');
+        $buffer     = new FileStringBuffer('');
         $expected   = '1234567890';
         $buffer->write('1234567890');
         $actual     = $buffer->getBuffer();
