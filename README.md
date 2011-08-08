@@ -93,7 +93,7 @@ Examples
     closedir($dir);
 
     // retrieve the second to last commit
-    $commit = file_get_contents(''git:///path/to/your/repository?ref=HEAD^^');
+    $commit = file_get_contents(''git:///path/to/your/repository?commit&ref=HEAD^^');
 
     // retrieve the commit log limited to 5entries skipping the first 2
     $log = file_get_contents(''git:///path/to/your/repository?log&limit=5&skip=2');

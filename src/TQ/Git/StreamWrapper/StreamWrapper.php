@@ -158,7 +158,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::dir_opendir — Open directory handle
-     * 
+     *
      * @param   string   $path      Specifies the URL that was passed to {@see opendir()}.
      * @param   integer  $options   Whether or not to enforce safe_mode (0x04).
      * @return  boolean             Returns TRUE on success or FALSE on failure.
@@ -179,7 +179,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::dir_readdir — Read entry from directory handle
-     * 
+     *
      * @return  string|false    Should return string representing the next filename, or FALSE if there is no next file.
      */
     public function dir_readdir()
@@ -191,7 +191,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::dir_rewinddir — Rewind directory handle
-     * 
+     *
      * @return  boolean     Returns TRUE on success or FALSE on failure.
      */
     public function dir_rewinddir()
@@ -202,7 +202,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::mkdir — Create a directory
-     * 
+     *
      * @param   string   $path      Directory which should be created.
      * @param   integer  $mode      The value passed to {@see mkdir()}.
      * @param   integer  $options   A bitwise mask of values, such as STREAM_MKDIR_RECURSIVE.
@@ -237,7 +237,7 @@ class StreamWrapper
     /**
      * streamWrapper::stream_cast — Retrieve the underlaying resource
      *
-     * @param   integer  $cast_as   Can be STREAM_CAST_FOR_SELECT when stream_select() is calling stream_cast() 
+     * @param   integer  $cast_as   Can be STREAM_CAST_FOR_SELECT when stream_select() is calling stream_cast()
      *                              or STREAM_CAST_AS_STREAM when stream_cast() is called for other uses.
      * @return  resource            Should return the underlying stream resource used by the wrapper, or FALSE.
      */
@@ -257,8 +257,8 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_eof — Tests for end-of-file on a file pointer
-     * 
-     * @return  boolean     Should return TRUE if the read/write position is at the end of the stream 
+     *
+     * @return  boolean     Should return TRUE if the read/write position is at the end of the stream
      *                      and if no more data is available to be read, or FALSE otherwise.
      */
     public function stream_eof()
@@ -268,8 +268,8 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_flush — Flushes the output
-     * 
-     * @return  boolean     Should return TRUE if the cached data was successfully stored 
+     *
+     * @return  boolean     Should return TRUE if the cached data was successfully stored
      *                      (or if there was no data to store), or FALSE if the data could not be stored.
      */
 /*
@@ -280,7 +280,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_lock — Advisory file locking
-     * 
+     *
      * @param   integer  $operation     operation is one of the following:
      *                                      LOCK_SH to acquire a shared lock (reader).
      *                                      LOCK_EX to acquire an exclusive lock (writer).
@@ -296,8 +296,8 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_metadata — Change stream options
-     * 
-     * @param   string   $path      The file path or URL to set metadata. Note that in the case of a URL, 
+     *
+     * @param   string   $path      The file path or URL to set metadata. Note that in the case of a URL,
      *                              it must be a :// delimited URL. Other URL forms are not supported.
      * @param   integer  $option    One of:
      *                                  PHP_STREAM_META_TOUCH (The method was called in response to touch())
@@ -308,7 +308,7 @@ class StreamWrapper
      *                                  PHP_STREAM_META_ACCESS (The method was called in response to chmod())
      * @param   integer  $var       If option is
      *                                  PHP_STREAM_META_TOUCH: Array consisting of two arguments of the touch() function.
-     *                                  PHP_STREAM_META_OWNER_NAME or PHP_STREAM_META_GROUP_NAME: The name of the owner 
+     *                                  PHP_STREAM_META_OWNER_NAME or PHP_STREAM_META_GROUP_NAME: The name of the owner
      *                                      user/group as string.
      *                                  PHP_STREAM_META_OWNER or PHP_STREAM_META_GROUP: The value owner user/group argument as integer.
      *                                  PHP_STREAM_META_ACCESS: The argument of the chmod() as integer.
@@ -321,19 +321,19 @@ class StreamWrapper
 */
 
     /**
-     * streamWrapper::stream_open — Opens file or URL 
+     * streamWrapper::stream_open — Opens file or URL
      *
      * @param   string   $path          Specifies the URL that was passed to the original function.
      * @param   string   $mode          The mode used to open the file, as detailed for fopen().
-     * @param   integer  $options       Holds additional flags set by the streams API. It can hold one or more of 
+     * @param   integer  $options       Holds additional flags set by the streams API. It can hold one or more of
      *                                      the following values OR'd together.
-     *                                      STREAM_USE_PATH         If path is relative, search for the resource using 
+     *                                      STREAM_USE_PATH         If path is relative, search for the resource using
      *                                                              the include_path.
-     *                                      STREAM_REPORT_ERRORS    If this flag is set, you are responsible for raising 
-     *                                                              errors using trigger_error() during opening of the 
-     *                                                              stream. If this flag is not set, you should not raise 
+     *                                      STREAM_REPORT_ERRORS    If this flag is set, you are responsible for raising
+     *                                                              errors using trigger_error() during opening of the
+     *                                                              stream. If this flag is not set, you should not raise
      *                                                              any errors.
-     * @param   string   $opened_path   If the path is opened successfully, and STREAM_USE_PATH is set in options, opened_path 
+     * @param   string   $opened_path   If the path is opened successfully, and STREAM_USE_PATH is set in options, opened_path
      *                                  should be set to the full path of the file/resource that was actually opened.
      * @return  boolean                 Returns TRUE on success or FALSE on failure.
      */
@@ -343,7 +343,7 @@ class StreamWrapper
             $path   = $this->getPath($path);
             $repo   = $path->getRepository();
 
-            if ($path->hasArgument('ref')) {
+            if ($path->hasArgument('commit')) {
                 $buffer = $repo->showCommit($path->getArgument('ref'));
             } else if ($path->hasArgument('log')) {
                 $buffer = implode(
@@ -368,7 +368,7 @@ class StreamWrapper
      * streamWrapper::stream_read — Read from stream
      *
      * @param   integer  $count     How many bytes of data from the current position should be returned.
-     * @return  string              If there are less than count bytes available, return as many as are available. 
+     * @return  string              If there are less than count bytes available, return as many as are available.
      *                              If no more data is available, return either FALSE or an empty string.
      */
     public function stream_read($count)
@@ -382,7 +382,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_seek — Seeks to specific location in a stream
-     * 
+     *
      * @param   integer  $offset    The stream offset to seek to.
      * @param   integer  $whence    Possible values:
      *                                  SEEK_SET - Set position equal to offset bytes.
@@ -397,7 +397,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_set_option
-     * 
+     *
      * @param   integer  $option    One of:
      *                                  STREAM_OPTION_BLOCKING (The method was called in response to stream_set_blocking())
      *                                  STREAM_OPTION_READ_TIMEOUT (The method was called in response to stream_set_timeout())
@@ -410,7 +410,7 @@ class StreamWrapper
      *                                  STREAM_OPTION_BLOCKING: This option is not set.
      *                                  STREAM_OPTION_READ_TIMEOUT: the timeout in microseconds.
      *                                  STREAM_OPTION_WRITE_BUFFER: the requested buffer size.
-     * @return  boolean             Returns TRUE on success or FALSE on failure. If option is not implemented, 
+     * @return  boolean             Returns TRUE on success or FALSE on failure. If option is not implemented,
      *                              FALSE should be returned.
      */
 /*
@@ -421,7 +421,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_stat — Retrieve information about a file resource
-     * 
+     *
      * @return  array       stat() and fstat() result format
      *                      Numeric     Associative (since PHP 4.0.6)   Description
      *                      0           dev                             device number
@@ -446,7 +446,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_tell — Retrieve the current position of a stream
-     * 
+     *
      * @return  integer     Should return the current position of the stream.
      */
     public function stream_tell()
@@ -456,7 +456,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::stream_write — Write to stream
-     * 
+     *
      * @param   string  $data   Should be stored into the underlying stream.
      * @return  integer         Should return the number of bytes that were successfully stored, or 0 if none could be stored.
      */
@@ -466,7 +466,7 @@ class StreamWrapper
 
     /**
      * streamWrapper::unlink — Delete a file
-     * 
+     *
      * @param   string   $path  The file URL which should be deleted.
      * @return  boolean         Returns TRUE on success or FALSE on failure.
      */
@@ -476,20 +476,20 @@ class StreamWrapper
 
     /**
      * streamWrapper::url_stat — Retrieve information about a file
-     * 
-     * @param   string  $path   The file path or URL to stat. Note that in the case of a URL, it must be a :// delimited URL. 
+     *
+     * @param   string  $path   The file path or URL to stat. Note that in the case of a URL, it must be a :// delimited URL.
      *                          Other URL forms are not supported.
-     * @param   integer $flags  Holds additional flags set by the streams API. It can hold one or more of the following 
+     * @param   integer $flags  Holds additional flags set by the streams API. It can hold one or more of the following
      *                          values OR'd together.
-     *                              STREAM_URL_STAT_LINK    For resources with the ability to link to other resource (such 
-     *                                                      as an HTTP Location: forward, or a filesystem symlink). This flag 
+     *                              STREAM_URL_STAT_LINK    For resources with the ability to link to other resource (such
+     *                                                      as an HTTP Location: forward, or a filesystem symlink). This flag
      *                                                      specified that only information about the link itself should be returned,
-     *                                                      not the resource pointed to by the link. This flag is set in response 
+     *                                                      not the resource pointed to by the link. This flag is set in response
      *                                                      to calls to lstat(), is_link(), or filetype().
-     *                              STREAM_URL_STAT_QUIET   If this flag is set, your wrapper should not raise any errors. If this 
+     *                              STREAM_URL_STAT_QUIET   If this flag is set, your wrapper should not raise any errors. If this
      *                                                      flag is not set, you are responsible for reporting errors using the
      *                                                      trigger_error() function during stating of the path.
-     * @return  array           Should return as many elements as stat() does. Unknown or unavailable values should be set to a 
+     * @return  array           Should return as many elements as stat() does. Unknown or unavailable values should be set to a
      *                          rational value (usually 0).
      */
 /*
