@@ -36,7 +36,7 @@
 namespace TQ\Git\StreamWrapper;
 
 /**
- * Interface for file buffers used in the stream wrapper
+ * Encapsulates a file revision buffer to be used in the streamwrapper
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -44,21 +44,60 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-interface FileBuffer
+class FileRevisionBuffer implements FileBuffer
 {
+    /**
+     * The buffer contents
+     *
+     * @var string
+     */
+    protected $buffer;
+
+    /**
+     * The buffer length
+     *
+     * @var integer
+     */
+    protected $length;
+
+    /**
+     * The current pointer position
+     *
+     * @var integer
+     */
+    protected $position;
+
+    /**
+     * Creates a neww file buffer with the given contents
+     *
+     * @param   string  $content    The contents
+     */
+    public function __construct($buffer)
+    {
+        $this->buffer   = $buffer;
+        $this->length   = strlen($buffer);
+        $this->position = 0;
+    }
+
     /**
      * Returns the complete contents of the buffer
      *
      * @return  string
      */
-    function getBuffer();
+    public function getBuffer()
+    {
+        return $this->buffer;
+    }
 
     /**
      * Returns true if the pointer is at the end of the buffer
      *
      * @return  boolean
      */
-    function isEof();
+    public function isEof()
+    {
+        return ($this->position > $this->length);
+    }
 
     /**
      * Reads $count bytes from the buffer
@@ -66,7 +105,15 @@ interface FileBuffer
      * @param   integer     $count      The number of bytes to read
      * @return  string|null
      */
-    function read($count);
+    public function read($count)
+    {
+        if ($this->isEof()) {
+            return null;
+        }
+        $buffer         = substr($this->buffer, $this->position, $count);
+        $this->position += $count;
+        return $buffer;
+    }
 
     /**
      * Writes the given date into the buffer at the current pointer position
@@ -74,14 +121,24 @@ interface FileBuffer
      * @param   string  $data       The data to write
      * @return  integer             The number of bytes written
      */
-    function write($data);
+    public function write($data)
+    {
+        $dataLength     = strlen($data);
+        $start          = substr($this->buffer, 0, $this->position);
+        $end            = substr($this->buffer, $this->position + $dataLength);
+        $this->buffer   = $start.$data.$end;
+        return $dataLength;
+    }
 
     /**
      * Returns the current pointer position
      *
      * @return integer
      */
-    function getPosition();
+    public function getPosition()
+    {
+        return $this->position;
+    }
 
     /**
      * Sets the pointer position
@@ -90,5 +147,30 @@ interface FileBuffer
      * @param   integer     $whence     The reference from where to measure $position (SEEK_SET, SEEK_CUR or SEEK_END)
      * @return  boolean                 True if the position could be set
      */
-    function setPosition($position, $whence);
+    public function setPosition($position, $whence)
+    {
+        switch ($whence) {
+            case SEEK_SET:
+                $this->position    = $position;
+                break;
+            case SEEK_CUR:
+                $this->position    += $position;
+                break;
+            case SEEK_END:
+                $this->position    = $this->length + $position;
+                break;
+            default:
+                return false;
+        }
+
+        if ($this->position < 0) {
+            $this->position    = 0;
+            return false;
+        } else if ($this->position > $this->length) {
+            $this->position    = $this->length;
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
