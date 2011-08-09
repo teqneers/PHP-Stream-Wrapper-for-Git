@@ -8,10 +8,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
+
 namespace TQ\Tests\Git\StreamWrapper;
 
 use TQ\Git\Cli\Binary;
@@ -190,5 +190,45 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(11, $i);
     }
 
+    public function testListDirectoryWithIterator()
+    {
+        $dir    = new \FilesystemIterator(
+            'git://'.TESTS_REPO_PATH_1,
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $i      = 0;
+        foreach ($dir as $f => $fi) {
+            if ($i < 5) {
+                $this->assertEquals(sprintf('dir_%d', $i), $f);
+            } else {
+                $this->assertEquals(sprintf('file_%d.txt', $i % 5), $f);
+            }
+            $i++;
+        }
+        $this->assertEquals(10, $i);
+    }
+
+    public function testListDirectoryWithRecursiveIterator()
+    {
+        $dir    = new \RecursiveDirectoryIterator(
+            'git://'.TESTS_REPO_PATH_1,
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $it     = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
+        $i      = 0;
+        foreach ($it as $f => $fi) {
+            if ($i < 10) {
+                if ($i % 2 === 0) {
+                    $this->assertEquals(sprintf('dir_%d', $i / 2), $f);
+                } else {
+                    $this->assertEquals('file.txt', $f);
+                }
+            } else {
+                $this->assertEquals(sprintf('file_%d.txt', $i % 5), $f);
+            }
+            $i++;
+        }
+        $this->assertEquals(15, $i);
+    }
 }
 
