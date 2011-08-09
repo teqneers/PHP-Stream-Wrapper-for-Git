@@ -91,4 +91,11 @@ interface FileBuffer
      * @return  boolean                 True if the position could be set
      */
     function setPosition($position, $whence);
+
+    /**
+     * Returns the stat information for the buffer
+     *
+     * @return array
+     */
+    function getStat();
 }

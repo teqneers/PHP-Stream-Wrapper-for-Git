@@ -173,4 +173,28 @@ class FileStringBuffer implements FileBuffer
             return true;
         }
     }
+
+    /**
+     * Returns the stat information for the buffer
+     *
+     * @return array
+     */
+    public function getStat()
+    {
+        $stat   = array(
+            'ino'       => 0,
+            'mode'      => 0,
+            'nlink'     => 0,
+            'uid'       => 0,
+            'gid'       => 0,
+            'rdev'      => 0,
+            'size'      => 0,
+            'atime'     => 0,
+            'mtime'     => 0,
+            'ctime'     => 0,
+            'blksize'   => 0,
+            'blocks'    => 0,
+        );
+        return array_merge($stat, array_values($stat));
+    }
 }

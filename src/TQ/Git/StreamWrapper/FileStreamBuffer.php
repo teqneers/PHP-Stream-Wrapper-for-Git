@@ -140,4 +140,14 @@ class FileStreamBuffer implements FileBuffer
     {
         return (fseek($this->stream, $position, $whence) == 0);
     }
+
+    /**
+     * Returns the stat information for the buffer
+     *
+     * @return array
+     */
+    public function getStat()
+    {
+        return fstat($this->stream);
+    }
 }

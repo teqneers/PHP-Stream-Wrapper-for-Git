@@ -454,6 +454,7 @@ class StreamWrapper
      */
     public function stream_stat()
     {
+        return $this->fileBuffer->getStat();
     }
 
     /**
@@ -504,10 +505,27 @@ class StreamWrapper
      * @return  array           Should return as many elements as stat() does. Unknown or unavailable values should be set to a
      *                          rational value (usually 0).
      */
-/*
     public function url_stat($path, $flags)
     {
+        $path   = $this->getPath($path);
+        if ($path->getRef() == 'HEAD' && file_exists($path->getFullPath())) {
+            return stat($path->getFullPath());
+        } else {
+            $stat   = array(
+                'ino'       => 0,
+                'mode'      => 0,
+                'nlink'     => 0,
+                'uid'       => 0,
+                'gid'       => 0,
+                'rdev'      => 0,
+                'size'      => 0,
+                'atime'     => 0,
+                'mtime'     => 0,
+                'ctime'     => 0,
+                'blksize'   => 0,
+                'blocks'    => 0,
+            );
+            return array_merge($stat, array_values($stat));
+        }
     }
-*/
 }
-
