@@ -141,9 +141,23 @@ class StreamWrapper
      */
     protected function getPath($streamUrl)
     {
-        $path   = ltrim(substr($streamUrl, strlen(self::$protocol) + 3), DIRECTORY_SEPARATOR.'/');
-        $url    = parse_url(self::$protocol.'://'.$path);
+        $url   = $this->parsePath($streamUrl);
         return new PathInformation(self::$binary, $url);
+    }
+
+    /**
+     * Returns path information for a given stream URL
+     *
+     * @param   string  $streamUrl      The URL given to the stream function
+     * @return  array                   An array containing information about the path
+     */
+    protected function parsePath($streamUrl)
+    {
+        $path           = ltrim(substr($streamUrl, strlen(self::$protocol) + 3), DIRECTORY_SEPARATOR.'/');
+        $url            = parse_url(self::$protocol.'://'.$path);
+        $url['path']    = DIRECTORY_SEPARATOR.$url['host'].$url['path'];
+        unset($url['host']);
+        return $url;
     }
 
     /**
@@ -223,21 +237,29 @@ class StreamWrapper
     public function rename($path_from, $path_to)
     {
         try {
-            $path   = $this->getPath($path_from);
-            if ($path->getRef() != 'HEAD') {
+            $pathFrom   = $this->getPath($path_from);
+            if ($pathFrom->getRef() != 'HEAD') {
                 throw new \Exception(sprintf(
-                    'Cannot rename a non-HEAD file [%s#%s]', $path->getFullPath(), $path->getRef()
+                    'Cannot rename a non-HEAD file [%s#%s]', $pathFrom->getFullPath(), $pathFrom->getRef()
                 ));
             }
-            if (!file_exists($path->getFullPath())) {
-                throw new \Exception(sprintf('Path %s not found', $path->getFullPath()));
+            if (!file_exists($pathFrom->getFullPath())) {
+                throw new \Exception(sprintf('Path %s not found', $pathFrom->getFullPath()));
             }
-            if (!is_file($path->getFullPath())) {
-                throw new \Exception(sprintf('Path %s is not a file', $path->getFullPath()));
+            if (!is_file($pathFrom->getFullPath())) {
+                throw new \Exception(sprintf('Path %s is not a file', $pathFrom->getFullPath()));
             }
 
-            $repo   = $path->getRepository();
-            $repo->renameFile($path->getLocalPath(), $repo->resolveLocalPath($path_to));
+            $pathTo = $this->parsePath($path_to);
+            $pathTo = $pathTo['path'];
+
+            if (strpos($pathTo, $pathFrom->getRepositoryPath()) !== 0) {
+                throw new \Exception(sprintf('Cannot rename across repositories [%s -> %s]',
+                    $pathFrom->getFullPath(), $pathTo));
+            }
+
+            $repo   = $pathFrom->getRepository();
+            $repo->renameFile($pathFrom->getLocalPath(), $pathTo);
             return true;
         } catch (Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);

@@ -70,7 +70,7 @@ class PathInformation
     protected $localPath;
 
     /**
-     * The version ref 
+     * The version ref
      *
      * @var string
      */
@@ -91,7 +91,7 @@ class PathInformation
      */
     public function __construct(Binary $binary, array $url)
     {
-        $this->fullPath     = DIRECTORY_SEPARATOR.$url['host'].$url['path'];
+        $this->fullPath     = $url['path'];
         $this->repository   = Repository::open($this->fullPath, $binary, false);
         $this->localPath    = $this->repository->resolveLocalPath($this->fullPath);
         $this->ref          = (array_key_exists('fragment', $url)) ? $url['fragment'] : 'HEAD';
@@ -144,7 +144,7 @@ class PathInformation
     }
 
     /**
-     * Returns the version ref 
+     * Returns the version ref
      *
      * @return  string
      */
