@@ -63,7 +63,7 @@ class Repository
 
     /**
      * The repository path
-     * 
+     *
      * @var string
      */
     protected $repositoryPath;
@@ -148,7 +148,7 @@ class Repository
 
     /**
      * Inits a path to be used as a Git repository
-     * 
+     *
      * @param   Binary   $binary        The Git binary
      * @param   string   $path          The repository path
      */
@@ -203,7 +203,7 @@ class Repository
 
     /**
      * Returns the full file system path to the repository
-     * 
+     *
      * @return  string
      */
     public function getRepositoryPath()
@@ -386,7 +386,7 @@ class Repository
 
     /**
      * Adds one or more files to the staging area
-     * 
+     *
      * @param   array   $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
      * @param   boolean $force
      */
@@ -483,7 +483,7 @@ class Repository
             }
         }
 
-        if (!file_put_contents($file, $data)) {
+        if (file_put_contents($file, $data) === false) {
             throw new \RuntimeException(sprintf('Cannot write to "%s"', $file));
         }
 
@@ -687,7 +687,7 @@ class Repository
 
     /**
      * Returns true if there are uncommitted changes in the working directory and/or the staging area
-     * 
+     *
      * @return  boolean
      */
     public function isDirty()
