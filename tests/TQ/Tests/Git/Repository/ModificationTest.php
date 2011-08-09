@@ -8,10 +8,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
+
 namespace TQ\Tests\Git\Repository;
 
 use TQ\Git\Cli\Binary;
@@ -165,6 +165,20 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('--- a/file_2.txt', $commit);
         $this->assertContains('--- a/file_3.txt', $commit);
         $this->assertContains('--- a/file_4.txt', $commit);
+    }
+
+    public function testRemoveSubdirectory()
+    {
+        $c      = $this->getRepository();
+        $c->writeFile('subdirectory/.gitkeep', '');
+
+        $hash   = $c->removeFile('subdirectory', null, true);
+        $this->assertEquals(40, strlen($hash));
+
+        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/subdirectory');
+
+        $commit = $c->showCommit($hash);
+        $this->assertContains('deleted file', $commit);
     }
 
     public function testMoveFile()
