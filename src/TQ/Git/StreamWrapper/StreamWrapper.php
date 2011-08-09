@@ -222,6 +222,27 @@ class StreamWrapper
      */
     public function rename($path_from, $path_to)
     {
+        try {
+            $path   = $this->getPath($path_from);
+            if ($path->getRef() != 'HEAD') {
+                throw new \Exception(sprintf(
+                    'Cannot rename a non-HEAD file [%s#%s]', $path->getFullPath(), $path->getRef()
+                ));
+            }
+            if (!file_exists($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s not found', $path->getFullPath()));
+            }
+            if (!is_file($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s is not a file', $path->getFullPath()));
+            }
+
+            $repo   = $path->getRepository();
+            $repo->renameFile($path->getLocalPath(), $repo->resolveLocalPath($path_to));
+            return true;
+        } catch (Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
     }
 
     /**
@@ -233,6 +254,27 @@ class StreamWrapper
      */
     public function rmdir($path, $options)
     {
+        try {
+            $path   = $this->getPath($path);
+            if ($path->getRef() != 'HEAD') {
+                throw new \Exception(sprintf(
+                    'Cannot remove a non-HEAD directory [%s#%s]', $path->getFullPath(), $path->getRef()
+                ));
+            }
+            if (!file_exists($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s not found', $path->getFullPath()));
+            }
+            if (!is_dir($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s is not a directory', $path->getFullPath()));
+            }
+
+            $repo   = $path->getRepository();
+            $repo->removeFile($path->getLocalPath(), null, true);
+            return true;
+        } catch (Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
     }
 
     /**
@@ -485,6 +527,27 @@ class StreamWrapper
      */
     public function unlink($path)
     {
+        try {
+            $path   = $this->getPath($path);
+            if ($path->getRef() != 'HEAD') {
+                throw new \Exception(sprintf(
+                    'Cannot unlink a non-HEAD file [%s#%s]', $path->getFullPath(), $path->getRef()
+                ));
+            }
+            if (!file_exists($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s not found', $path->getFullPath()));
+            }
+            if (!is_file($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s is not a file', $path->getFullPath()));
+            }
+
+            $repo   = $path->getRepository();
+            $repo->removeFile($path->getLocalPath());
+            return true;
+        } catch (Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
     }
 
     /**
@@ -507,25 +570,30 @@ class StreamWrapper
      */
     public function url_stat($path, $flags)
     {
-        $path   = $this->getPath($path);
-        if ($path->getRef() == 'HEAD' && file_exists($path->getFullPath())) {
-            return stat($path->getFullPath());
-        } else {
-            $stat   = array(
-                'ino'       => 0,
-                'mode'      => 0,
-                'nlink'     => 0,
-                'uid'       => 0,
-                'gid'       => 0,
-                'rdev'      => 0,
-                'size'      => 0,
-                'atime'     => 0,
-                'mtime'     => 0,
-                'ctime'     => 0,
-                'blksize'   => 0,
-                'blocks'    => 0,
-            );
-            return array_merge($stat, array_values($stat));
+        try {
+            $path   = $this->getPath($path);
+            if ($path->getRef() == 'HEAD' && file_exists($path->getFullPath())) {
+                return stat($path->getFullPath());
+            } else {
+                $stat   = array(
+                    'ino'       => 0,
+                    'mode'      => 0,
+                    'nlink'     => 0,
+                    'uid'       => 0,
+                    'gid'       => 0,
+                    'rdev'      => 0,
+                    'size'      => 0,
+                    'atime'     => 0,
+                    'mtime'     => 0,
+                    'ctime'     => 0,
+                    'blksize'   => 0,
+                    'blocks'    => 0,
+                );
+                return array_merge($stat, array_values($stat));
+            }
+        } catch (Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
         }
     }
 }
