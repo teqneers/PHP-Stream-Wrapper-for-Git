@@ -114,7 +114,9 @@ class Binary
         };
 
         $binary     = escapeshellcmd($this->path);
-        $command    = escapeshellarg($command);
+        if (!empty($command)) {
+            $command    = escapeshellarg($command);
+        }
         $args       = array();
         $files      = array();
         $fileMode   = false;
