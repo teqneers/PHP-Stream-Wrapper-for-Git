@@ -160,6 +160,7 @@ class FileStringBuffer implements FileBuffer
                 $this->position    = $this->length + $position;
                 break;
             default:
+                $this->position    = 0;
                 return false;
         }
 
