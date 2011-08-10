@@ -95,7 +95,7 @@ class CallResult
      *
      * @return Call
      */
-    public function cliCall()
+    public function getCliCall()
     {
         return $this->cliCall;
     }
