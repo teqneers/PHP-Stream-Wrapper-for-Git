@@ -128,5 +128,22 @@ class FileStringBufferTest extends \PHPUnit_Framework_TestCase
         $actual     = $buffer->getBuffer();
         $this->assertEquals($expected, $actual);
     }
+
+    public function testSeekBeyondLimits()
+    {
+        $buffer     = new FileStringBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $this->assertFalse($buffer->setPosition(-5, SEEK_SET));
+        $this->assertEquals(0, $buffer->getPosition());
+
+        $this->assertFalse($buffer->setPosition(4711, SEEK_SET));
+        $this->assertEquals(26, $buffer->getPosition());
+    }
+
+    public function testSeekWithIllegalWhence()
+    {
+        $buffer     = new FileStringBuffer('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+        $this->assertFalse($buffer->setPosition(5, 4711));
+        $this->assertEquals(0, $buffer->getPosition());
+    }
 }
 
