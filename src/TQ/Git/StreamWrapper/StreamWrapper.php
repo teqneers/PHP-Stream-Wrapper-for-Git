@@ -153,7 +153,10 @@ class StreamWrapper
      */
     protected function parsePath($streamUrl)
     {
-        $path           = ltrim(substr($streamUrl, strlen(self::$protocol) + 3), DIRECTORY_SEPARATOR.'/');
+        $path   = ltrim(substr($streamUrl, strlen(self::$protocol) + 3), DIRECTORY_SEPARATOR.'/');
+        //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
+        $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
+
         $url            = parse_url(self::$protocol.'://'.$path);
         $url['path']    = DIRECTORY_SEPARATOR.$url['host'].$url['path'];
         unset($url['host']);
@@ -575,6 +578,7 @@ class StreamWrapper
     /**
      * streamWrapper::url_stat — Retrieve information about a file
      *
+     * mode bit mask:
      * S_IFMT     0170000   bit mask for the file type bit fields
      * S_IFSOCK   0140000   socket
      * S_IFLNK    0120000   symbolic link
@@ -621,19 +625,22 @@ class StreamWrapper
             if ($path->getRef() == 'HEAD' && file_exists($path->getFullPath())) {
                 return stat($path->getFullPath());
             } else {
+                $repo   = $path->getRepository();
+                $info   = $repo->getObjectInfo($path->getLocalPath(), $path->getRef());
+
                 $stat   = array(
                     'ino'       => 0,
-                    'mode'      => 0,
+                    'mode'      => $info['mode'],
                     'nlink'     => 0,
                     'uid'       => 0,
                     'gid'       => 0,
                     'rdev'      => 0,
-                    'size'      => 0,
+                    'size'      => $info['size'],
                     'atime'     => 0,
                     'mtime'     => 0,
                     'ctime'     => 0,
-                    'blksize'   => 0,
-                    'blocks'    => 0,
+                    'blksize'   => -1,
+                    'blocks'    => -1,
                 );
                 return array_merge($stat, array_values($stat));
             }

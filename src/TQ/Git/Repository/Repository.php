@@ -601,6 +601,7 @@ class Repository
      *
      * @param   string  $file       The path to the file
      * @param   string  $ref        The version ref
+     * @return  string
      */
     public function showFile($file, $ref = 'HEAD')
     {
@@ -613,6 +614,59 @@ class Repository
 
 
         return $result->getStdOut();
+    }
+
+    /**
+     * Returns information about an object at a given version
+     *
+     * The information returned is an array with the following structure
+     * array(
+     *      'type'  => blob|tree|commit,
+     *      'mode'  => 0040000 for a tree, 0100000 for a blob, 0 otherwise,
+     *      'size'  => the size
+     * )
+     *
+     * @param   string  $path       The path to the object
+     * @param   string  $ref        The version ref
+     * @return  array               The object info
+     */
+    public function getObjectInfo($path, $ref = 'HEAD')
+    {
+        $info   = array(
+            'type'  => null,
+            'mode'  => 0,
+            'size'  => 0
+        );
+
+        $result = $this->getBinary()->{'cat-file'}($this->getRepositoryPath(), array(
+            '-t',
+            sprintf('%s:%s', $ref, $path)
+        ));
+        self::throwIfError($result, sprintf('Cannot get type of "%s" at "%s" from "%s"',
+            $path, $ref, $this->getRepositoryPath()
+        ));
+        $info['type']   = $result->getStdOut();
+        $mode           = 0;
+        switch ($info['type']) {
+            case 'tree':
+                $mode   |= 0040000;
+                break;
+            case 'blob':
+                $mode   |= 0100000;
+                break;
+        }
+        $info['mode']   = (int)$mode;
+
+        $result = $this->getBinary()->{'cat-file'}($this->getRepositoryPath(), array(
+            '-s',
+            sprintf('%s:%s', $ref, $path)
+        ));
+        self::throwIfError($result, sprintf('Cannot get size of "%s" at "%s" from "%s"',
+            $path, $ref, $this->getRepositoryPath()
+        ));
+        $info['size']   = $result->getStdOut();
+
+        return $info;
     }
 
     /**
