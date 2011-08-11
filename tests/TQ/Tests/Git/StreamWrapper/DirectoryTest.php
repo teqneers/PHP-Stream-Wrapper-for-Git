@@ -230,5 +230,240 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(15, $i);
     }
+
+    public function testListDirectoryWithRefWithRecursiveIterator()
+    {
+        $c  = $this->getRepository();
+        for ($i = 0; $i < 5; $i++) {
+            $dir   = sprintf('dir_%d', $i);
+            $path  = TESTS_REPO_PATH_1.'/'.$dir.'/test.txt';
+            $c->writeFile($path, 'Test');
+        }
+        $c->writeFile('test.txt', 'Test');
+
+        $dir    = new \RecursiveDirectoryIterator(
+            'git://'.TESTS_REPO_PATH_1,
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
+        $i  = 0;
+        $ex = array(
+            'dir_0',
+            'file.txt',
+            'test.txt',
+            'dir_1',
+            'file.txt',
+            'test.txt',
+            'dir_2',
+            'file.txt',
+            'test.txt',
+            'dir_3',
+            'file.txt',
+            'test.txt',
+            'dir_4',
+            'file.txt',
+            'test.txt',
+            'file_0.txt',
+            'file_1.txt',
+            'file_2.txt',
+            'file_3.txt',
+            'file_4.txt',
+            'test.txt'
+        );
+        foreach ($it as $f => $fi) {
+            $this->assertEquals($ex[$i], $f);
+            $i++;
+        }
+        $this->assertEquals(count($ex), $i);
+
+        $dir    = new \RecursiveDirectoryIterator(
+            'git://'.TESTS_REPO_PATH_1.'#HEAD^',
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
+        $i  = 0;
+        $ex = array(
+            'dir_0',
+            'file.txt',
+            'test.txt',
+            'dir_1',
+            'file.txt',
+            'test.txt',
+            'dir_2',
+            'file.txt',
+            'test.txt',
+            'dir_3',
+            'file.txt',
+            'test.txt',
+            'dir_4',
+            'file.txt',
+            'test.txt',
+            'file_0.txt',
+            'file_1.txt',
+            'file_2.txt',
+            'file_3.txt',
+            'file_4.txt',
+        );
+        foreach ($it as $f => $fi) {
+            $this->assertEquals($ex[$i], $f);
+            $i++;
+        }
+        $this->assertEquals(count($ex), $i);
+
+        $dir    = new \RecursiveDirectoryIterator(
+            'git://'.TESTS_REPO_PATH_1.'#HEAD^^',
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
+        $i  = 0;
+        $ex = array(
+            'dir_0',
+            'file.txt',
+            'test.txt',
+            'dir_1',
+            'file.txt',
+            'test.txt',
+            'dir_2',
+            'file.txt',
+            'test.txt',
+            'dir_3',
+            'file.txt',
+            'test.txt',
+            'dir_4',
+            'file.txt',
+            'file_0.txt',
+            'file_1.txt',
+            'file_2.txt',
+            'file_3.txt',
+            'file_4.txt'
+        );
+        foreach ($it as $f => $fi) {
+            $this->assertEquals($ex[$i], $f);
+            $i++;
+        }
+        $this->assertEquals(count($ex), $i);
+
+        $dir    = new \RecursiveDirectoryIterator(
+            'git://'.TESTS_REPO_PATH_1.'#HEAD^^^',
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
+        $i  = 0;
+        $ex = array(
+            'dir_0',
+            'file.txt',
+            'test.txt',
+            'dir_1',
+            'file.txt',
+            'test.txt',
+            'dir_2',
+            'file.txt',
+            'test.txt',
+            'dir_3',
+            'file.txt',
+            'dir_4',
+            'file.txt',
+            'file_0.txt',
+            'file_1.txt',
+            'file_2.txt',
+            'file_3.txt',
+            'file_4.txt'
+        );
+        foreach ($it as $f => $fi) {
+            $this->assertEquals($ex[$i], $f);
+            $i++;
+        }
+        $this->assertEquals(count($ex), $i);
+
+        $dir    = new \RecursiveDirectoryIterator(
+            'git://'.TESTS_REPO_PATH_1.'#HEAD^^^^',
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
+        $i  = 0;
+        $ex = array(
+            'dir_0',
+            'file.txt',
+            'test.txt',
+            'dir_1',
+            'file.txt',
+            'test.txt',
+            'dir_2',
+            'file.txt',
+            'dir_3',
+            'file.txt',
+            'dir_4',
+            'file.txt',
+            'file_0.txt',
+            'file_1.txt',
+            'file_2.txt',
+            'file_3.txt',
+            'file_4.txt'
+        );
+        foreach ($it as $f => $fi) {
+            $this->assertEquals($ex[$i], $f);
+            $i++;
+        }
+        $this->assertEquals(count($ex), $i);
+
+        $dir    = new \RecursiveDirectoryIterator(
+            'git://'.TESTS_REPO_PATH_1.'#HEAD^^^^^',
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
+        $i  = 0;
+        $ex = array(
+            'dir_0',
+            'file.txt',
+            'test.txt',
+            'dir_1',
+            'file.txt',
+            'dir_2',
+            'file.txt',
+            'dir_3',
+            'file.txt',
+            'dir_4',
+            'file.txt',
+            'file_0.txt',
+            'file_1.txt',
+            'file_2.txt',
+            'file_3.txt',
+            'file_4.txt'
+        );
+        foreach ($it as $f => $fi) {
+            $this->assertEquals($ex[$i], $f);
+            $i++;
+        }
+        $this->assertEquals(count($ex), $i);
+
+        $dir    = new \RecursiveDirectoryIterator(
+            'git://'.TESTS_REPO_PATH_1.'#HEAD^^^^^^',
+            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        );
+        $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
+        $i  = 0;
+        $ex = array(
+            'dir_0',
+            'file.txt',
+            'dir_1',
+            'file.txt',
+            'dir_2',
+            'file.txt',
+            'dir_3',
+            'file.txt',
+            'dir_4',
+            'file.txt',
+            'file_0.txt',
+            'file_1.txt',
+            'file_2.txt',
+            'file_3.txt',
+            'file_4.txt'
+        );
+        foreach ($it as $f => $fi) {
+            $this->assertEquals($ex[$i], $f);
+            $i++;
+        }
+        $this->assertEquals(count($ex), $i);
+    }
 }
 
