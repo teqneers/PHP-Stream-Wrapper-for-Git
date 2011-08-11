@@ -193,8 +193,8 @@ class FileStringBuffer implements FileBuffer
             'atime'     => 0,
             'mtime'     => 0,
             'ctime'     => 0,
-            'blksize'   => 0,
-            'blocks'    => 0,
+            'blksize'   => -1,
+            'blocks'    => -1,
         );
         return array_merge($stat, array_values($stat));
     }
