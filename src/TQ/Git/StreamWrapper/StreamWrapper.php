@@ -228,6 +228,24 @@ class StreamWrapper
      */
     public function mkdir($path, $mode, $options)
     {
+        try {
+            $path   = $this->getPath($path);
+            if ($path->getRef() != 'HEAD') {
+                throw new \Exception(sprintf(
+                    'Cannot create a non-HEAD directory [%s#%s]', $path->getFullPath(), $path->getRef()
+                ));
+            }
+            if (file_exists($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s already exists', $path->getFullPath()));
+            }
+
+            $repo   = $path->getRepository();
+            $repo->writeFile($path->getLocalPath().'/.gitkeep', '');
+            return true;
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
     }
 
     /**

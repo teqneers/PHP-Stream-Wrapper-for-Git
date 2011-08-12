@@ -87,8 +87,8 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
 
     public function testUnlinkFile()
     {
-        $filePath   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
-        unlink($filePath);
+        $path   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        unlink($path);
 
         $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
 
@@ -129,9 +129,9 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
 
     public function testRenameFile()
     {
-        $filePathFrom   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
-        $filePathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($filePathFrom, $filePathTo);
+        $pathFrom   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        rename($pathFrom, $pathTo);
 
         $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
         $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
@@ -147,9 +147,9 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenameFileNonHead()
     {
-        $filePathFrom   = sprintf('git://%s/file_0.txt#HEAD^', TESTS_REPO_PATH_1);
-        $filePathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($filePathFrom, $filePathTo);
+        $pathFrom   = sprintf('git://%s/file_0.txt#HEAD^', TESTS_REPO_PATH_1);
+        $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        rename($pathFrom, $pathTo);
     }
 
     /**
@@ -157,9 +157,9 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
      */
     public function testRenameNonExistantFile()
     {
-        $filePathFrom   = sprintf('git://%s/file_does_not_exist.txt', TESTS_REPO_PATH_1);
-        $filePathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($filePathFrom, $filePathTo);
+        $pathFrom   = sprintf('git://%s/file_does_not_exist.txt', TESTS_REPO_PATH_1);
+        $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        rename($pathFrom, $pathTo);
     }
 
     /**
@@ -170,9 +170,9 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $c  = $this->getRepository();
         $c->writeFile('directory/test.txt', 'Test');
 
-        $filePathFrom   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
-        $filePathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($filePathFrom, $filePathTo);
+        $pathFrom   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        rename($pathFrom, $pathTo);
     }
 
     public function testRmdirDirectory()
@@ -182,13 +182,14 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists(TESTS_REPO_PATH_1.'/directory');
         $this->assertFileExists(TESTS_REPO_PATH_1.'/directory/test.txt');
 
-        $dirPath   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
-        rmdir($dirPath);
+        $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        rmdir($path);
 
         $this->assertFileNotExists(TESTS_REPO_PATH_1.'/directory');
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
+
         $this->assertContains('--- a/directory/test.txt', $commit);
     }
 
@@ -200,8 +201,8 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $c  = $this->getRepository();
         $c->writeFile('directory/test.txt', 'Test');
 
-        $dirPath   = sprintf('git://%s/directory#HEAD^', TESTS_REPO_PATH_1);
-        rmdir($dirPath);
+        $path   = sprintf('git://%s/directory#HEAD^', TESTS_REPO_PATH_1);
+        rmdir($path);
     }
 
     /**
@@ -221,5 +222,40 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $path   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
         rmdir($path);
     }
+
+    public function testMkdirDirectory()
+    {
+        $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        mkdir($path);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory/.gitkeep');
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertContains('b/directory/.gitkeep', $commit);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testMkdirDirectoryNonHead()
+    {
+        $path   = sprintf('git://%s/directory#HEAD^', TESTS_REPO_PATH_1);
+        mkdir($path);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testMkdirExistantDirectory()
+    {
+        $c  = $this->getRepository();
+        $c->writeFile('directory/test.txt', 'Test');
+
+        $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        mkdir($path);
+    }
+
 }
 
