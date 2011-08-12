@@ -111,32 +111,28 @@ class Repository
             ));
         }
 
-        if (file_exists($repositoryPath) && is_file($repositoryPath)) {
-            $repositoryPath = dirname($repositoryPath);
-        }
+        $repositoryRoot = self::findRepositoryRoot($repositoryPath);
 
-        if (   !$createIfNotExists
-            && (!file_exists($repositoryPath) || !is_dir($repositoryPath))
-        ) {
-            throw new \InvalidArgumentException(sprintf(
-                '"%s" is not a valid path', $repositoryPath
-            ));
-        }
-
-        if ($createIfNotExists) {
-            if (!file_exists($repositoryPath) && !mkdir($repositoryPath, $createIfNotExists, true)) {
-                throw new \RuntimeException(sprintf(
-                    '"%s" cannot be created', $repositoryPath
-                ));
-            } else if (!is_dir($repositoryPath)) {
+        if ($repositoryRoot === null) {
+            if (!$createIfNotExists) {
                 throw new \InvalidArgumentException(sprintf(
                     '"%s" is not a valid path', $repositoryPath
                 ));
+            } else {
+                if (!file_exists($repositoryPath) && !mkdir($repositoryPath, true, true)) {
+                    throw new \RuntimeException(sprintf(
+                        '"%s" cannot be created', $repositoryPath
+                    ));
+                } else if (!is_dir($repositoryPath)) {
+                    throw new \InvalidArgumentException(sprintf(
+                        '"%s" is not a valid path', $repositoryPath
+                    ));
+                }
+                self::initRepository($binary, $repositoryPath);
+                $repositoryRoot = $repositoryPath;
             }
-            self::initRepository($binary, $repositoryPath);
         }
 
-        $repositoryRoot = self::findRepositoryRoot($repositoryPath);
         if ($repositoryRoot === null) {
             throw new \InvalidArgumentException(sprintf(
                 '"%s" is not a valid Git repository', $repositoryPath
