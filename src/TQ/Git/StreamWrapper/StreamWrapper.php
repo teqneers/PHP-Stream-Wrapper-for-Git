@@ -189,7 +189,7 @@ class StreamWrapper
             $listing            = $repo->listDirectory($path->getLocalPath(), $path->getRef());
             $this->dirBuffer    = new DirectoryBuffer($listing);
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             return false;
         }
@@ -249,6 +249,7 @@ class StreamWrapper
             if (!file_exists($pathFrom->getFullPath())) {
                 throw new \Exception(sprintf('Path %s not found', $pathFrom->getFullPath()));
             }
+
             if (!is_file($pathFrom->getFullPath())) {
                 throw new \Exception(sprintf('Path %s is not a file', $pathFrom->getFullPath()));
             }
@@ -264,7 +265,7 @@ class StreamWrapper
             $repo   = $pathFrom->getRepository();
             $repo->renameFile($pathFrom->getLocalPath(), $pathTo);
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             return false;
         }
@@ -296,7 +297,7 @@ class StreamWrapper
             $repo   = $path->getRepository();
             $repo->removeFile($path->getLocalPath(), null, true);
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             return false;
         }
@@ -439,7 +440,7 @@ class StreamWrapper
             }
             $this->fileBuffer   = $buffer;
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             return false;
         }
@@ -571,7 +572,7 @@ class StreamWrapper
             $repo   = $path->getRepository();
             $repo->removeFile($path->getLocalPath());
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             return false;
         }
@@ -646,7 +647,7 @@ class StreamWrapper
                 );
                 return array_merge($stat, array_values($stat));
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
             return false;
         }
