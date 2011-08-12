@@ -639,33 +639,29 @@ class Repository
         );
 
         $result = $this->getBinary()->{'cat-file'}($this->getRepositoryPath(), array(
-            '-t',
-            sprintf('%s:%s', $ref, $path)
-        ));
-        self::throwIfError($result, sprintf('Cannot get type of "%s" at "%s" from "%s"',
+            '--batch-check'
+        ), sprintf('%s:%s', $ref, $path));
+        self::throwIfError($result, sprintf('Cannot cat-file "%s" at "%s" from "%s"',
             $path, $ref, $this->getRepositoryPath()
         ));
-        $info['type']   = $result->getStdOut();
-        $mode           = 0;
-        switch ($info['type']) {
-            case 'tree':
-                $mode   |= 0040000;
-                break;
-            case 'blob':
-                $mode   |= 0100000;
-                break;
+        $output = trim($result->getStdOut());
+
+        $parts  = array();
+        if (preg_match('/^(?<sha1>[0-9a-f]{40}) (?<type>\w+) (?<size>\d+)$/', $output, $parts)) {
+            $mode   = 0;
+            switch ($parts['type']) {
+                case 'tree':
+                    $mode   |= 0040000;
+                    break;
+                case 'blob':
+                    $mode   |= 0100000;
+                    break;
+            }
+            $info['sha1']   = $parts['sha1'];
+            $info['type']   = $parts['type'];
+            $info['mode']   = (int)$mode;
+            $info['size']   = (int)$parts['size'];
         }
-        $info['mode']   = (int)$mode;
-
-        $result = $this->getBinary()->{'cat-file'}($this->getRepositoryPath(), array(
-            '-s',
-            sprintf('%s:%s', $ref, $path)
-        ));
-        self::throwIfError($result, sprintf('Cannot get size of "%s" at "%s" from "%s"',
-            $path, $ref, $this->getRepositoryPath()
-        ));
-        $info['size']   = $result->getStdOut();
-
         return $info;
     }
 
