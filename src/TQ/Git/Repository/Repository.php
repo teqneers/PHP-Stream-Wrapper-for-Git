@@ -119,7 +119,7 @@ class Repository
                     '"%s" is not a valid path', $repositoryPath
                 ));
             } else {
-                if (!file_exists($repositoryPath) && !mkdir($repositoryPath, true, true)) {
+                if (!file_exists($repositoryPath) && !mkdir($repositoryPath, $createIfNotExists, true)) {
                     throw new \RuntimeException(sprintf(
                         '"%s" cannot be created', $repositoryPath
                     ));
