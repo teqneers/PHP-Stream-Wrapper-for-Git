@@ -7,6 +7,18 @@ The *Git Streamwrapper for PHP* core is a wrapper around the Git command line bi
 
 **The code is currently in an early pre-alpha state so it is neither extensively tested nor feature-complete or API-stable.**
 
+To-Do
+-----
+
+- write-support for files
+- support the various options in
+  - dir_opendir
+  - mkdir
+  - rmdir
+  - stream_open
+  - url_stat
+- stream context support
+
 Examples
 --------
 
@@ -113,6 +125,13 @@ unlink('git:///path/to/your/repository/file_to_delete.txt');
 
 // rename a file - change is committed to the repository
 rename('git:///path/to/your/repository/old.txt', 'git:///path/to/your/repository/new.txt');
+
+// remove a directory - change is committed to the repository
+rmdir('git:///path/to/your/repository/directory_to_delete');
+
+// create a directory - change is committed to the repository
+// this creates a .gitkeep file in new_directory because Git does not track directories
+mkdir('git:///path/to/your/repository/new_directory');
 
 // unregister the wrapper if needed
 StreamWrapper::unregister();
