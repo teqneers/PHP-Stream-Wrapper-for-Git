@@ -12,94 +12,111 @@ Examples
 
 ### Using the repository abstraction
 
-    use TQ\Git\Cli\Binary;
-    use TQ\Git\Repository\Repository;
-    // open an already initialized repository
-    $git = Repository::open('/path/to/your/repository', new Binary('/usr/bin/git'));
+```php
+use TQ\Git\Cli\Binary;
+use TQ\Git\Repository\Repository;
+// open an already initialized repository
+$git = Repository::open('/path/to/your/repository', new Binary('/usr/bin/git'));
 
-    // open repository and create path and init repository if necessary
-    $git = Repository::open('/path/to/your/repository', new Binary('/usr/bin/git'), 0755);
+// open repository and create path and init repository if necessary
+$git = Repository::open('/path/to/your/repository', new Binary('/usr/bin/git'), 0755);
 
-    // get current branch
-    $branch = $git->getCurrentBranch();
+// get current branch
+$branch = $git->getCurrentBranch();
 
-    // get status of working directory
-    $status = $git->getStatus();
-    // are there uncommitted changes in the staging area or in the working directory
-    $isDirty = $git->isDirty();
+// get status of working directory
+$status = $git->getStatus();
+// are there uncommitted changes in the staging area or in the working directory
+$isDirty = $git->isDirty();
 
-    // retrieve the commit log limited to $limit entries skipping the first $skip
-    $log = $git->getLog($limit, $skip);
+// retrieve the commit log limited to $limit entries skipping the first $skip
+$log = $git->getLog($limit, $skip);
 
-    // retrieve the second to last commit
-    $commit = $git->showCommit('HEAD^');
+// retrieve the second to last commit
+$commit = $git->showCommit('HEAD^');
 
-    // list the directory contents two commits before
-    $list  = $git->listDirectory('.', 'HEAD^^');
+// list the directory contents two commits before
+$list  = $git->listDirectory('.', 'HEAD^^');
 
-    // show contents of file $file at commit abcd123...
-    $contents = $git->showFile($file, 'abcd123');
+// show contents of file $file at commit abcd123...
+$contents = $git->showFile($file, 'abcd123');
 
-    // write a file and commit the changes
-    $commit = $git->writeFile('test.txt', 'Test', 'Added test.txt');
+// write a file and commit the changes
+$commit = $git->writeFile('test.txt', 'Test', 'Added test.txt');
 
-    // remove multiple files
-    $commit = $git->removeFile('file_*', 'Removed all files not needed any more');
+// remove multiple files
+$commit = $git->removeFile('file_*', 'Removed all files not needed any more');
 
-    // rename a file
-    $commit = $c->renameFile('test.txt', 'test.txt-old', 'Made a backup copy');
+// rename a file
+$commit = $c->renameFile('test.txt', 'test.txt-old', 'Made a backup copy');
 
-    // do some file operations and commit all changes at once
-    $result = $git->transactional(function(TQ\Git\Repository\Transaction $t) {
-        file_put_contents($t->getRepositoryPath().'/text1.txt', 'Test 1');
-        file_put_contents($t->getRepositoryPath().'/text2.txt', 'Test 2');
+// do some file operations and commit all changes at once
+$result = $git->transactional(function(TQ\Git\Repository\Transaction $t) {
+    file_put_contents($t->getRepositoryPath().'/text1.txt', 'Test 1');
+    file_put_contents($t->getRepositoryPath().'/text2.txt', 'Test 2');
 
-        unlink($t->resolvePath('old.txt'));
-        rename($t->resolvePath('to_keep.txt'), $t->resolvePath('test3.txt'));
+    unlink($t->resolvePath('old.txt'));
+    rename($t->resolvePath('to_keep.txt'), $t->resolvePath('test3.txt'));
 
-        $t->setCommitMsg('Don\'t know what to write here');
+    $t->setCommitMsg('Don\'t know what to write here');
 
-        // if we throw an execption from within the callback the changes are discarded
-        // throw new Exception('No we don\'t want to to these changes');
-        // note: the exception will be re-thrown by the repository so you have to catch
-        // the exception yourself outside the transactional scope.
-    });
+    // if we throw an execption from within the callback the changes are discarded
+    // throw new Exception('No we don\'t want to to these changes');
+    // note: the exception will be re-thrown by the repository so you have to catch
+    // the exception yourself outside the transactional scope.
+});
+```
 
 ### Using the streamwrapper
 
-    use TQ\Git\Cli\Binary;
-    use TQ\Git\StreamWrapper\StreamWrapper;
+```php
+use TQ\Git\Cli\Binary;
+use TQ\Git\StreamWrapper\StreamWrapper;
 
-    // register the wrapper
-    StreamWrapper::register('git', new Binary('/usr/bin/git'));
+// register the wrapper
+StreamWrapper::register('git', new Binary('/usr/bin/git'));
 
-    // read the contents of a file
-    $content = file_get_contents('git:///path/to/your/repository/file_0.txt');
+// read the contents of a file
+$content = file_get_contents('git:///path/to/your/repository/file_0.txt');
 
-    // show contents of a file at commit abcd123...
-    $content = file_get_contents('git:///path/to/your/repository/file_0.txt#abcd123');
+// show contents of a file at commit abcd123...
+$content = file_get_contents('git:///path/to/your/repository/file_0.txt#abcd123');
 
-    // show contents of a file two commits before
-    $content = file_get_contents('git:///path/to/your/repository/file_0.txt#HEAD^^');
+// show contents of a file two commits before
+$content = file_get_contents('git:///path/to/your/repository/file_0.txt#HEAD^^');
 
-    // show the directory information two commits before
-    $directory = file_get_contents('git:///path/to/your/repository/#HEAD^^');
+// show the directory information two commits before
+$directory = file_get_contents('git:///path/to/your/repository/#HEAD^^');
 
-    // list directory contents two commits before
-    $dir = opendir('git:///path/to/your/repository/subdir#HEAD^^');
-    while ($f = readdir($dir)) {
-        echo $f.PHP_EOL;
-    }
-    closedir($dir);
+// list directory contents two commits before
+$dir = opendir('git:///path/to/your/repository/subdir#HEAD^^');
+while ($f = readdir($dir)) {
+    echo $f.PHP_EOL;
+}
+closedir($dir);
 
-    // retrieve the second to last commit
-    $commit = file_get_contents(''git:///path/to/your/repository?commit&ref=HEAD^^');
+// recursively traverse the repository two commits before
+$dir = new RecursiveDirectoryIterator('git:///path/to/your/repository#HEAD^^');
+$it  = new RecursiveIteratorIterator($dir, RecursiveIteratorIterator::SELF_FIRST);
+foreach ($it as $fileInfo) {
+    echo str_repeat(' ', $it->getDepth() * 3).$fileInfo->getFilename().PHP_EOL;
+}
 
-    // retrieve the commit log limited to 5entries skipping the first 2
-    $log = file_get_contents(''git:///path/to/your/repository?log&limit=5&skip=2');
+// retrieve the second to last commit
+$commit = file_get_contents('git:///path/to/your/repository?commit&ref=HEAD^^');
 
-    // unregister the wrapper if needed
-    StreamWrapper::unregister();
+// retrieve the commit log limited to 5entries skipping the first 2
+$log = file_get_contents('git:///path/to/your/repository?log&limit=5&skip=2');
+
+// remove a file - change is committed to the repository
+unlink('git:///path/to/your/repository/file_to_delete.txt');
+
+// rename a file - change is committed to the repository
+rename('git:///path/to/your/repository/old.txt', 'git:///path/to/your/repository/new.txt');
+
+// unregister the wrapper if needed
+StreamWrapper::unregister();
+```
 
 Requirements
 ------------
