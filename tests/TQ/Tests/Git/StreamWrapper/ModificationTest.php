@@ -97,6 +97,36 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('--- a/file_0.txt', $commit);
     }
 
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testUnlinkFileNonHead()
+    {
+        $path   = sprintf('git://%s/file_0.txt#HEAD^', TESTS_REPO_PATH_1);
+        unlink($path);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testUnlinkNonExistantFile()
+    {
+        $path   = sprintf('git://%s/file_does_not_exist.txt', TESTS_REPO_PATH_1);
+        unlink($path);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testUnlinkNonFile()
+    {
+        $c  = $this->getRepository();
+        $c->writeFile('directory/test.txt', 'Test');
+
+        $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        unlink($path);
+    }
+
     public function testRenameFile()
     {
         $filePathFrom   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
@@ -143,6 +173,53 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $filePathFrom   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
         $filePathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
         rename($filePathFrom, $filePathTo);
+    }
+
+    public function testRmdirDirectory()
+    {
+        $c  = $this->getRepository();
+        $c->writeFile('directory/test.txt', 'Test');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory/test.txt');
+
+        $dirPath   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        rmdir($dirPath);
+
+        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/directory');
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertContains('--- a/directory/test.txt', $commit);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testRmdirDirectoryNonHead()
+    {
+        $c  = $this->getRepository();
+        $c->writeFile('directory/test.txt', 'Test');
+
+        $dirPath   = sprintf('git://%s/directory#HEAD^', TESTS_REPO_PATH_1);
+        rmdir($dirPath);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testRmdirNonExistantDirectory()
+    {
+        $path   = sprintf('git://%s/directory_does_not_exist', TESTS_REPO_PATH_1);
+        rmdir($path);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testRmdirNonDirectory()
+    {
+        $path   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        rmdir($path);
     }
 }
 
