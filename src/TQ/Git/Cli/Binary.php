@@ -165,18 +165,25 @@ class Binary
             ));
         }
         $path   = array_shift($arguments);
+        $args   = array();
+        $stdIn  = null;
 
-        if (count($arguments) >= 1) {
+        if (count($arguments) > 0) {
             $args   = array_shift($arguments);
             if (!is_array($args)) {
                 $args   = array($args);
             }
-        } else {
-            $args   = array();
+
+            if (count($arguments) > 0) {
+                $stdIn  = array_shift($arguments);
+                if (!is_string($stdIn)) {
+                    $stdIn   = null;
+                }
+            }
         }
 
         $call   = $this->createGitCall($path, $method, $args);
-        return $call->execute();
+        return $call->execute($stdIn);
     }
 }
 
