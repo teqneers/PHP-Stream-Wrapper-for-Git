@@ -111,5 +111,38 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('--- a/file_0.txt', $commit);
         $this->assertContains('+++ b/test.txt', $commit);
     }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testRenameFileNonHead()
+    {
+        $filePathFrom   = sprintf('git://%s/file_0.txt#HEAD^', TESTS_REPO_PATH_1);
+        $filePathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        rename($filePathFrom, $filePathTo);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testRenameNonExistantFile()
+    {
+        $filePathFrom   = sprintf('git://%s/file_does_not_exist.txt', TESTS_REPO_PATH_1);
+        $filePathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        rename($filePathFrom, $filePathTo);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testRenameNonFile()
+    {
+        $c  = $this->getRepository();
+        $c->writeFile('directory/test.txt', 'Test');
+
+        $filePathFrom   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        $filePathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        rename($filePathFrom, $filePathTo);
+    }
 }
 
