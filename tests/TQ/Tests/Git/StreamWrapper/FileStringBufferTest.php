@@ -145,5 +145,29 @@ class FileStringBufferTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($buffer->setPosition(5, 4711));
         $this->assertEquals(0, $buffer->getPosition());
     }
+
+    public function testLengthAndPositionUpdatedWithWrite()
+    {
+        $buffer     = new FileStringBuffer('');
+        $this->assertEquals(0, $buffer->getPosition());
+        $this->assertEquals(0, $buffer->getLength());
+
+        $buffer->write('1');
+        $this->assertEquals(1, $buffer->getPosition());
+        $this->assertEquals(1, $buffer->getLength());
+
+        $buffer->write('23');
+        $this->assertEquals(3, $buffer->getPosition());
+        $this->assertEquals(3, $buffer->getLength());
+
+        $buffer->setPosition(-2, SEEK_CUR);
+        $this->assertEquals(1, $buffer->getPosition());
+
+        $buffer->write('4');
+        $this->assertEquals(2, $buffer->getPosition());
+        $this->assertEquals(3, $buffer->getLength());
+
+        $this->assertEquals('143', $buffer->getBuffer());
+    }
 }
 

@@ -136,6 +136,8 @@ class FileStringBuffer implements FileBuffer
         $start          = substr($this->buffer, 0, $this->position);
         $end            = substr($this->buffer, $this->position + $dataLength);
         $this->buffer   = $start.$data.$end;
+        $this->length   = strlen($this->buffer);
+        $this->position += $dataLength;
         return $dataLength;
     }
 
@@ -147,6 +149,16 @@ class FileStringBuffer implements FileBuffer
     public function getPosition()
     {
         return $this->position;
+    }
+
+    /**
+     * Returns the current length
+     *
+     * @return integer
+     */
+    public function getLength()
+    {
+        return $this->length;
     }
 
     /**
