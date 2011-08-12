@@ -411,6 +411,7 @@ class StreamWrapper
             $path   = $this->getPath($path);
             $repo   = $path->getRepository();
 
+            $objectInfo = array();
             if ($path->hasArgument('commit')) {
                 $buffer = $repo->showCommit($path->getArgument('ref'));
             } else if ($path->hasArgument('log')) {
@@ -428,12 +429,13 @@ class StreamWrapper
                 ) {
                     $buffer = new FileStreamBuffer($path->getFullPath());
                 } else {
-                    $buffer = $repo->showFile($path->getLocalPath(), $path->getRef());
+                    $buffer     = $repo->showFile($path->getLocalPath(), $path->getRef());
+                    $objectInfo = $repo->getObjectInfo($path->getLocalPath(), $path->getRef());
                 }
             }
 
             if (!($buffer instanceof FileBuffer)) {
-                $buffer = new FileStringBuffer($buffer);
+                $buffer = new FileStringBuffer($buffer, $objectInfo);
             }
             $this->fileBuffer   = $buffer;
             return true;

@@ -68,15 +68,24 @@ class FileStringBuffer implements FileBuffer
     protected $position;
 
     /**
+     * The object info if available
+     *
+     * @var array
+     */
+    protected $objectInfo;
+
+    /**
      * Creates a neww file buffer with the given contents
      *
      * @param   string  $content    The contents
+     * @param   array   $objectInfo The object info
      */
-    public function __construct($buffer)
+    public function __construct($buffer, array $objectInfo = array())
     {
-        $this->buffer   = $buffer;
-        $this->length   = strlen($buffer);
-        $this->position = 0;
+        $this->buffer       = $buffer;
+        $this->length       = strlen($buffer);
+        $this->position     = 0;
+        $this->objectInfo   = $objectInfo;
     }
 
     /**
@@ -184,12 +193,12 @@ class FileStringBuffer implements FileBuffer
     {
         $stat   = array(
             'ino'       => 0,
-            'mode'      => 0,
+            'mode'      => (array_key_exists('mode', $this->objectInfo)) ? $this->objectInfo['mode'] : 0,
             'nlink'     => 0,
             'uid'       => 0,
             'gid'       => 0,
             'rdev'      => 0,
-            'size'      => 0,
+            'size'      => (array_key_exists('size', $this->objectInfo)) ? $this->objectInfo['size'] : 0,
             'atime'     => 0,
             'mtime'     => 0,
             'ctime'     => 0,
