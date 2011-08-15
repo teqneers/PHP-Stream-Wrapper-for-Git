@@ -90,6 +90,13 @@ class StreamWrapper
     protected $fileBuffer;
 
     /**
+     * The opened path
+     *
+     * @var Path
+     */
+    protected $path;
+
+    /**
      * Registers the stream wrapper with the given protocol
      *
      * @param   string           $protocol      The protocol (auch as "git")
@@ -171,6 +178,7 @@ class StreamWrapper
     public function dir_closedir()
     {
         $this->dirBuffer    = null;
+        $this->path         = null;
         return true;
     }
 
@@ -188,6 +196,7 @@ class StreamWrapper
             $repo               = $path->getRepository();
             $listing            = $repo->listDirectory($path->getLocalPath(), $path->getRef());
             $this->dirBuffer    = new DirectoryBuffer($listing);
+            $this->path         = $path;
             return true;
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -340,6 +349,7 @@ class StreamWrapper
     public function stream_close()
     {
         $this->fileBuffer   = null;
+        $this->path         = null;
     }
 
     /**
@@ -457,6 +467,7 @@ class StreamWrapper
                 $buffer = new FileStringBuffer($buffer, $objectInfo);
             }
             $this->fileBuffer   = $buffer;
+            $this->path         = $path;
             return true;
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
