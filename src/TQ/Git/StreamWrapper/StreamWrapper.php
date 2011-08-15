@@ -148,26 +148,7 @@ class StreamWrapper
      */
     protected function getPath($streamUrl)
     {
-        $url   = $this->parsePath($streamUrl);
-        return new PathInformation(self::$binary, $url);
-    }
-
-    /**
-     * Returns path information for a given stream URL
-     *
-     * @param   string  $streamUrl      The URL given to the stream function
-     * @return  array                   An array containing information about the path
-     */
-    protected function parsePath($streamUrl)
-    {
-        $path   = ltrim(substr($streamUrl, strlen(self::$protocol) + 3), DIRECTORY_SEPARATOR.'/');
-        //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
-        $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
-
-        $url            = parse_url(self::$protocol.'://'.$path);
-        $url['path']    = DIRECTORY_SEPARATOR.$url['host'].$url['path'];
-        unset($url['host']);
-        return $url;
+        return PathInformation::fromUrl($streamUrl, self::$protocol, self::$binary);
     }
 
     /**
@@ -281,7 +262,7 @@ class StreamWrapper
                 throw new \Exception(sprintf('Path %s is not a file', $pathFrom->getFullPath()));
             }
 
-            $pathTo = $this->parsePath($path_to);
+            $pathTo = PathInformation::parseUrl($path_to, self::$protocol);
             $pathTo = $pathTo['path'];
 
             if (strpos($pathTo, $pathFrom->getRepositoryPath()) !== 0) {

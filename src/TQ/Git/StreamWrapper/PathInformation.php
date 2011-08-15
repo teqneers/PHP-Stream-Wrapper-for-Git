@@ -84,12 +84,44 @@ class PathInformation
     protected $arguments;
 
     /**
+     * Returns path information for a given stream URL
+     *
+     * @param   string      $url        The URL
+     * @param   string      $protocol   The protocol registered
+     * @return  array                   An array containing information about the path
+     */
+    public static function parseUrl($url, $protocol)
+    {
+        $path   = ltrim(substr($url, strlen($protocol) + 3), DIRECTORY_SEPARATOR.'/');
+        //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
+        $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
+        $url    = parse_url($protocol.'://'.$path);
+        $url['path']    = DIRECTORY_SEPARATOR.$url['host'].$url['path'];
+        unset($url['host']);
+        return $url;
+    }
+
+    /**
+     * Creates a path information object from a URL string
+     *
+     * @param   string          $url        The URL
+     * @param   string          $protocol   The protocol registered
+     * @param   Binary          $binary     The Git binary
+     * @return  PathInformation
+     */
+    public static function fromUrl($url, $protocol, Binary $binary)
+    {
+        $url    = self::parseUrl($url, $protocol);
+        return new self($url, $binary);
+    }
+
+    /**
      * Creates a new path information instance from a given URL
      *
-     * @param   Binary  $binary     The git binary
      * @param   array   $url        The URL
+     * @param   Binary  $binary     The Git binary
      */
-    public function __construct(Binary $binary, array $url)
+    public function __construct(array $url, Binary $binary)
     {
         $this->fullPath     = $url['path'];
         $this->repository   = Repository::open($this->fullPath, $binary, false);
