@@ -458,24 +458,27 @@ class Repository
      * @param   string          $path           The file path
      * @param   scalar|array    $data           The data to write to the file
      * @param   string|null     $commitMsg      The commit message used when committing the changes
+     * @param   integer|null    $fileMode       The mode for creating the file
+     * @param   integer|null    $dirMode        The mode for creating the intermediate directories
+     * @param   boolean         $recursive      Create intermediate directories recursively if required
      * @return  string                          The current commit hash
      */
-    public function writeFile($path, $data, $commitMsg = null)
+    public function writeFile($path, $data, $commitMsg = null, $fileMode = null, $dirMode = null, $recursive = true)
     {
         $file       = $this->resolveFullPath($path);
 
-        $fileMode   = $this->getFileCreationMode();
-        $dirMode    = $this->getDirectoryCreationMode();
+        $fileMode   = $fileMode ?: $this->getFileCreationMode();
+        $dirMode    = $dirMode ?: $this->getDirectoryCreationMode();
 
         $directory  = dirname($file);
-        if (!file_exists($directory) && !mkdir($directory, $dirMode, true)) {
+        if (!file_exists($directory) && !mkdir($directory, (int)$dirMode, $recursive)) {
             throw new \RuntimeException(sprintf('Cannot create "%s"', $directory));
         } else if (!file_exists($file)) {
             if (!touch($file)) {
                 throw new \RuntimeException(sprintf('Cannot create "%s"', $file));
             }
-            if (!chmod($file, $fileMode)) {
-                throw new \RuntimeException(sprintf('Cannot chmod "%s" to %d', $file, $fileMode));
+            if (!chmod($file, (int)$fileMode)) {
+                throw new \RuntimeException(sprintf('Cannot chmod "%s" to %d', $file, (int)$fileMode));
             }
         }
 

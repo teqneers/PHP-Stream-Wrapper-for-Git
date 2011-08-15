@@ -229,8 +229,13 @@ class StreamWrapper
                 throw new \Exception(sprintf('Path %s already exists', $path->getFullPath()));
             }
 
+            $recursive  = false;
+            if (($options & STREAM_MKDIR_RECURSIVE) === STREAM_MKDIR_RECURSIVE) {
+                $recursive  = true;
+            }
+
             $repo   = $path->getRepository();
-            $repo->writeFile($path->getLocalPath().'/.gitkeep', '');
+            $repo->writeFile($path->getLocalPath().'/.gitkeep', '', null, 0666, $mode, $recursive);
             return true;
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -302,8 +307,14 @@ class StreamWrapper
                 throw new \Exception(sprintf('Path %s is not a directory', $path->getFullPath()));
             }
 
+            $recursive  = false;
+            $options    |= STREAM_MKDIR_RECURSIVE;
+            if (($options & STREAM_MKDIR_RECURSIVE) === STREAM_MKDIR_RECURSIVE) {
+                $recursive  = true;
+            }
+
             $repo   = $path->getRepository();
-            $repo->removeFile($path->getLocalPath(), null, true);
+            $repo->removeFile($path->getLocalPath(), null, $recursive);
             return true;
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -658,6 +669,9 @@ class StreamWrapper
                 return array_merge($stat, array_values($stat));
             }
         } catch (\Exception $e) {
+            if (($flags & STREAM_URL_STAT_QUIET) === STREAM_URL_STAT_QUIET) {
+                return false;
+            }
             trigger_error($e->getMessage(), E_USER_WARNING);
             return false;
         }

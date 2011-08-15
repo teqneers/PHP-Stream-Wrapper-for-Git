@@ -257,5 +257,27 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         mkdir($path);
     }
 
+    public function testMkdirDirectoryRecursively()
+    {
+        $path   = sprintf('git://%s/directory/directory', TESTS_REPO_PATH_1);
+        mkdir($path, 0777, true);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory/directory');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory/directory/.gitkeep');
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertContains('b/directory/directory/.gitkeep', $commit);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testMkdirDirectoryRecursivelyFailsIfNotRequested()
+    {
+        $path   = sprintf('git://%s/directory/directory', TESTS_REPO_PATH_1);
+        mkdir($path, 0777, false);
+    }
 }
 

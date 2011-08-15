@@ -12,12 +12,9 @@ To-Do
 
 - write-support for files
 - support the various options in
-  - dir_opendir
-  - mkdir
-  - rmdir
   - stream_open
-  - url_stat
 - stream context support
+- support for Windows
 
 Examples
 --------
