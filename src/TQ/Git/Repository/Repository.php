@@ -338,10 +338,11 @@ class Repository
      *
      * @param   string       $commitMsg         The commit message
      * @param   array|null   $file              Restrict commit to the given files or NULL to commit all staged changes
+     * @param   string|null  $author            The author
      */
-    public function commit($commitMsg, array $file = null)
+    public function commit($commitMsg, array $file = null, $author = null)
     {
-        $author = $this->getAuthor();
+        $author = $author ?: $this->getAuthor();
         $args   = array(
             '--message'   => $commitMsg
         );
@@ -461,10 +462,12 @@ class Repository
      * @param   integer|null    $fileMode       The mode for creating the file
      * @param   integer|null    $dirMode        The mode for creating the intermediate directories
      * @param   boolean         $recursive      Create intermediate directories recursively if required
+     * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */
-    public function writeFile($path, $data, $commitMsg = null, $fileMode = null, $dirMode = null, $recursive = true)
-    {
+    public function writeFile($path, $data, $commitMsg = null, $fileMode = null,
+        $dirMode = null, $recursive = true, $author = null
+    ) {
         $file       = $this->resolveFullPath($path);
 
         $fileMode   = $fileMode ?: $this->getFileCreationMode();
@@ -492,7 +495,7 @@ class Repository
             $commitMsg  = sprintf('%s created or changed file "%s"', __CLASS__, $path);
         }
 
-        $this->commit($commitMsg, array($file));
+        $this->commit($commitMsg, array($file), $author);
 
         return $this->getCurrentCommit();
     }
@@ -504,9 +507,10 @@ class Repository
      * @param   string|null     $commitMsg      The commit message used when committing the changes
      * @param   boolean         $recursive      True to recursively remove subdirectories
      * @param   boolean         $force          True to continue even though Git reports a possible conflict
+     * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */
-    public function removeFile($path, $commitMsg = null, $recursive = false, $force = false)
+    public function removeFile($path, $commitMsg = null, $recursive = false, $force = false, $author = null)
     {
         $this->remove(array($path), $recursive, $force);
 
@@ -514,7 +518,7 @@ class Repository
             $commitMsg  = sprintf('%s deleted file "%s"', __CLASS__, $path);
         }
 
-        $this->commit($commitMsg, array($path));
+        $this->commit($commitMsg, array($path), $author);
 
         return $this->getCurrentCommit();
     }
@@ -526,9 +530,10 @@ class Repository
      * @param   string          $toPath         The destination path
      * @param   string|null     $commitMsg      The commit message used when committing the changes
      * @param   boolean         $force          True to continue even though Git reports a possible conflict
+     * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */
-    public function renameFile($fromPath, $toPath, $commitMsg = null, $force = false)
+    public function renameFile($fromPath, $toPath, $commitMsg = null, $force = false, $author = null)
     {
         $this->move($fromPath, $toPath, $force);
 
@@ -536,7 +541,7 @@ class Repository
             $commitMsg  = sprintf('%s renamed/moved file "%s" to "%s"', __CLASS__, $fromPath, $toPath);
         }
 
-        $this->commit($commitMsg, array($fromPath, $toPath));
+        $this->commit($commitMsg, array($fromPath, $toPath), $author);
 
         return $this->getCurrentCommit();
     }
@@ -787,7 +792,7 @@ class Repository
                     $this->getRepositoryPath()
                 );
             }
-            $this->commit($commitMsg, null);
+            $this->commit($commitMsg, null, $transaction->getAuthor());
             $commitHash  = $this->getCurrentCommit();
             $transaction->setCommitHash($commitHash);
             $transaction->setResult($result);

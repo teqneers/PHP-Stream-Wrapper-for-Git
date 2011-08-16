@@ -61,6 +61,13 @@ class Transaction
     protected $commitMsg;
 
     /**
+     * The author
+     *
+     * @var string|null
+     */
+    protected $author;
+
+    /**
      * The return value of the transactional callback
      *
      * @var mixed
@@ -142,8 +149,34 @@ class Transaction
     }
 
     /**
+     * Returns the author that will be used when comitting the transaction
+     *
+     * @return  string|null
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /**
+     * Sets  the author that will be used when comitting the transaction
+     *
+     * @param   string|null     $author      The author
+     * @return  Transaction
+     */
+    public function setAuthor($author)
+    {
+        if ($author === null) {
+            $this->author    = null;
+        } else {
+            $this->author    = (string)$author;
+        }
+        return $this;
+    }
+
+    /**
      * Returns the return value of the closure executed in the transactional scope
-     * 
+     *
      * @return  mixed
      */
     public function getResult()
@@ -165,7 +198,7 @@ class Transaction
 
     /**
      * Returns the hash identifiying the commit
-     * 
+     *
      * @return  string|null
      */
     public function getCommitHash()
