@@ -317,5 +317,20 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('--- a/file_1.txt', $commit);
         $this->assertContains('+++ b/test.txt', $commit);
     }
+
+    public function testTransactionalNoChanges()
+    {
+        $c              = $this->getRepository();
+        $currentCommit  = $c->getCurrentCommit();
+
+        $result = $c->transactional(function(Transaction $t) {
+            $t->setCommitMsg('Hello World');
+            return 'This is the return value';
+        });
+
+        $this->assertEquals('This is the return value', $result->getResult());
+        $this->assertEquals($currentCommit, $result->getCommitHash());
+        $this->assertEquals($currentCommit, $c->getCurrentCommit());
+    }
 }
 

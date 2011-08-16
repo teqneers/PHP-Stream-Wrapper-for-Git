@@ -782,17 +782,19 @@ class Repository
         try {
             $transaction    = new Transaction($this);
             $result         = $function($transaction);
-            $this->add(null);
 
-            $commitMsg  = $transaction->getCommitMsg();
-            if (empty($commitMsg)) {
-                $commitMsg  = sprintf(
-                    '%s did a transactional commit in "%s"',
-                    __CLASS__,
-                    $this->getRepositoryPath()
-                );
+            $this->add(null);
+            if ($this->isDirty()) {
+                $commitMsg  = $transaction->getCommitMsg();
+                if (empty($commitMsg)) {
+                    $commitMsg  = sprintf(
+                        '%s did a transactional commit in "%s"',
+                        __CLASS__,
+                        $this->getRepositoryPath()
+                    );
+                }
+                $this->commit($commitMsg, null, $transaction->getAuthor());
             }
-            $this->commit($commitMsg, null, $transaction->getAuthor());
             $commitHash  = $this->getCurrentCommit();
             $transaction->setCommitHash($commitHash);
             $transaction->setResult($result);
