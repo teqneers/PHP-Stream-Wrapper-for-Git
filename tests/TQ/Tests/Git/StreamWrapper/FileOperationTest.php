@@ -28,7 +28,7 @@ use TQ\Git\Repository\Repository;
 use TQ\Git\StreamWrapper\StreamWrapper;
 use TQ\Tests\Helper;
 
-class ModificationTest extends \PHPUnit_Framework_TestCase
+class FileOperationTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
