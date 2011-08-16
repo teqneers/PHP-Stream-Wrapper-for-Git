@@ -5,7 +5,7 @@ Git Streamwrapper for PHP
 
 The *Git Streamwrapper for PHP* core is a wrapper around the Git command line binary so it is required to have Git installed on the machine running the PHP code. ***Git Streamwrapper for PHP* does not include a Git protocol abstraction**, it relies on the Git command line binary for all its functionality.
 
-**The code is currently in an early pre-alpha state so it is neither extensively tested nor feature-complete or API-stable.**
+**The code is currently in a beta state so it is neither throughoutly tested nor feature-complete or fully API-stable.**
 
 To-Do
 -----
@@ -129,6 +129,22 @@ rmdir('git:///path/to/your/repository/directory_to_delete');
 // create a directory - change is committed to the repository
 // this creates a .gitkeep file in new_directory because Git does not track directories
 mkdir('git:///path/to/your/repository/new_directory');
+
+// write to a file - change is committed to the repository when file is closed
+$file = fopen('git:///path/to/your/repository/test.txt', 'w');
+fwrite($file, 'Test');
+fclose($file);
+
+// support for stream context
+$context = stream_context_create(array(
+    'git'   => array(
+        'commitMsg' => 'Hello World',
+        'author'    => 'Luke Skywalker <skywalker@deathstar.com>'
+    )
+));
+$file = fopen('git:///path/to/your/repository/test.txt', 'w', false, $context);
+fwrite($file, 'Test');
+fclose($file); // file gets committed with the preset commit message and author
 
 // unregister the wrapper if needed
 StreamWrapper::unregister();
