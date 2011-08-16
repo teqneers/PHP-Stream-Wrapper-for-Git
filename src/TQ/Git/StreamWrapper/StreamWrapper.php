@@ -76,6 +76,20 @@ class StreamWrapper
     public $context;
 
     /**
+     * The parsed stream context options
+     *
+     * @var array
+     */
+    protected $contextOptions;
+
+    /**
+     * The parsed stream context parameters
+     *
+     * @var array
+     */
+    protected $contextParameters;
+
+    /**
      * The directory buffer if used on a directory
      *
      * @var DirectoryBuffer
@@ -138,6 +152,73 @@ class StreamWrapper
      */
     public function __construct()
     {
+    }
+
+    /**
+     * Parses the passed stream context and returns the context options
+     * relevant for this stream wrapper
+     *
+     * @param   boolean $all    Return all options instead of just the relevant options
+     * @return  array           The context options
+     */
+    protected function getContextOptions($all = false)
+    {
+        if ($this->contextOptions === null) {
+            $this->contextOptions   = stream_context_get_options($this->context);
+        }
+
+        if (!$all && array_key_exists(self::$protocol, $this->contextOptions)) {
+            return $this->contextOptions[self::$protocol];
+        } else if ($all) {
+            return $this->contextOptions;
+        } else {
+            return array();
+        }
+    }
+
+    /**
+     * Returns a context option - $default if option is not found
+     *
+     * @param   string  $option     The option to retrieve
+     * @param   mixed   $default    The default value if $option is not found
+     */
+    protected function getContextOption($option, $default = null)
+    {
+        $options    = $this->getContextOptions();
+        if (array_key_exists($option, $options)) {
+            return $options[$option];
+        } else {
+            return $default;
+        }
+    }
+
+    /**
+     * Parses the passed stream context and returns the context parameters
+     *
+     * @return  array       The context parameters
+     */
+    protected function getContextParameters()
+    {
+        if ($this->contextParameters === null) {
+            $this->contextParameters    = stream_context_get_params($this->context);
+        }
+        return $this->contextParameters;
+    }
+
+    /**
+     * Returns a context parameter - $default if parameter is not found
+     *
+     * @param   string  $parameter  The parameter to retrieve
+     * @param   mixed   $default    The default value if $parameter is not found
+     */
+    protected function getContextParameter($parameter, $default = null)
+    {
+        $parameters    = $this->getContextParameters();
+        if (array_key_exists($parameter, $parameters)) {
+            return $parameters[$parameter];
+        } else {
+            return $default;
+        }
     }
 
     /**
@@ -232,7 +313,11 @@ class StreamWrapper
             $recursive  = self::maskHasFlag($options, STREAM_MKDIR_RECURSIVE);
 
             $repo   = $path->getRepository();
-            $repo->writeFile($path->getLocalPath().'/.gitkeep', '', null, 0666, $mode, $recursive);
+
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+
+            $repo->writeFile($path->getLocalPath().'/.gitkeep', '', $commitMsg, 0666, $mode, $recursive, $author);
             return true;
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -273,7 +358,11 @@ class StreamWrapper
             }
 
             $repo   = $pathFrom->getRepository();
-            $repo->renameFile($pathFrom->getLocalPath(), $pathTo);
+
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+
+            $repo->renameFile($pathFrom->getLocalPath(), $pathTo, $commitMsg, false, $author);
             return true;
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -308,7 +397,11 @@ class StreamWrapper
             $recursive  = self::maskHasFlag($options, STREAM_MKDIR_RECURSIVE);
 
             $repo   = $path->getRepository();
-            $repo->removeFile($path->getLocalPath(), null, $recursive);
+
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+
+            $repo->removeFile($path->getLocalPath(), $commitMsg, $recursive, false, $author);
             return true;
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -592,7 +685,11 @@ class StreamWrapper
             }
 
             $repo   = $path->getRepository();
-            $repo->removeFile($path->getLocalPath());
+
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+
+            $repo->removeFile($path->getLocalPath(), $commitMsg, false, false, $author);
             return true;
         } catch (\Exception $e) {
             trigger_error($e->getMessage(), E_USER_WARNING);

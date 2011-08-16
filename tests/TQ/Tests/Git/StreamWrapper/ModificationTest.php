@@ -127,6 +127,23 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         unlink($path);
     }
 
+    public function testUnlinkFileWithContext()
+    {
+        $path   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        $cntxt  = stream_context_create(array(
+            'git'   => array(
+                'commitMsg' => 'Hello World',
+                'author'    => 'Luke Skywalker <skywalker@deathstar.com>'
+            )
+        ));
+        unlink($path, $cntxt);
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertContains('Hello World', $commit);
+        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+    }
+
     public function testRenameFile()
     {
         $pathFrom   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
@@ -175,6 +192,24 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         rename($pathFrom, $pathTo);
     }
 
+    public function testRenameFileWithContext()
+    {
+        $pathFrom   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        $cntxt      = stream_context_create(array(
+            'git'   => array(
+                'commitMsg' => 'Hello World',
+                'author'    => 'Luke Skywalker <skywalker@deathstar.com>'
+            )
+        ));
+        rename($pathFrom, $pathTo, $cntxt);
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertContains('Hello World', $commit);
+        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+    }
+
     public function testRmdirDirectory()
     {
         $c  = $this->getRepository();
@@ -221,6 +256,28 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
     {
         $path   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
         rmdir($path);
+    }
+
+    public function testRmdirDirectoryWithContext()
+    {
+        $c  = $this->getRepository();
+        $c->writeFile('directory/test.txt', 'Test');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory/test.txt');
+
+        $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        $cntxt  = stream_context_create(array(
+            'git'   => array(
+                'commitMsg' => 'Hello World',
+                'author'    => 'Luke Skywalker <skywalker@deathstar.com>'
+            )
+        ));
+        rmdir($path, $cntxt);
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertContains('Hello World', $commit);
+        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 
     public function testMkdirDirectory()
@@ -278,6 +335,23 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
     {
         $path   = sprintf('git://%s/directory/directory', TESTS_REPO_PATH_1);
         mkdir($path, 0777, false);
+    }
+
+    public function testMkdirDirectoryWithContext()
+    {
+        $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        $cntxt  = stream_context_create(array(
+            'git'   => array(
+                'commitMsg' => 'Hello World',
+                'author'    => 'Luke Skywalker <skywalker@deathstar.com>'
+            )
+        ));
+        mkdir($path, 0777, false, $cntxt);
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertContains('Hello World', $commit);
+        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 }
 
