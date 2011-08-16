@@ -56,6 +56,13 @@ class PathInformation
     protected $repository;
 
     /**
+     * The Git URL
+     *
+     * @var string
+     */
+    protected $url;
+
+    /**
      * The absolute path to the resource
      *
      * @var string
@@ -102,27 +109,15 @@ class PathInformation
     }
 
     /**
-     * Creates a path information object from a URL string
-     *
-     * @param   string          $url        The URL
-     * @param   string          $protocol   The protocol registered
-     * @param   Binary          $binary     The Git binary
-     * @return  PathInformation
-     */
-    public static function fromUrl($url, $protocol, Binary $binary)
-    {
-        $url    = self::parseUrl($url, $protocol);
-        return new self($url, $binary);
-    }
-
-    /**
      * Creates a new path information instance from a given URL
      *
-     * @param   array   $url        The URL
-     * @param   Binary  $binary     The Git binary
+     * @param   string      $url        The URL
+     * @param   string      $protocol   The protocol registered
+     * @param   Binary      $binary     The Git binary
      */
-    public function __construct(array $url, Binary $binary)
+    public function __construct($url, $protocol, Binary $binary)
     {
+        $url                = self::parseUrl($url, $protocol);
         $this->fullPath     = $url['path'];
         $this->repository   = Repository::open($this->fullPath, $binary, false);
         $this->localPath    = $this->repository->resolveLocalPath($this->fullPath);
@@ -133,6 +128,20 @@ class PathInformation
             parse_str($url['query'], $arguments);
         }
         $this->arguments    = $arguments;
+
+        $this->url          =  $protocol.'://'.$this->fullPath
+                              .'#'.$this->ref
+                              .'?'.http_build_query($this->arguments);
+    }
+
+    /**
+     * Returns the Git URL
+     *
+     * @return  string
+     */
+    public function getUrl()
+    {
+        return $this->url;
     }
 
     /**

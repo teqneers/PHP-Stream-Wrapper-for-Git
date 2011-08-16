@@ -148,7 +148,7 @@ class StreamWrapper
      */
     protected function getPath($streamUrl)
     {
-        return PathInformation::fromUrl($streamUrl, self::$protocol, self::$binary);
+        return new PathInformation($streamUrl, self::$protocol, self::$binary);
     }
 
     /**
@@ -229,10 +229,7 @@ class StreamWrapper
                 throw new \Exception(sprintf('Path %s already exists', $path->getFullPath()));
             }
 
-            $recursive  = false;
-            if (($options & STREAM_MKDIR_RECURSIVE) === STREAM_MKDIR_RECURSIVE) {
-                $recursive  = true;
-            }
+            $recursive  = self::maskHasFlag($options, STREAM_MKDIR_RECURSIVE);
 
             $repo   = $path->getRepository();
             $repo->writeFile($path->getLocalPath().'/.gitkeep', '', null, 0666, $mode, $recursive);
@@ -307,11 +304,8 @@ class StreamWrapper
                 throw new \Exception(sprintf('Path %s is not a directory', $path->getFullPath()));
             }
 
-            $recursive  = false;
             $options    |= STREAM_MKDIR_RECURSIVE;
-            if (($options & STREAM_MKDIR_RECURSIVE) === STREAM_MKDIR_RECURSIVE) {
-                $recursive  = true;
-            }
+            $recursive  = self::maskHasFlag($options, STREAM_MKDIR_RECURSIVE);
 
             $repo   = $path->getRepository();
             $repo->removeFile($path->getLocalPath(), null, $recursive);
@@ -460,9 +454,16 @@ class StreamWrapper
             }
             $this->fileBuffer   = $buffer;
             $this->path         = $path;
+
+            if (self::maskHasFlag($options, STREAM_USE_PATH)) {
+                $opened_path    = $this->path->getUrl();
+            }
+
             return true;
         } catch (\Exception $e) {
-            trigger_error($e->getMessage(), E_USER_WARNING);
+            if (self::maskHasFlag($options, STREAM_REPORT_ERRORS)) {
+                trigger_error($e->getMessage(), E_USER_WARNING);
+            }
             return false;
         }
     }
@@ -669,11 +670,23 @@ class StreamWrapper
                 return array_merge($stat, array_values($stat));
             }
         } catch (\Exception $e) {
-            if (($flags & STREAM_URL_STAT_QUIET) === STREAM_URL_STAT_QUIET) {
-                return false;
+            if (!self::maskHasFlag($flags, STREAM_URL_STAT_QUIET)) {
+                trigger_error($e->getMessage(), E_USER_WARNING);
             }
-            trigger_error($e->getMessage(), E_USER_WARNING);
             return false;
         }
+    }
+
+    /**
+     * Checks if a bitmask has a specific flag set
+     *
+     * @param   integer     $mask   The bitmask
+     * @param   integer     $flag   The flag to check
+     * @return  boolean
+     */
+    protected static function maskHasFlag($mask, $flag)
+    {
+        $flag   = (int)$flag;
+        return ((int)$mask & $flag) === $flag;
     }
 }
