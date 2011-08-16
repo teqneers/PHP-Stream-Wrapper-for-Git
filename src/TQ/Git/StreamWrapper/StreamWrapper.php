@@ -106,7 +106,7 @@ class StreamWrapper
     /**
      * The opened path
      *
-     * @var Path
+     * @var PathInformation
      */
     protected $path;
 
@@ -429,6 +429,15 @@ class StreamWrapper
     {
         $this->fileBuffer->close();
         $this->fileBuffer   = null;
+
+        $repo   = $this->path->getRepository();
+        $repo->add(array($this->path->getFullPath()));
+        if ($repo->isDirty()) {
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+            $repo->commit($commitMsg, array($this->path->getFullPath()), $author);
+        }
+
         $this->path         = null;
     }
 
@@ -660,6 +669,7 @@ class StreamWrapper
      */
     public function stream_write($data)
     {
+        return $this->fileBuffer->write($data);
     }
 
     /**
