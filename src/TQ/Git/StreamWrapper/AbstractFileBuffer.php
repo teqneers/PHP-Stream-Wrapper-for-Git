@@ -36,7 +36,7 @@
 namespace TQ\Git\StreamWrapper;
 
 /**
- * Interface for file buffers used in the stream wrapper
+ * base class for FileBuffers
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -44,63 +44,22 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-interface FileBuffer
+abstract class AbstractFileBuffer implements FileBuffer
 {
     /**
-     * Returns the complete contents of the buffer
+     * The read/write mode
      *
-     * @return  string
+     * @var string
      */
-    function getBuffer();
+    protected $mode;
 
     /**
-     * Returns true if the pointer is at the end of the buffer
+     * Creates a new abstract file buffer
      *
-     * @return  boolean
+     * @param   string  $mode    The file mode
      */
-    function isEof();
-
-    /**
-     * Reads $count bytes from the buffer
-     *
-     * @param   integer     $count      The number of bytes to read
-     * @return  string|null
-     */
-    function read($count);
-
-    /**
-     * Writes the given date into the buffer at the current pointer position
-     *
-     * @param   string  $data       The data to write
-     * @return  integer             The number of bytes written
-     */
-    function write($data);
-
-    /**
-     * Returns the current pointer position
-     *
-     * @return integer
-     */
-    function getPosition();
-
-    /**
-     * Sets the pointer position
-     *
-     * @param   integer     $position   The position in bytes
-     * @param   integer     $whence     The reference from where to measure $position (SEEK_SET, SEEK_CUR or SEEK_END)
-     * @return  boolean                 True if the position could be set
-     */
-    function setPosition($position, $whence);
-
-    /**
-     * Returns the stat information for the buffer
-     *
-     * @return array
-     */
-    function getStat();
-
-    /**
-     * Closes the buffer
-     */
-    function close();
+    public function __construct($mode)
+    {
+        $this->mode     = $mode;
+    }
 }

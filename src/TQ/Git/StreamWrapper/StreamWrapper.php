@@ -427,6 +427,7 @@ class StreamWrapper
      */
     public function stream_close()
     {
+        $this->fileBuffer->close();
         $this->fileBuffer   = null;
         $this->path         = null;
     }
@@ -532,10 +533,9 @@ class StreamWrapper
                 );
             } else {
                 if (   $path->getRef() == 'HEAD'
-                    && file_exists($path->getFullPath())
-                    && is_file($path->getFullPath())
+                    && !is_dir($path->getFullPath())
                 ) {
-                    $buffer = new FileStreamBuffer($path->getFullPath());
+                    $buffer = new FileStreamBuffer($path->getFullPath(), $mode);
                 } else {
                     $buffer     = $repo->showFile($path->getLocalPath(), $path->getRef());
                     $objectInfo = $repo->getObjectInfo($path->getLocalPath(), $path->getRef());
@@ -543,7 +543,7 @@ class StreamWrapper
             }
 
             if (!($buffer instanceof FileBuffer)) {
-                $buffer = new FileStringBuffer($buffer, $objectInfo);
+                $buffer = new FileStringBuffer($buffer, $objectInfo, 'r');
             }
             $this->fileBuffer   = $buffer;
             $this->path         = $path;

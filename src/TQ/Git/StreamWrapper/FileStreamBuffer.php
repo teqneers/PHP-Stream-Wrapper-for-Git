@@ -44,7 +44,7 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class FileStreamBuffer implements FileBuffer
+class FileStreamBuffer extends AbstractFileBuffer
 {
     /**
      * The file resource
@@ -53,15 +53,16 @@ class FileStreamBuffer implements FileBuffer
      */
     protected $stream;
 
-
     /**
      * Creates a neww file buffer with the given path
      *
      * @param   string  $path    The path
+     * @param   string  $mode    The file mode
      */
-    public function __construct($path)
+    public function __construct($path, $mode = 'r+')
     {
-        $this->stream   = fopen($path, 'r+');
+        parent::__construct($mode);
+        $this->stream   = fopen($path, $mode);
     }
 
     /**
@@ -69,8 +70,7 @@ class FileStreamBuffer implements FileBuffer
      */
     public function __destruct()
     {
-        fclose($this->stream);
-        $this->stream   = null;
+        $this->close();
     }
 
     /**
@@ -149,5 +149,16 @@ class FileStreamBuffer implements FileBuffer
     public function getStat()
     {
         return fstat($this->stream);
+    }
+
+    /**
+     * Closes the buffer
+     */
+    public function close()
+    {
+        if ($this->stream !== null) {
+            fclose($this->stream);
+            $this->stream   = null;
+        }
     }
 }

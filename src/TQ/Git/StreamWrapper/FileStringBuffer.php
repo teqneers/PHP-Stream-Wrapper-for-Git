@@ -44,7 +44,7 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class FileStringBuffer implements FileBuffer
+class FileStringBuffer extends AbstractFileBuffer
 {
     /**
      * The buffer contents
@@ -79,13 +79,15 @@ class FileStringBuffer implements FileBuffer
      *
      * @param   string  $content    The contents
      * @param   array   $objectInfo The object info
+     * @param   string  $mode       The file mode
      */
-    public function __construct($buffer, array $objectInfo = array())
+    public function __construct($buffer, array $objectInfo = array(), $mode = 'r+')
     {
         $this->buffer       = $buffer;
         $this->length       = strlen($buffer);
         $this->position     = 0;
         $this->objectInfo   = $objectInfo;
+        parent::__construct($mode);
     }
 
     /**
@@ -218,5 +220,16 @@ class FileStringBuffer implements FileBuffer
             'blocks'    => -1,
         );
         return array_merge($stat, array_values($stat));
+    }
+
+    /**
+     * Closes the buffer
+     */
+    public function close()
+    {
+        $this->buffer       = null;
+        $this->length       = null;
+        $this->position     = null;
+        $this->objectInfo   = null;
     }
 }
