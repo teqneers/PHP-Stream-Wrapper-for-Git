@@ -160,5 +160,132 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
         $this->assertRegExp('~^-File 0$~m', $commit);
         $this->assertRegExp('~^\+File 0Test$~m', $commit);
     }
+
+    public function testWriteNewFileWithX()
+    {
+        $filePath   = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        $file       = fopen($filePath, 'x');
+        fwrite($file, 'Test');
+        fclose($file);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
+        $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertRegExp('~^\+Test$~m', $commit);
+    }
+
+    /**
+     * @expectedException PHPUnit_Framework_Error_Warning
+     */
+    public function testWriteExistingFileWithXFails()
+    {
+        $filePath   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        $file       = fopen($filePath, 'x');
+        fwrite($file, 'Test');
+    }
+
+    public function testWriteNewFileWithC()
+    {
+        $filePath   = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        $file       = fopen($filePath, 'c');
+        fwrite($file, 'Test');
+        fclose($file);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
+        $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertRegExp('~^\+Test$~m', $commit);
+    }
+
+    public function testWriteExistingFileWithC()
+    {
+        $filePath   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        $file       = fopen($filePath, 'c');
+        fseek($file, 0, SEEK_END);
+        fwrite($file, 'Test');
+        fclose($file);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertEquals('File 0Test', file_get_contents(TESTS_REPO_PATH_1.'/file_0.txt'));
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertRegExp('~^--- a/file_0.txt$~m', $commit);
+        $this->assertRegExp('~^\+\+\+ b/file_0.txt$~m', $commit);
+        $this->assertRegExp('~^-File 0$~m', $commit);
+        $this->assertRegExp('~^\+File 0Test$~m', $commit);
+    }
+
+    public function testWriteAndReadNewFile()
+    {
+        $filePath   = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        $file       = fopen($filePath, 'w+');
+        fwrite($file, 'Test');
+        fseek($file, -2, SEEK_END);
+        $this->assertEquals('st', fread($file, 2));
+        fseek($file, -2, SEEK_END);
+        fwrite($file, 'xt');
+        fclose($file);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
+        $this->assertEquals('Text', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertRegExp('~^\+Text$~m', $commit);
+    }
+
+    public function testWriteNewFileWithFilePutContents()
+    {
+        $filePath   = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        file_put_contents($filePath, 'Test');
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
+        $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertRegExp('~^\+Test$~m', $commit);
+    }
+
+    public function testWriteExistingFileWithFilePutContents()
+    {
+        $filePath   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        file_put_contents($filePath, 'Test');
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/file_0.txt'));
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertRegExp('~^--- a/file_0.txt$~m', $commit);
+        $this->assertRegExp('~^\+\+\+ b/file_0.txt$~m', $commit);
+        $this->assertRegExp('~^-File 0$~m', $commit);
+        $this->assertRegExp('~^\+Test$~m', $commit);
+    }
+
+    public function testAppendExistingFileWithFilePutContents()
+    {
+        $filePath   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
+        file_put_contents($filePath, 'Test', FILE_APPEND);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertEquals('File 0Test', file_get_contents(TESTS_REPO_PATH_1.'/file_0.txt'));
+
+        $c      = $this->getRepository();
+        $commit = $c->showCommit($c->getCurrentCommit());
+        $this->assertRegExp('~^--- a/file_0.txt$~m', $commit);
+        $this->assertRegExp('~^\+\+\+ b/file_0.txt$~m', $commit);
+        $this->assertRegExp('~^-File 0$~m', $commit);
+        $this->assertRegExp('~^\+File 0Test$~m', $commit);
+    }
 }
 

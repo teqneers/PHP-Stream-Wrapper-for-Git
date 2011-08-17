@@ -62,7 +62,10 @@ class FileStreamBuffer extends AbstractFileBuffer
     public function __construct($path, $mode = 'r+')
     {
         parent::__construct($mode);
-        $this->stream   = fopen($path, $mode);
+        $this->stream   = @fopen($path, $mode);
+        if ($this->stream === false) {
+            throw new FileStreamException(sprintf('Cannot access "%s" in mode "%s"', $path, $mode));
+        }
     }
 
     /**
