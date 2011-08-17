@@ -10,10 +10,6 @@ The *Git Streamwrapper for PHP* core is a wrapper around the Git command line bi
 To-Do
 -----
 
-- write-support for files
-- support the various options in
-  - stream_open
-- stream context support
 - support for Windows
 
 Examples
@@ -145,6 +141,15 @@ $context = stream_context_create(array(
 $file = fopen('git:///path/to/your/repository/test.txt', 'w', false, $context);
 fwrite($file, 'Test');
 fclose($file); // file gets committed with the preset commit message and author
+
+// append to a file using file_put_contents using a custom author and commit message
+$context = stream_context_create(array(
+    'git'   => array(
+        'commitMsg' => 'Hello World',
+        'author'    => 'Luke Skywalker <skywalker@deathstar.com>'
+    )
+));
+file_put_contents('git:///path/to/your/repository/test.txt', 'Test', FILE_APPEND, $context);
 
 // unregister the wrapper if needed
 StreamWrapper::unregister();
