@@ -85,8 +85,8 @@ class CallResult
     public function __construct(Call $cliCall, $stdOut, $stdErr, $returnCode)
     {
         $this->cliCall      = $cliCall;
-        $this->stdOut       = trim((string)$stdOut);
-        $this->stdErr       = trim((string)$stdErr);
+        $this->stdOut       = rtrim((string)$stdOut);
+        $this->stdErr       = rtrim((string)$stdErr);
         $this->returnCode   = (int)$returnCode;
     }
 
