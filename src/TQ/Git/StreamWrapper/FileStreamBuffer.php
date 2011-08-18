@@ -69,7 +69,7 @@ class FileStreamBuffer extends AbstractFileBuffer
     }
 
     /**
-     * Dexructor closes file stream handle
+     * Destructor closes file stream handle
      */
     public function __destruct()
     {
