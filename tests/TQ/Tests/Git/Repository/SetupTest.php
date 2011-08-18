@@ -8,10 +8,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
+
 namespace TQ\Tests\Git\Repository;
 
 use TQ\Git\Cli\Binary;
@@ -78,7 +78,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
     {
         $c  = $this->getRepository(__FILE__, false);
         $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
-        $this->assertEquals(__DIR__, $c->getRepositoryPath());
+        $this->assertEquals(PROJECT_PATH, $c->getRepositoryPath());
     }
 
     /**
@@ -105,7 +105,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
     {
         $c  = $this->getRepository(__FILE__, 0755);
         $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
-        $this->assertEquals(__DIR__, $c->getRepositoryPath());
+        $this->assertEquals(PROJECT_PATH, $c->getRepositoryPath());
     }
 
     public function testRepositoryCreateOnExistingPath()
