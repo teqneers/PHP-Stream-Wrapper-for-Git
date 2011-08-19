@@ -7,10 +7,6 @@ The *Git Streamwrapper for PHP* core is a wrapper around the Git command line bi
 
 **The code is currently in a beta state so it is neither throughoutly tested nor feature-complete or fully API-stable.**
 
-To-Do
------
-
-- support for Windows
 
 Examples
 --------
