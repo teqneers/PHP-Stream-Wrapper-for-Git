@@ -192,13 +192,16 @@ class Call
             }
             fclose($pipes[0]);
 
-            $stdOut = stream_get_contents($pipes[1]);
+            $stdOut     = fopen('php://temp', 'w+');
+            $hasStdOut  = stream_copy_to_stream($pipes[1], $stdOut) > 0;
             fclose($pipes[1]);
-            $stdErr = stream_get_contents($pipes[2]);
+
+            $stdErr     = fopen('php://temp', 'w+');
+            $hasStdErr  = stream_copy_to_stream($pipes[2], $stdErr) > 0;
             fclose($pipes[2]);
 
             $returnCode = proc_close($process);
-            return new CallResult($this, $stdOut, $stdErr, $returnCode);
+            return new CallResult($this, $stdOut, $hasStdOut, $stdErr, $hasStdErr, $returnCode);
         }
         throw new \RuntimeException(sprintf('Cannot execute "%s"', $cmd));
     }
