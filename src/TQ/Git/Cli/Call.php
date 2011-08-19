@@ -172,15 +172,18 @@ class Call
      */
     public function execute($stdIn = null)
     {
-        $descriptorspec = array(
+        $stdOut = fopen('php://temp', 'r');
+        $stdErr = fopen('php://temp', 'r');
+
+        $descriptorSpec = array(
            0 => array("pipe", "r"), // stdin is a pipe that the child will read from
-           1 => array("pipe", "w"), // stdout is a pipe that the child will write to
-           2 => array("pipe", "w")  // stderr is a pipe that the child will write to
+           1 => $stdOut,            // stdout is a temp file that the child will write to
+           2 => $stdErr             // stderr is a temp file that the child will write to
         );
         $pipes   = array();
         $process = proc_open(
             $this->getCmd(),
-            $descriptorspec,
+            $descriptorSpec,
             $pipes,
             $this->getCwd(),
             $this->getEnv()
@@ -191,19 +194,13 @@ class Call
                 fwrite($pipes[0], (string)$stdIn);
             }
             fclose($pipes[0]);
-
-            $stdOut     = fopen('php://temp', 'w+');
-            $hasStdOut  = stream_copy_to_stream($pipes[1], $stdOut) > 0;
-            fclose($pipes[1]);
-
-            $stdErr     = fopen('php://temp', 'w+');
-            $hasStdErr  = stream_copy_to_stream($pipes[2], $stdErr) > 0;
-            fclose($pipes[2]);
-
             $returnCode = proc_close($process);
-            return new CallResult($this, $stdOut, $hasStdOut, $stdErr, $hasStdErr, $returnCode);
+            return new CallResult($this, $stdOut, $stdErr, $returnCode);
+        } else {
+            fclose($stdOut);
+            fclose($stdErr);
+            throw new \RuntimeException(sprintf('Cannot execute "%s"', $cmd));
         }
-        throw new \RuntimeException(sprintf('Cannot execute "%s"', $cmd));
     }
 }
 

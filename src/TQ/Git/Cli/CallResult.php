@@ -93,13 +93,21 @@ class CallResult
      *
      * @param   Call       $cliCall       Reference to the call that resulted in this result
      * @param   resource   $stdOut        The stdout stream
-     * @param   boolean    $hasStdOut     True if there is a stdout
      * @param   resource   $stdErr        The stderr stream
-     * @param   boolean    $hasStdErr     True if there is a stderr
      * @param   integer    $returnCode    The return code
      */
-    public function __construct(Call $cliCall, $stdOut, $hasStdOut, $stdErr, $hasStdErr, $returnCode)
+    public function __construct(Call $cliCall, $stdOut, $stdErr, $returnCode)
     {
+        // @todo is there a better way to determine if a stream contains data?
+        fseek($stdOut, 0, SEEK_END);
+        $hasStdOut  = (ftell($stdOut) > 0);
+        fseek($stdOut, 0, SEEK_SET);
+
+        // @todo is there a better way to determine if a stream contains data?
+        fseek($stdErr, 0, SEEK_END);
+        $hasStdErr  = (ftell($stdErr) > 0);
+        fseek($stdErr, 0, SEEK_SET);
+
         $this->cliCall      = $cliCall;
         $this->stdOut       = $stdOut;
         $this->hasStdOut    = $hasStdOut;
