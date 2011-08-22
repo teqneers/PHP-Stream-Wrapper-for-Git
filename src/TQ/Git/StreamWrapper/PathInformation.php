@@ -101,7 +101,7 @@ class PathInformation
     {
         // normalize directory separators
         $path   = str_replace(DIRECTORY_SEPARATOR, '/', $url);
-        $path   = ltrim(substr($url, strlen($protocol) + 3), '/');
+        $path   = ltrim(substr($path, strlen($protocol) + 3), '/');
         //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
         $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
         $url    = parse_url($protocol.'://'.$path);

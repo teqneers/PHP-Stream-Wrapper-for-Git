@@ -162,8 +162,15 @@ class Repository
      */
     public static function findRepositoryRoot($path)
     {
-        $found      = null;
-        $path       = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+        $found   = null;
+        $path    = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+
+        $drive  = null;
+        if (preg_match('~^\w:.+~', $path)) {
+            $drive  = substr($path, 0, 2);
+            $path   = substr($path, 2);
+        }
+
         $pathParts  = explode('/', $path);
         while (count($pathParts) > 0 && $found === null) {
             $path   = implode('/', $pathParts);
@@ -173,6 +180,11 @@ class Repository
             }
             array_pop($pathParts);
         }
+
+        if ($drive && $found) {
+            $found  = $drive.$found;
+        }
+
         return $found;
     }
 
@@ -184,9 +196,7 @@ class Repository
      */
     protected function __construct($repositoryPath, Binary $binary)
     {
-        $this->binary   = $binary;
-
-        $repositoryPath         = str_replace(DIRECTORY_SEPARATOR, '/', $repositoryPath);
+        $this->binary           = $binary;
         $this->repositoryPath   = rtrim($repositoryPath, '/');
     }
 
