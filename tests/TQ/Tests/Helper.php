@@ -48,7 +48,7 @@ class Helper
             if ($f->isDir()) {
                 rmdir($p);
             } else if ($f->isFile()) {
-                chmod(0777, $p);
+                chmod($p, 0777);
                 unlink($p);
             }
         }
