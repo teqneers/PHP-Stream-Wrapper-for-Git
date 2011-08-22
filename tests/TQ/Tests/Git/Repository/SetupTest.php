@@ -42,7 +42,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
 
         exec(sprintf('cd %s && %s init',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY)
+            GIT_BINARY
         ));
     }
 

@@ -42,20 +42,20 @@ class FileStatTest extends \PHPUnit_Framework_TestCase
 
         exec(sprintf('cd %s && %s init',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY)
+            GIT_BINARY
         ));
 
         $path   = TESTS_REPO_PATH_1.'/test.txt';
         file_put_contents($path, 'File 1');
         exec(sprintf('cd %s && %s add %s',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY),
+            GIT_BINARY,
             escapeshellarg($path)
         ));
 
         exec(sprintf('cd %s && %s commit --message=%s',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY),
+            GIT_BINARY,
             escapeshellarg('Commit 1')
         ));
 
@@ -64,13 +64,13 @@ class FileStatTest extends \PHPUnit_Framework_TestCase
         file_put_contents($path.'/test.txt', 'Directory File 1');
         exec(sprintf('cd %s && %s add %s',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY),
+            GIT_BINARY,
             escapeshellarg($path)
         ));
 
         exec(sprintf('cd %s && %s commit --message=%s',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY),
+            GIT_BINARY,
             escapeshellarg('Commit 2')
         ));
 
@@ -78,13 +78,13 @@ class FileStatTest extends \PHPUnit_Framework_TestCase
         file_put_contents($path, 'File 1 New');
         exec(sprintf('cd %s && %s add %s',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY),
+            GIT_BINARY,
             escapeshellarg($path)
         ));
 
         exec(sprintf('cd %s && %s commit --message=%s',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY),
+            GIT_BINARY,
             escapeshellarg('Commit 3')
         ));
 
