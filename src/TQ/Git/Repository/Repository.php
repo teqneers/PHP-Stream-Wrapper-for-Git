@@ -162,11 +162,12 @@ class Repository
      */
     public static function findRepositoryRoot($path)
     {
-        $found  = null;
-        $pathParts  = explode(DIRECTORY_SEPARATOR, $path);
+        $found      = null;
+        $path       = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+        $pathParts  = explode('/', $path);
         while (count($pathParts) > 0 && $found === null) {
-            $path   = implode(DIRECTORY_SEPARATOR, $pathParts);
-            $gitDir = $path.DIRECTORY_SEPARATOR.'.git';
+            $path   = implode('/', $pathParts);
+            $gitDir = $path.'/'.'.git';
             if (file_exists($gitDir) && is_dir($gitDir)) {
                 $found  = $path;
             }
@@ -183,8 +184,10 @@ class Repository
      */
     protected function __construct($repositoryPath, Binary $binary)
     {
-        $this->binary           = $binary;
-        $this->repositoryPath   = rtrim($repositoryPath, DIRECTORY_SEPARATOR.'/');
+        $this->binary   = $binary;
+
+        $repositoryPath         = str_replace(DIRECTORY_SEPARATOR, '/', $repositoryPath);
+        $this->repositoryPath   = rtrim($repositoryPath, '/');
     }
 
     /**
@@ -288,10 +291,11 @@ class Repository
             }
             return $paths;
         } else {
+            $path   = str_replace(DIRECTORY_SEPARATOR, '/', $path);
             if (strpos($path, $this->getRepositoryPath()) === 0) {
                 $path  = substr($path, strlen($this->getRepositoryPath()));
             }
-            return ltrim($path, DIRECTORY_SEPARATOR.'/');
+            return ltrim($path, '/');
         }
     }
 
@@ -313,7 +317,8 @@ class Repository
             if (strpos($path, $this->getRepositoryPath()) === 0) {
                 return $path;
             }
-            $path  = ltrim($path, DIRECTORY_SEPARATOR.'/');
+            $path  = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+            $path  = ltrim($path, '/');
             return $this->getRepositoryPath().'/'.$path;
         }
     }
@@ -678,8 +683,9 @@ class Repository
      */
     public function listDirectory($directory = '.', $ref = 'HEAD')
     {
-        $directory  = rtrim($directory, DIRECTORY_SEPARATOR.'/').DIRECTORY_SEPARATOR;
-        $path       = $this->getRepositoryPath().DIRECTORY_SEPARATOR.$this->resolveLocalPath($directory);
+        $directory  = str_replace(DIRECTORY_SEPARATOR, '/', $directory);
+        $directory  = rtrim($directory, '/').'/';
+        $path       = $this->getRepositoryPath().'/'.$this->resolveLocalPath($directory);
         $result     = $this->getBinary()->{'ls-tree'}($path, array(
             '--name-only',
             '-z',

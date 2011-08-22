@@ -105,7 +105,7 @@ class PathInformation
         //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
         $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
         $url    = parse_url($protocol.'://'.$path);
-        $url['path']    = DIRECTORY_SEPARATOR.$url['host'].$url['path'];
+        $url['path']    = '/'.$url['host'].$url['path'];
         unset($url['host']);
         return $url;
     }
