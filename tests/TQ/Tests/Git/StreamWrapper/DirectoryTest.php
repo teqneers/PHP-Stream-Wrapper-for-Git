@@ -42,7 +42,7 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
 
         exec(sprintf('cd %s && %s init',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY)
+            GIT_BINARY
         ));
 
         for ($i = 0; $i < 5; $i++) {
@@ -51,7 +51,7 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
             file_put_contents($path, sprintf('File %d', $i));
             exec(sprintf('cd %s && %s add %s',
                 escapeshellarg(TESTS_REPO_PATH_1),
-                escapeshellcmd(GIT_BINARY),
+                GIT_BINARY,
                 escapeshellarg($file)
             ));
         }
@@ -63,14 +63,14 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
             file_put_contents($path.'/file.txt', sprintf('Directory %d File', $i));
             exec(sprintf('cd %s && %s add %s',
                 escapeshellarg(TESTS_REPO_PATH_1),
-                escapeshellcmd(GIT_BINARY),
+                GIT_BINARY,
                 escapeshellarg($path)
             ));
         }
 
         exec(sprintf('cd %s && %s commit --message=%s',
             escapeshellarg(TESTS_REPO_PATH_1),
-            escapeshellcmd(GIT_BINARY),
+            GIT_BINARY,
             escapeshellarg('Initial commit')
         ));
 
