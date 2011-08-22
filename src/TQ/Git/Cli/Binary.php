@@ -61,7 +61,7 @@ class Binary
      */
     public static function locateBinary()
     {
-        if (PHP_OS != 'Windows') {
+        if (strpos(PHP_OS, 'WIN') === false) {
             $result = Call::create('which git')->execute();
             return $result->getStdOut();
         }
