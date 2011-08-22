@@ -107,7 +107,7 @@ class PathInformation
         $url    = parse_url($protocol.'://'.$path);
 
         if (preg_match('~^\w:.+~', $path)) {
-            $url['path']    = '/'.$url['host'].':'.$url['path'];
+            $url['path']    = $url['host'].':'.$url['path'];
         } else {
             $url['path']    = '/'.$url['host'].$url['path'];
         }
