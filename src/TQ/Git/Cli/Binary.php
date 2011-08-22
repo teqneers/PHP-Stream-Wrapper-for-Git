@@ -113,7 +113,11 @@ class Binary
             return $arg;
         };
 
-        $binary     = escapeshellcmd($this->path);
+        if (strpos(PHP_OS, 'WIN') === false) {
+            $binary = escapeshellcmd($this->path);
+        } else {
+            $binary = escapeshellarg($this->path);
+        }
         if (!empty($command)) {
             $command    = escapeshellarg($command);
         }
