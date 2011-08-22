@@ -47,18 +47,32 @@ namespace TQ\Git\Cli;
 class CallResult
 {
     /**
-     * The contents of stdout
+     * The stdout stream
      *
-     * @var string
+     * @var resource
      */
     protected $stdOut;
 
     /**
-     * The contents of stderr
+     * True if there is a stdout
      *
-     * @var string
+     * @var boolean
+     */
+    protected $hasStdOut;
+
+    /**
+     * The stderr stream
+     *
+     * @var resource
      */
     protected $stdErr;
+
+    /**
+     * True if there is a stderr
+     *
+     * @var boolean
+     */
+    protected $hasStdErr;
 
     /**
      * The return code
@@ -77,17 +91,37 @@ class CallResult
     /**
      * Creates a new result container for a CLI call
      *
-     * @param Call       $cliCall       Reference to the call that resulted in this result
-     * @param string     $stdOut        The contents of stdout
-     * @param string     $stdErr        The contents of stderr
-     * @param integer    $returnCode    The return code
+     * @param   Call       $cliCall       Reference to the call that resulted in this result
+     * @param   resource   $stdOut        The stdout stream
+     * @param   resource   $stdErr        The stderr stream
+     * @param   integer    $returnCode    The return code
      */
     public function __construct(Call $cliCall, $stdOut, $stdErr, $returnCode)
     {
+        // @todo is there a better way to determine if a stream contains data?
+        fseek($stdOut, 0, SEEK_END);
+        $hasStdOut  = (ftell($stdOut) > 0);
+        fseek($stdOut, 0, SEEK_SET);
+
+        // @todo is there a better way to determine if a stream contains data?
+        fseek($stdErr, 0, SEEK_END);
+        $hasStdErr  = (ftell($stdErr) > 0);
+        fseek($stdErr, 0, SEEK_SET);
+
         $this->cliCall      = $cliCall;
-        $this->stdOut       = rtrim((string)$stdOut);
-        $this->stdErr       = rtrim((string)$stdErr);
+        $this->stdOut       = $stdOut;
+        $this->hasStdOut    = $hasStdOut;
+        $this->stdErr       = $stdErr;
+        $this->hasStdErr    = $hasStdErr;
         $this->returnCode   = (int)$returnCode;
+    }
+
+    /**
+     * Destructor closes the result and the internal stream resources
+     */
+    public function __destruct()
+    {
+        $this->close();
     }
 
     /**
@@ -101,13 +135,24 @@ class CallResult
     }
 
     /**
+     * Returns the stdout stream
+     *
+     * @return resource
+     */
+    public function getStdOutStream()
+    {
+        return $this->stdOut;
+    }
+
+    /**
      * Returns the contents of stdout
      *
      * @return string
      */
     public function getStdOut()
     {
-        return $this->stdOut;
+        fseek($this->stdOut, 0, SEEK_SET);
+        return rtrim(stream_get_contents($this->stdOut));
     }
 
     /**
@@ -117,7 +162,17 @@ class CallResult
      */
     public function hasStdOut()
     {
-        return !empty($this->stdOut);
+        return $this->hasStdOut;
+    }
+
+    /**
+     * Returns the stderr stream
+     *
+     * @return resource
+     */
+    public function getStdErrStream()
+    {
+        return $this->stdErr;
     }
 
     /**
@@ -127,7 +182,8 @@ class CallResult
      */
     public function getStdErr()
     {
-        return $this->stdErr;
+        fseek($this->stdErr, 0, SEEK_SET);
+        return rtrim(stream_get_contents($this->stdErr));
     }
 
     /**
@@ -137,7 +193,7 @@ class CallResult
      */
     public function hasStdErr()
     {
-        return !empty($this->stdErr);
+        return $this->hasStdErr;
     }
 
     /**
@@ -148,6 +204,23 @@ class CallResult
     public function getReturnCode()
     {
         return $this->returnCode;
+    }
+
+    /**
+     * Closes the call result and the internal stream resources
+     *
+     * Prevents further usage
+     */
+    public function close()
+    {
+        if ($this->stdOut !== null) {
+            fclose($this->stdOut);
+            $this->stdOut   = null;
+        }
+        if ($this->stdErr !== null) {
+            fclose($this->stdErr);
+            $this->stdErr   = null;
+        }
     }
 }
 
