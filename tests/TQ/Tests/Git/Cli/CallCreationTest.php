@@ -8,10 +8,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,20 +20,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
+
 namespace TQ\Tests\Git\Cli;
 
 use TQ\Git\Cli\Binary;
 
 class CallCreationTest extends \PHPUnit_Framework_TestCase
 {
+    protected function assertCliCommandEquals($expected, $actual)
+    {
+        if (strpos(PHP_OS, 'Win') !== false) {
+            $actual = str_replace("'", '"', $actual);
+        }
+        $this->assertEquals($expected, $actual);
+    }
+
     public function testHandleSingleDash()
     {
         $binary = new Binary('/usr/bin/git');
         $call   = $binary->createGitCall('/', 'command', array(
             '-a'
         ));
-        $this->assertEquals("/usr/bin/git 'command' -'a'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command' -'a'", $call->getCmd());
     }
 
     public function testHandleDoubleDash()
@@ -42,7 +50,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $call   = $binary->createGitCall('/', 'command', array(
             '--argument'
         ));
-        $this->assertEquals("/usr/bin/git 'command' --'argument'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command' --'argument'", $call->getCmd());
     }
 
     public function testHandleSingleDashWithValue()
@@ -51,7 +59,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $call   = $binary->createGitCall('/', 'command', array(
             '-a' => 'value'
         ));
-        $this->assertEquals("/usr/bin/git 'command' -'a' 'value'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command' -'a' 'value'", $call->getCmd());
     }
 
     public function testHandleDoubleDashWithValue()
@@ -60,7 +68,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $call   = $binary->createGitCall('/', 'command', array(
             '--argument' => 'value'
         ));
-        $this->assertEquals("/usr/bin/git 'command' --'argument'='value'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command' --'argument'='value'", $call->getCmd());
     }
 
     public function testIgnoreLoneDoubleDash()
@@ -69,7 +77,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $call   = $binary->createGitCall('/', 'command', array(
             '--'
         ));
-        $this->assertEquals("/usr/bin/git 'command'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command'", $call->getCmd());
     }
 
     public function testSimpleArgument()
@@ -78,7 +86,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $call   = $binary->createGitCall('/', 'command', array(
             'option'
         ));
-        $this->assertEquals("/usr/bin/git 'command' 'option'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command' 'option'", $call->getCmd());
     }
 
     public function testFilePathAsArgument()
@@ -87,7 +95,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $call   = $binary->createGitCall('/', 'command', array(
             '/path/to/file'
         ));
-        $this->assertEquals("/usr/bin/git 'command' '/path/to/file'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command' '/path/to/file'", $call->getCmd());
     }
 
     public function testFileModeSwitch()
@@ -98,7 +106,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
             '--',
             'path/to/file'
         ));
-        $this->assertEquals("/usr/bin/git 'command' 'option' -- 'path/to/file'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command' 'option' -- 'path/to/file'", $call->getCmd());
     }
 
     public function testFileModeSwitchWithFileArgument()
@@ -110,7 +118,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
             '--',
             'path/to/file'
         ));
-        $this->assertEquals("/usr/bin/git 'command' 'option' '/path/to/file' -- 'path/to/file'", $call->getCmd());
+        $this->assertCliCommandEquals("/usr/bin/git 'command' 'option' '/path/to/file' -- 'path/to/file'", $call->getCmd());
     }
 }
 
