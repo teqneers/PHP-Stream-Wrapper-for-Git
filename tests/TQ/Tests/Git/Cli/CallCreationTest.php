@@ -30,7 +30,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     protected function assertCliCommandEquals($expected, $actual)
     {
         if (strpos(PHP_OS, 'WIN') !== false) {
-            $actual = str_replace("'", '"', $actual);
+            $expected = str_replace('"', "'", $expected);
         }
         $this->assertEquals($expected, $actual);
     }
