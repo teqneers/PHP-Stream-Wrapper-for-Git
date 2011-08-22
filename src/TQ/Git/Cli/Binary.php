@@ -116,7 +116,7 @@ class Binary
         if (strpos(PHP_OS, 'WIN') === false) {
             $binary = escapeshellcmd($this->path);
         } else {
-            $binary = escapeshellarg($this->path);
+            $binary = $this->path;
         }
         if (!empty($command)) {
             $command    = escapeshellarg($command);
