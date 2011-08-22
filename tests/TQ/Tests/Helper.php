@@ -27,6 +27,7 @@ class Helper
 {
     public static function removeDirectory($path)
     {
+        clearstatcache();
         if (!file_exists($path)) {
             return;
         }
