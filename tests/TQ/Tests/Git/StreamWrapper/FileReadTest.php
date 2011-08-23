@@ -187,37 +187,37 @@ class FileReadTest extends \PHPUnit_Framework_TestCase
         $c      = $this->getRepository();
 
         $dir    = sprintf('git://%s', TESTS_REPO_PATH_1);
-        $this->assertEquals(str_replace("\r\n", "\n", "tree HEAD:
+        $this->assertEquals(Helper::normalizeNewLines("tree HEAD:
 
 file_0.txt
 file_1.txt
 file_2.txt
 file_3.txt
-file_4.txt"), str_replace("\r\n", "\n", file_get_contents($dir)));
+file_4.txt"), Helper::normalizeNewLines(file_get_contents($dir)));
 
         $c->removeFile('file_0.txt');
         $c->renameFile('file_1.txt', 'file_x.txt');
-        $this->assertEquals(str_replace("\r\n", "\n", "tree HEAD:
+        $this->assertEquals(Helper::normalizeNewLines("tree HEAD:
 
 file_2.txt
 file_3.txt
 file_4.txt
-file_x.txt"), str_replace("\r\n", "\n", file_get_contents($dir)));
+file_x.txt"), Helper::normalizeNewLines(file_get_contents($dir)));
 
-        $this->assertEquals(str_replace("\r\n", "\n", "tree HEAD^:
+        $this->assertEquals(Helper::normalizeNewLines("tree HEAD^:
 
 file_1.txt
 file_2.txt
 file_3.txt
-file_4.txt"), str_replace("\r\n", "\n", file_get_contents($dir.'#HEAD^')));
+file_4.txt"), Helper::normalizeNewLines(file_get_contents($dir.'#HEAD^')));
 
-        $this->assertEquals(str_replace("\r\n", "\n", "tree HEAD^^:
+        $this->assertEquals(Helper::normalizeNewLines("tree HEAD^^:
 
 file_0.txt
 file_1.txt
 file_2.txt
 file_3.txt
-file_4.txt"), str_replace("\r\n", "\n", file_get_contents($dir.'#HEAD^^')));
+file_4.txt"), Helper::normalizeNewLines(file_get_contents($dir.'#HEAD^^')));
     }
 }
 

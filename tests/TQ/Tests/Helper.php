@@ -55,4 +55,19 @@ class Helper
         }
         rmdir($path);
     }
+
+    public static function normalizeDirectorySeparator($path)
+    {
+        return str_replace(DIRECTORY_SEPARATOR, '/', $path);
+    }
+
+    public static function normalizeNewLines($string)
+    {
+        return str_replace("\r\n", "\n", $string);
+    }
+
+    public static function normalizeEscapeShellArg($command)
+    {
+        return str_replace("'", '"', $command);
+    }
 }

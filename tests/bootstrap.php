@@ -29,14 +29,16 @@ if (file_exists($file = __DIR__.'/../autoload.php')) {
     require_once $file;
 }
 
-define('PROJECT_PATH',      str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__)));
+use TQ\Tests\Helper;
+
+define('PROJECT_PATH',      Helper::normalizeDirectorySeparator(dirname(__DIR__)));
 define('SOURCE_PATH',       PROJECT_PATH.'/src');
-define('TESTS_PATH',        str_replace(DIRECTORY_SEPARATOR, '/', __DIR__));
+define('TESTS_PATH',        Helper::normalizeDirectorySeparator(__DIR__));
 
 if (defined('TEST_REPO_PATH') && is_string(TEST_REPO_PATH)) {
-    define('TESTS_TMP_PATH',    str_replace(DIRECTORY_SEPARATOR, '/', TEST_REPO_PATH).'/_tq_git_streamwrapper_tests');
+    define('TESTS_TMP_PATH',    Helper::normalizeDirectorySeparator(TEST_REPO_PATH).'/_tq_git_streamwrapper_tests');
 } else {
-    define('TESTS_TMP_PATH',    str_replace(DIRECTORY_SEPARATOR, '/', sys_get_temp_dir()).'/_tq_git_streamwrapper_tests');
+    define('TESTS_TMP_PATH',    Helper::normalizeDirectorySeparator(sys_get_temp_dir()).'/_tq_git_streamwrapper_tests');
 }
 define('TESTS_REPO_PATH_1', TESTS_TMP_PATH.'/repo1');
 define('TESTS_REPO_PATH_2', TESTS_TMP_PATH.'/repo2');
