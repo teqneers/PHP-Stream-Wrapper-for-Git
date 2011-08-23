@@ -5,7 +5,7 @@ Git Streamwrapper for PHP
 
 The *Git Streamwrapper for PHP* core is a wrapper around the Git command line binary so it is required to have Git installed on the machine running the PHP code. ***Git Streamwrapper for PHP* does not include a Git protocol abstraction**, it relies on the Git command line binary for all its functionality.
 
-**The code is currently in a beta state so it is neither throughoutly tested nor feature-complete or fully API-stable.**
+**The code is currently in a beta state so it is neither throughoutly tested nor feature-complete but it should be API-stable by now.**
 
 
 Examples
@@ -165,7 +165,7 @@ Run tests
 3. adjust the `GIT_BINARY` constant in `phpunit.xml` to the path to your Git binary
 4. run `phpunit` from within the cloned project folder
 
-Please note that the library is currently in a pre-alpha state and was tested only on a Mac OS X 10.7 with the bundled PHP 5.3.6. The code should run on all *nix-based systems though, but currenty you're not able to run the tests on a Windows-based machine.
+Please note that the library is currently in a pre-alpha state and was tested on a Mac OS X 10.7 with the bundled PHP 5.3.6 on several Ubuntu Linux installations and on Windows Vista running PHP 5.3.7. Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
 
 Contribute
 ----------
