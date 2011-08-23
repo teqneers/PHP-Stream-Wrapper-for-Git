@@ -165,7 +165,7 @@ Run tests
 3. adjust the `GIT_BINARY` constant in `phpunit.xml` to the path to your Git binary
 4. run `phpunit` from within the cloned project folder
 
-Please note that the library is currently in a pre-alpha state and was tested on a Mac OS X 10.7 with the bundled PHP 5.3.6 on several Ubuntu Linux installations and on Windows Vista running PHP 5.3.7. Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
+Please note that the library is currently in a pre-alpha state and was tested on a Mac OS X 10.7 with the bundled PHP 5.3.6 (git version 1.7.6) on several Ubuntu Linux installations and on Windows Vista running PHP 5.3.7 (1.7.6.msysgit.0) . Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
 
 Contribute
 ----------
