@@ -24,6 +24,7 @@
 namespace TQ\Tests\Git\Cli;
 
 use TQ\Git\Cli\Binary;
+use TQ\Tests\Helper;
 
 class CallCreationTest extends \PHPUnit_Framework_TestCase
 {
