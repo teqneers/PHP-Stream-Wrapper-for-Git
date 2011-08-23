@@ -155,6 +155,17 @@ class Repository
     }
 
     /**
+     * Normalizes the directory separator to /
+     *
+     * @param   string  $path       The path
+     * @return  string              The normalized path
+     */
+    public static function normalizeDirectorySeparator($path)
+    {
+        return str_replace(DIRECTORY_SEPARATOR, '/', $path);
+    }
+
+    /**
      * Tries to find the root directory for a given repository path
      *
      * @param   string      $path       The file system path
@@ -163,12 +174,12 @@ class Repository
     public static function findRepositoryRoot($path)
     {
         $found   = null;
-        $path    = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+        $path    = self::normalizeDirectorySeparator($path);
 
         $drive  = null;
-        if (preg_match('~^\w:.+~', $path)) {
-            $drive  = substr($path, 0, 2);
-            $path   = substr($path, 2);
+        if (preg_match('~^(\w:)(.+)~', $path, $parts)) {
+            $drive  = $parts[1];
+            $path   = $parts[2];
         }
 
         $pathParts  = explode('/', $path);
@@ -301,7 +312,7 @@ class Repository
             }
             return $paths;
         } else {
-            $path   = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+            $path   = self::normalizeDirectorySeparator($path);
             if (strpos($path, $this->getRepositoryPath()) === 0) {
                 $path  = substr($path, strlen($this->getRepositoryPath()));
             }
@@ -327,7 +338,7 @@ class Repository
             if (strpos($path, $this->getRepositoryPath()) === 0) {
                 return $path;
             }
-            $path  = str_replace(DIRECTORY_SEPARATOR, '/', $path);
+            $path  = self::normalizeDirectorySeparator($path);
             $path  = ltrim($path, '/');
             return $this->getRepositoryPath().'/'.$path;
         }
@@ -693,7 +704,7 @@ class Repository
      */
     public function listDirectory($directory = '.', $ref = 'HEAD')
     {
-        $directory  = str_replace(DIRECTORY_SEPARATOR, '/', $directory);
+        $directory  = self::normalizeDirectorySeparator($directory);
         $directory  = rtrim($directory, '/').'/';
         $path       = $this->getRepositoryPath().'/'.$this->resolveLocalPath($directory);
         $result     = $this->getBinary()->{'ls-tree'}($path, array(

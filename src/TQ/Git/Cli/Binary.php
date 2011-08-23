@@ -61,11 +61,21 @@ class Binary
      */
     public static function locateBinary()
     {
-        if (strpos(PHP_OS, 'WIN') === false) {
+        if (!self::isWindows()) {
             $result = Call::create('which git')->execute();
             return $result->getStdOut();
         }
         return '';
+    }
+
+    /**
+     * Checks if the current system is Windows
+     *
+     * @return  boolean     True if we're on a Windows machine
+     */
+    protected static function isWindows()
+    {
+        return (strpos(PHP_OS, 'WIN') !== false);
     }
 
     /**
@@ -113,7 +123,7 @@ class Binary
             return $arg;
         };
 
-        if (strpos(PHP_OS, 'WIN') === false) {
+        if (!self::isWindows()) {
             $binary = escapeshellcmd($this->path);
         } else {
             $binary = $this->path;
