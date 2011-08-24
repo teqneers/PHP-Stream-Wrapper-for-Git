@@ -88,6 +88,8 @@ class FileStatTest extends \PHPUnit_Framework_TestCase
             escapeshellarg('Commit 3')
         ));
 
+        clearstatcache();
+
         StreamWrapper::register('git', new Binary(GIT_BINARY));
     }
 

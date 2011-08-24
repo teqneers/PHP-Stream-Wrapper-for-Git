@@ -40,6 +40,8 @@ class FileStreamBufferTest extends \PHPUnit_Framework_TestCase
         file_put_contents(TESTS_TMP_PATH.'/file_0.txt', 'File 0');
         file_put_contents(TESTS_TMP_PATH.'/abc.txt', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
         touch(TESTS_TMP_PATH.'/empty.txt');
+
+        clearstatcache();
     }
 
     /**

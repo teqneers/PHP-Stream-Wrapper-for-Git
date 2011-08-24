@@ -60,6 +60,8 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
             GIT_BINARY,
             escapeshellarg('Initial commit')
         ));
+
+        clearstatcache();
     }
 
     /**

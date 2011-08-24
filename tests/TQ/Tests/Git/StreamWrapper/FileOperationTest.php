@@ -62,6 +62,8 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
             escapeshellarg('Initial commit')
         ));
 
+        clearstatcache();
+
         StreamWrapper::register('git', new Binary(GIT_BINARY));
     }
 

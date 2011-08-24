@@ -45,6 +45,8 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
             GIT_BINARY
         ));
 
+        clearstatcache();
+
         StreamWrapper::register('git', new Binary(GIT_BINARY));
     }
 

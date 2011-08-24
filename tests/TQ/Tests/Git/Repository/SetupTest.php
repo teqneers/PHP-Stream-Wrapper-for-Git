@@ -44,6 +44,8 @@ class SetupTest extends \PHPUnit_Framework_TestCase
             escapeshellarg(TESTS_REPO_PATH_1),
             GIT_BINARY
         ));
+
+        clearstatcache();
     }
 
     /**
