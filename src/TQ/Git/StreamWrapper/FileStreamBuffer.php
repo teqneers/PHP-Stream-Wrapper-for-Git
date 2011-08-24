@@ -44,7 +44,7 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class FileStreamBuffer extends AbstractFileBuffer
+class FileStreamBuffer implements FileBuffer
 {
     /**
      * The file resource
@@ -61,7 +61,6 @@ class FileStreamBuffer extends AbstractFileBuffer
      */
     public function __construct($path, $mode = 'r+')
     {
-        parent::__construct($mode);
         $this->stream   = @fopen($path, $mode);
         if ($this->stream === false) {
             throw new FileStreamException(sprintf('Cannot access "%s" in mode "%s"', $path, $mode));
