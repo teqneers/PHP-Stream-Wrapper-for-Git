@@ -33,11 +33,12 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper;
-use TQ\Git\Exception;
+namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
+use TQ\Git\StreamWrapper\PathInformation;
+use TQ\Git\StreamWrapper\FileBuffer\StreamBuffer;
 
 /**
- * Exception thrown when an error occured executing a CLI call
+ * Factory to create a HEAD file buffer
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -45,6 +46,30 @@ use TQ\Git\Exception;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class FileStreamException extends \RuntimeException implements Exception
+class HeadFileFactory implements Factory
 {
+    /**
+     * Returns true if this factory can handle the requested path
+     *
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the file
+     * @return  boolean                     True if this factory can handle the path
+     */
+    public function canHandle(PathInformation $path, $mode)
+    {
+        return $path->getRef() == 'HEAD' && !is_dir($path->getFullPath());
+    }
+
+    /**
+     * Returns the file stream to handle the requested path
+     *
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the path
+     * @return  FileBuffer                  The file buffer to handle the path
+     */
+    public function createFileBuffer(PathInformation $path, $mode)
+    {
+        return new StreamBuffer($path->getFullPath(), $mode);
+    }
+
 }

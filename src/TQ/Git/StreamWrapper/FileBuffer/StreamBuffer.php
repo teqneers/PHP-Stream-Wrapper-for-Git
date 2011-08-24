@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper;
+namespace TQ\Git\StreamWrapper\FileBuffer;
 
 /**
  * Encapsulates a file stream buffer to be used in the streamwrapper
@@ -44,7 +44,7 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class FileStreamBuffer implements FileBuffer
+class StreamBuffer implements FileBuffer
 {
     /**
      * The file resource
@@ -63,7 +63,7 @@ class FileStreamBuffer implements FileBuffer
     {
         $this->stream   = @fopen($path, $mode);
         if ($this->stream === false) {
-            throw new FileStreamException(sprintf('Cannot access "%s" in mode "%s"', $path, $mode));
+            throw new StreamException(sprintf('Cannot access "%s" in mode "%s"', $path, $mode));
         }
     }
 

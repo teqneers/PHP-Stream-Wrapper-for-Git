@@ -36,6 +36,7 @@
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
 
 /**
  * The streamwrapper that hooks into PHP's stream infrastructure
@@ -44,8 +45,7 @@ use TQ\Git\Repository\Repository;
  * @uses       TQ\Git\Repository\Repository;
  * @uses       TQ\Git\StreamWrapper\PathInformation
  * @uses       TQ\Git\StreamWrapper\DirectoryBuffer
- * @uses       TQ\Git\StreamWrapper\FileRevsionBuffer
- * @uses       TQ\Git\StreamWrapper\FileStreamBuffer
+ * @uses       TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Git
@@ -526,34 +526,10 @@ class StreamWrapper
     {
         try {
             $path   = $this->getPath($path);
-            $repo   = $path->getRepository();
 
-            $objectInfo = array();
-            if ($path->hasArgument('commit')) {
-                $buffer = $repo->showCommit($path->getArgument('ref'));
-            } else if ($path->hasArgument('log')) {
-                $buffer = implode(
-                    str_repeat(PHP_EOL, 3),
-                    $repo->getLog(
-                        $path->getArgument('limit'),
-                        $path->getArgument('skip')
-                    )
-                );
-            } else {
-                if (   $path->getRef() == 'HEAD'
-                    && !is_dir($path->getFullPath())
-                ) {
-                    $buffer = new FileStreamBuffer($path->getFullPath(), $mode);
-                } else {
-                    $buffer     = $repo->showFile($path->getLocalPath(), $path->getRef());
-                    $objectInfo = $repo->getObjectInfo($path->getLocalPath(), $path->getRef());
-                }
-            }
-
-            if (!($buffer instanceof FileBuffer)) {
-                $buffer = new FileStringBuffer($buffer, $objectInfo, 'r');
-            }
-            $this->fileBuffer   = $buffer;
+            $resolver           = Resolver::create();
+            $factory            = $resolver->findFactory($path, $mode);
+            $this->fileBuffer   = $factory->createFileBuffer($path, $mode);
             $this->path         = $path;
 
             if (self::maskHasFlag($options, STREAM_USE_PATH)) {

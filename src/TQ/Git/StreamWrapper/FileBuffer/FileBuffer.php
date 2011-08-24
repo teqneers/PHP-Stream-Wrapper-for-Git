@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper;
+namespace TQ\Git\StreamWrapper\FileBuffer;
 
 /**
  * Interface for file buffers used in the stream wrapper

@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper;
+namespace TQ\Git\StreamWrapper\FileBuffer;
 
 /**
  * Encapsulates a file revision buffer to be used in the streamwrapper
@@ -44,7 +44,7 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class FileStringBuffer implements FileBuffer
+class StringBuffer implements FileBuffer
 {
     /**
      * The buffer contents

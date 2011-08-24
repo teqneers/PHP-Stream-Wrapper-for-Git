@@ -33,7 +33,8 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper;
+namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
+use TQ\Git\StreamWrapper\PathInformation;
 
 /**
  * Resolves the file stream factory to use on a stream_open call
@@ -44,7 +45,7 @@ namespace TQ\Git\StreamWrapper;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class FileStreamFactoryResolver
+class Resolver
 {
     /**
      * The list containing the possible factories
@@ -52,6 +53,21 @@ class FileStreamFactoryResolver
      * @var \SplPriorityQueue
      */
     protected $factoryList;
+
+    /**
+     * Creates the default factory
+     *
+     * @return  Resolver
+     */
+    public static function create()
+    {
+        $factory    = new static();
+        $factory->addFactory(new CommitFactory(), 100)
+                ->addFactory(new LogFactory(), 90)
+                ->addFactory(new HeadFileFactory(), 80)
+                ->addFactory(new DefaultFactory(), -100);
+        return $factory;
+    }
 
     /**
      * Creates a new factory resolver
@@ -62,25 +78,16 @@ class FileStreamFactoryResolver
     }
 
     /**
-     * Adds a factory class to the list of possible factories
+     * Adds a factory to the list of possible factories
      *
-     * @param   string      $class      The factory class name
+     * @param   Factory     $class      The factory
      * @param   integer     $priority   The priority
+     * @return  Resolver                The resolver
      */
-    public function addFactoryClass($class, $priority = 10)
+    public function addFactory(Factory $factory, $priority = 10)
     {
-        $class  = (string)$class;
-        if (strpos($class, '\\') === false) {
-            $class  = __NAMESPACE__.'\\'.$class;
-        }
-        if (!class_exists($class)) {
-            throw new \InvalidArgumentException(sprintf('"%s" does not exist', $class));
-        }
-
-        if (!is_subclass_of($class, __NAMESPACE__.'\\FileStreamFactory')) {
-            throw new \InvalidArgumentException(sprintf('"%s" is not a valid factory', $class));
-        }
-        $this->factoryList->insert($class, $priority);
+        $this->factoryList->insert($factory, $priority);
+        return $this;
     }
 
     /**
@@ -88,12 +95,11 @@ class FileStreamFactoryResolver
      *
      * @param   PathInformation     $path   The path information
      * @param   string              $mode   The mode used to open the path
-     * @return  FileStreamFactory           The file stream factory to handle the path
+     * @return  Factory                     The file buffer factory to handle the path
      */
-    public function resolveFactory(PathInformation $path, $mode)
+    public function findFactory(PathInformation $path, $mode)
     {
-        foreach ($this->factoryList as $factoryClass) {
-            $factory    = new $factoryClass();
+        foreach ($this->factoryList as $factory) {
             if ($factory->canHandle($path, $mode)) {
                 return $factory;
             }
