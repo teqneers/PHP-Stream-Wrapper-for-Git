@@ -100,6 +100,13 @@ interface FileBuffer
     function getStat();
 
     /**
+     * Flushes the buffer to the storage media
+     *
+     * @return  boolean
+     */
+    function flush();
+
+    /**
      * Closes the buffer
      */
     function close();

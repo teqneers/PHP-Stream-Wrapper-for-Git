@@ -458,11 +458,10 @@ class StreamWrapper
      * @return  boolean     Should return TRUE if the cached data was successfully stored
      *                      (or if there was no data to store), or FALSE if the data could not be stored.
      */
-/*
     public function stream_flush()
     {
+        return $this->fileBuffer->flush();
     }
-*/
 
     /**
      * streamWrapper::stream_lock — Advisory file locking

@@ -223,6 +223,17 @@ class FileStringBuffer extends AbstractFileBuffer
     }
 
     /**
+     * Flushes the buffer to the storage media
+     *
+     * @return  boolean
+     */
+    public function flush()
+    {
+        // no needed for the string buffer
+        return true;
+    }
+
+    /**
      * Closes the buffer
      */
     public function close()

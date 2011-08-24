@@ -155,6 +155,16 @@ class FileStreamBuffer extends AbstractFileBuffer
     }
 
     /**
+     * Flushes the buffer to the storage media
+     *
+     * @return  boolean
+     */
+    public function flush()
+    {
+        return fflush($this->stream);
+    }
+
+    /**
      * Closes the buffer
      */
     public function close()
