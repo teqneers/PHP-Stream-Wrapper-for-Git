@@ -36,6 +36,7 @@
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
+use TQ\Git\StreamWrapper\FileBuffer\FileBuffer;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\CommitFactory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;
