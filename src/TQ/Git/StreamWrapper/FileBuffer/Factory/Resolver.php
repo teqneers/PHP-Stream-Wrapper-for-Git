@@ -55,21 +55,6 @@ class Resolver
     protected $factoryList;
 
     /**
-     * Creates the default factory
-     *
-     * @return  Resolver
-     */
-    public static function create()
-    {
-        $factory    = new static();
-        $factory->addFactory(new CommitFactory(), 100)
-                ->addFactory(new LogFactory(), 90)
-                ->addFactory(new HeadFileFactory(), 80)
-                ->addFactory(new DefaultFactory(), -100);
-        return $factory;
-    }
-
-    /**
      * Creates a new factory resolver
      */
     public function __construct()

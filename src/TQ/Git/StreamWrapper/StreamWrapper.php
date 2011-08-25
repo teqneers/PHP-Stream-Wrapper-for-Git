@@ -37,6 +37,10 @@ namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\CommitFactory;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\HeadFileFactory;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
 
 /**
  * The streamwrapper that hooks into PHP's stream infrastructure
@@ -46,6 +50,10 @@ use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
  * @uses       TQ\Git\StreamWrapper\PathInformation
  * @uses       TQ\Git\StreamWrapper\DirectoryBuffer
  * @uses       TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver
+ * @uses       TQ\Git\StreamWrapper\FileBuffer\Factory\CommitFactory
+ * @uses       TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory
+ * @uses       TQ\Git\StreamWrapper\FileBuffer\Factory\HeadFileFactory
+ * @uses       TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Git
@@ -527,7 +535,7 @@ class StreamWrapper
         try {
             $path   = $this->getPath($path);
 
-            $resolver           = Resolver::create();
+            $resolver           = $this->createBufferFactoryResolver();
             $factory            = $resolver->findFactory($path, $mode);
             $this->fileBuffer   = $factory->createFileBuffer($path, $mode);
             $this->path         = $path;
@@ -543,6 +551,21 @@ class StreamWrapper
             }
             return false;
         }
+    }
+
+    /**
+     * Creates the factory resolver
+     *
+     * @return  Resolver
+     */
+    protected function createBufferFactoryResolver()
+    {
+        $resolver    = new Resolver();
+        $resolver->addFactory(new CommitFactory(), 100)
+                 ->addFactory(new LogFactory(), 90)
+                 ->addFactory(new HeadFileFactory(), 80)
+                 ->addFactory(new DefaultFactory(), -100);
+        return $resolver;
     }
 
     /**
