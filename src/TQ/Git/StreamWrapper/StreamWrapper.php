@@ -137,12 +137,12 @@ class StreamWrapper
             ));
         }
 
-        static::$binary    = $binary;
-        if (!stream_wrapper_register($protocol, __CLASS__)) {
+        self::$binary    = $binary;
+        if (!stream_wrapper_register($protocol, get_class(new static()))) {
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
         }
-        static::$protocol = $protocol;
+        self::$protocol = $protocol;
     }
 
     /**
@@ -150,9 +150,9 @@ class StreamWrapper
      */
     public static function unregister()
     {
-        if (!stream_wrapper_unregister(static::$protocol)) {
+        if (!stream_wrapper_unregister(self::$protocol)) {
             throw new \RuntimeException(sprintf('The protocol "%s" cannot be unregistered
-                from the runtime', static::$protocol));
+                from the runtime', self::$protocol));
         }
     }
 
@@ -176,8 +176,8 @@ class StreamWrapper
             $this->contextOptions   = stream_context_get_options($this->context);
         }
 
-        if (!$all && array_key_exists(static::$protocol, $this->contextOptions)) {
-            return $this->contextOptions[static::$protocol];
+        if (!$all && array_key_exists(self::$protocol, $this->contextOptions)) {
+            return $this->contextOptions[self::$protocol];
         } else if ($all) {
             return $this->contextOptions;
         } else {
@@ -238,7 +238,7 @@ class StreamWrapper
      */
     protected function getPath($streamUrl)
     {
-        return new PathInformation($streamUrl, static::$protocol, static::$binary);
+        return new PathInformation($streamUrl, self::$protocol, self::$binary);
     }
 
     /**
@@ -358,7 +358,7 @@ class StreamWrapper
                 throw new \Exception(sprintf('Path %s is not a file', $pathFrom->getFullPath()));
             }
 
-            $pathTo = PathInformation::parseUrl($path_to, static::$protocol);
+            $pathTo = PathInformation::parseUrl($path_to, self::$protocol);
             $pathTo = $pathTo['path'];
 
             if (strpos($pathTo, $pathFrom->getRepositoryPath()) !== 0) {
