@@ -87,6 +87,12 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('master', $c->getCurrentBranch());
     }
 
+    public function testGetBranches()
+    {
+        $c  = $this->getRepository();
+        $this->assertEquals(array('master'), $c->getBranches());
+    }
+
     public function testGetStatus()
     {
         $c  = $this->getRepository();

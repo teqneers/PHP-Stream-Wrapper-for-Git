@@ -54,6 +54,10 @@ class Repository
     const RESET_WORKING = 2;
     const RESET_ALL     = 3;
 
+    const BRANCHES_LOCAL    = 1;
+    const BRANCHES_REMOTE   = 2;
+    const BRANCHES_ALL      = 3;
+
     /**
      * The Git binary
      *
@@ -793,6 +797,48 @@ class Repository
         );
 
         return $result->getStdOut();
+    }
+
+    /**
+     * Returns a list of the branches in the repository
+     *
+     * @param   integer     $which      Which branches to retrieve (all, local or remote-tracking)
+     * @return  array
+     */
+    public function getBranches($which = self::BRANCHES_LOCAL)
+    {
+        $which       = (int)$which;
+        $arguments  = array(
+            '--no-color'
+        );
+
+        $local  = (($which & self::BRANCHES_LOCAL) == self::BRANCHES_LOCAL);
+        $remote = (($which & self::BRANCHES_REMOTE) == self::BRANCHES_REMOTE);
+
+        if ($local && $remote) {
+            $arguments[] = '-a';
+        } else if ($remote) {
+            $arguments[] = '-r';
+        }
+
+        $result = $this->getBinary()->branch($this->getRepositoryPath(), $arguments);
+        self::throwIfError($result,
+            sprintf('Cannot retrieve branche from "%s"', $this->getRepositoryPath())
+        );
+
+        $output = rtrim($result->getStdOut());
+        if (empty($output)) {
+            return array();
+        }
+
+        $branches = array_map(function($b) {
+            $line   = rtrim($b);
+            if (strpos($line, '* ') === 0) {
+                $line   = substr($line, 2);
+            }
+            return $line;
+        }, explode("\n", $output));
+        return $branches;
     }
 
     /**
