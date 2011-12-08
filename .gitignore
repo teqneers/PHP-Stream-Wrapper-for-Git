@@ -1,5 +1,4 @@
 .DS_Store
 phpunit.xml
 autoload.php
-
-.idea/
+.idea
