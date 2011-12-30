@@ -7,7 +7,7 @@ Git Streamwrapper for PHP
 
 The *Git Streamwrapper for PHP* core is a wrapper around the Git command line binary so it is required to have Git installed on the machine running the PHP code. ***Git Streamwrapper for PHP* does not include a Git protocol abstraction**, it relies on the Git command line binary for all its functionality.
 
-**The code is currently in a beta state so it is neither throughoutly tested nor feature-complete but it should be API-stable by now.**
+**The code is currently running stable (see comments on Windows below) and should be API-stable. It's however not feature-complete - so please feel free to request features you require.**
 
 
 Examples
@@ -167,7 +167,9 @@ Run tests
 3. adjust the `GIT_BINARY` constant in `phpunit.xml` to the path to your Git binary
 4. run `phpunit` from within the cloned project folder
 
-Please note that the library is currently in a pre-alpha state and was tested on a Mac OS X 10.7 with the bundled PHP 5.3.6 (git version 1.7.6) on several Ubuntu Linux installations and on Windows Vista running PHP 5.3.7 (1.7.6.msysgit.0) . Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
+Please note that the library has been tested on a Mac OS X 10.7 with the bundled PHP 5.3.6 (git version 1.7.6), on several Ubuntu Linux installations and on Windows Vista running PHP 5.3.7 (1.7.6.msysgit.0). Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories. 
+
+The unit test suite is continuously tested with [Travis CI](http://travis-ci.org/) on PHP 5.3 and 5.4 and its current status is: [![Build Status](https://secure.travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.png)](http://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
 
 Contribute
 ----------
