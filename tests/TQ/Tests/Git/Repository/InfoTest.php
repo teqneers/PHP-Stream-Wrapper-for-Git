@@ -143,6 +143,10 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $log    = $c->getLog(1, 1);
         $this->assertEquals(1, count($log));
         $this->assertContains('Initial commit', $log[0]);
+
+        $log    = $c->getLog(10,0);
+        $this->assertEquals(2, count($log));
+        $this->assertContains('Initial commit', $log[1]);
     }
 
     public function testShowCommit()
