@@ -109,7 +109,7 @@ class Binary
     {
         $handleArg  = function($key, $value) {
             $key  = ltrim($key, '-');
-            if (strlen($key) == 1) {
+            if (strlen($key) == 1 || is_numeric($key)) {
                 $arg = sprintf('-%s', escapeshellarg($key));
                 if ($value !== null) {
                     $arg    .= ' '.escapeshellarg($value);
