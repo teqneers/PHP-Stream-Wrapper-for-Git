@@ -54,7 +54,7 @@ class StreamBuffer implements FileBuffer
     protected $stream;
 
     /**
-     * Creates a neww file buffer with the given path
+     * Creates a new file buffer with the given path
      *
      * @param   string  $path    The path
      * @param   string  $mode    The file mode
