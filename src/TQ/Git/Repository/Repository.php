@@ -388,6 +388,21 @@ class Repository
         self::throwIfError($result, sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
     }
 
+	/**
+	 * Pushes the currently commited changes to a remote repository
+	 *
+	 * @param   string|null       $args_str         The argument string for the push
+	 */
+	public function push($args_str = null)
+	{
+		$args   = array();
+		if ($args_str !== null) {
+			$args[] = $args_str;
+		}
+		$result = $this->getBinary()->push($this->getRepositoryPath(), $args);
+		self::throwIfError($result, sprintf('Cannot push "%s"', $this->getRepositoryPath()));
+	}
+
     /**
      * Resets the working directory and/or the staging area and discards all changes
      *
