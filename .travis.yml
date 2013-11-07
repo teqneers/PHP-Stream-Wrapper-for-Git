@@ -1,5 +1,9 @@
 language: php
 
+env:
+  - GIT_AUTHOR_NAME=teqneers 
+
 php:
   - 5.3
   - 5.4
+  - 5.5
