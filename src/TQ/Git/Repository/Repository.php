@@ -890,5 +890,27 @@ class Repository
             throw new CallException($message, $result);
         }
     }
+     
+    /**
+     * Returns the remote info
+     *
+     * @return  array
+     */
+    public function getCurrentRemote()
+    {
+        $result = $this->getBinary()->{'remote'}($this->getRepositoryPath(), array(
+             '-v'
+        ));
+        self::throwIfError($result, sprintf('Cannot remote "%s"', $this->getRepositoryPath()));
+        
+        $tmp = $result->getStdOut();
+        
+        preg_match_all("/([a-z]*)\h(.*)\h\((.*)\)/", $tmp, $matches);
+                
+        foreach($matches[0] as $key => $value)
+            $retvar[$matches[3][$key]] = array($matches[1][$key] => $matches[2][$key]);
+                
+        return $retvar;
+    }
 }
 
