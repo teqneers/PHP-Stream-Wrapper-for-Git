@@ -70,4 +70,11 @@ class Helper
     {
         return str_replace("'", '"', $command);
     }
+
+    public static function initEmptyRepository($path) {
+         exec(sprintf('cd %1$s && %2$s init && %2$s config user.email "test@example.com" && %2$s config user.name "test"',
+            escapeshellarg($path),
+            GIT_BINARY
+        ));
+    }
 }
