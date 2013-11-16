@@ -70,7 +70,7 @@ class PathInformation
     protected $fullPath;
 
     /**
-     * The relative path to the reosurce based on the repository path
+     * The relative path to the resource based on the repository path
      *
      * @var string
      */
