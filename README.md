@@ -16,13 +16,12 @@ Examples
 ### Using the repository abstraction
 
 ```php
-use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 // open an already initialized repository
-$git = Repository::open('/path/to/your/repository', new Binary('/usr/bin/git'));
+$git = Repository::open('/path/to/your/repository', '/usr/bin/git');
 
 // open repository and create path and init repository if necessary
-$git = Repository::open('/path/to/your/repository', new Binary('/usr/bin/git'), 0755);
+$git = Repository::open('/path/to/your/repository', '/usr/bin/git', 0755);
 
 // get current branch
 $branch = $git->getCurrentBranch();
@@ -73,11 +72,10 @@ $result = $git->transactional(function(TQ\Git\Repository\Transaction $t) {
 ### Using the streamwrapper
 
 ```php
-use TQ\Git\Cli\Binary;
 use TQ\Git\StreamWrapper\StreamWrapper;
 
 // register the wrapper
-StreamWrapper::register('git', new Binary('/usr/bin/git'));
+StreamWrapper::register('git', '/usr/bin/git');
 
 // read the contents of a file
 $content = file_get_contents('git:///path/to/your/repository/file_0.txt');

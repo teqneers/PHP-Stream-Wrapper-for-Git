@@ -122,9 +122,9 @@ class StreamWrapper
     /**
      * Registers the stream wrapper with the given protocol
      *
-     * @param   string           $protocol      The protocol (such as "git")
-     * @param   Binary|string    $binary        The Git binary
-     * @throws  \RuntimeException               If $protocol is already registered
+     * @param   string              $protocol    The protocol (such as "git")
+     * @param   Binary|string|null  $binary      The Git binary
+     * @throws  \RuntimeException                If $protocol is already registered
      */
     public static function register($protocol, $binary = null)
     {
