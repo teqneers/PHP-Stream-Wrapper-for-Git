@@ -22,7 +22,7 @@
  */
 
 /**
- * Git Streamwrapper for PHP
+ * Git Stream Wrapper for PHP
  *
  * @category   TQ
  * @package    TQ_Git
@@ -48,7 +48,7 @@ class DirectoryBuffer implements \Iterator
 {
     /**
      * The directory listing
-     * 
+     *
      * @var array
      */
     protected $listing;

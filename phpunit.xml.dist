@@ -16,7 +16,7 @@
         <const name="TEST_REPO_PATH" value="false"/>
     </php>
     <testsuites>
-        <testsuite name="TEQneers Git Streamwrapper Test Suite">
+        <testsuite name="TEQneers Git Stream Wrapper Test Suite">
             <directory>./tests/TQ/</directory>
         </testsuite>
     </testsuites>

@@ -22,7 +22,7 @@
  */
 
 /**
- * Git Streamwrapper for PHP
+ * Git Stream Wrapper for PHP
  *
  * @category   TQ
  * @package    TQ_Git

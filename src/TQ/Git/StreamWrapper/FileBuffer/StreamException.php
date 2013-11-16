@@ -22,7 +22,7 @@
  */
 
 /**
- * Git Streamwrapper for PHP
+ * Git Stream Wrapper for PHP
  *
  * @category   TQ
  * @package    TQ_Git
@@ -37,7 +37,7 @@ namespace TQ\Git\StreamWrapper\FileBuffer;
 use TQ\Git\Exception;
 
 /**
- * Exception thrown when an error occured executing a CLI call
+ * Exception thrown when an error occurred executing a CLI call
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
