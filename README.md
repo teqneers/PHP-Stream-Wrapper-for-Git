@@ -167,9 +167,9 @@ Run tests
 3. adjust the `GIT_BINARY` constant in `phpunit.xml` to the path to your Git binary
 4. run `phpunit` from within the cloned project folder
 
-Please note that the library has been tested on a Mac OS X 10.7 with the bundled PHP 5.3.6 (git version 1.7.6), on several Ubuntu Linux installations and on Windows Vista running PHP 5.3.7 (1.7.6.msysgit.0). Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories. 
+Please note that the library has been tested on a Mac OS X 10.7 with the bundled PHP 5.3.6 (git version 1.7.6), on several Ubuntu Linux installations and on Windows Vista running PHP 5.3.7 (1.7.6.msysgit.0). Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
 
-The unit test suite is continuously tested with [Travis CI](http://travis-ci.org/) on PHP 5.3 and 5.4 and its current status is: [![Build Status](https://secure.travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.png)](http://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
+The unit test suite is continuously tested with [Travis CI](http://travis-ci.org/) on PHP 5.3, 5.4 and 5.5 and its current status is: [![Build Status](https://secure.travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.png)](http://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
 
 Contribute
 ----------
