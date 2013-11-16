@@ -84,7 +84,8 @@ class Binary
      * If no path is given the class tries to find the correct
      * binary {@see locateBinary()}
      *
-     * @param   string|null $path   The path to the Git binary or NULL to auto-detect
+     * @param   string|null $path           The path to the Git binary or NULL to auto-detect
+     * @throws  \InvalidArgumentException   If no Git binary is found
      */
     public function __construct($path = null)
     {
@@ -166,10 +167,11 @@ class Binary
     /**
      * Method overloading - allows calling Git commands directly as class methods
      *
-     * @param   string  $method     The Git command, e.g. show, commit or add
-     * @param   array   $arguments  The command arguments with the path to the Git
-     *                              repository beeing the first argument
+     * @param   string  $method             The Git command, e.g. show, commit or add
+     * @param   array   $arguments          The command arguments with the path to the Git
+     *                                      repository beeing the first argument
      * @return  CallResult
+     * @throws \InvalidArgumentException    If the method is called with less than one argument
      */
     public function __call($method, array $arguments)
     {

@@ -75,7 +75,8 @@ class Call
      * @param   array|null  $env    Environment variables - defaults to the current environment
      * @return  Call
      */
-    public static function create($cmd, $cwd = null, array $env = null) {
+    public static function create($cmd, $cwd = null, array $env = null)
+    {
         return new static($cmd, $cwd, $env);
     }
 
@@ -165,10 +166,11 @@ class Call
     }
 
     /**
-     * Executes the call usign the preconfigured command
+     * Executes the call using the preconfigured command
      *
      * @param   string|null  $stdIn     Content that will be piped to the command
      * @return  CallResult
+     * @throws  \RuntimeException       If the command cannot be executed
      */
     public function execute($stdIn = null)
     {
@@ -199,7 +201,7 @@ class Call
         } else {
             fclose($stdOut);
             fclose($stdErr);
-            throw new \RuntimeException(sprintf('Cannot execute "%s"', $cmd));
+            throw new \RuntimeException(sprintf('Cannot execute "%s"', $this->getCmd()));
         }
     }
 }

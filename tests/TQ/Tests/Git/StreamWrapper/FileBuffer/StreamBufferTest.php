@@ -35,7 +35,7 @@ class StreamBufferTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
-        mkdir(TESTS_TMP_PATH, 0777, true);
+        Helper::createDirectory(TESTS_TMP_PATH);
 
         file_put_contents(TESTS_TMP_PATH.'/file_0.txt', 'File 0');
         file_put_contents(TESTS_TMP_PATH.'/abc.txt', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
@@ -68,7 +68,6 @@ class StreamBufferTest extends \PHPUnit_Framework_TestCase
 
     public function testSeek()
     {
-        $expected   = 'File 0';
         $buffer     = new StreamBuffer(TESTS_TMP_PATH.'/file_0.txt');
 
         $buffer->setPosition(-1, SEEK_END);

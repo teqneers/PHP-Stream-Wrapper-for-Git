@@ -34,6 +34,7 @@
  * @namespace
  */
 namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
+use TQ\Git\StreamWrapper\FileBuffer\FileBuffer;
 use TQ\Git\StreamWrapper\PathInformation;
 use TQ\Git\StreamWrapper\FileBuffer\StringBuffer;
 

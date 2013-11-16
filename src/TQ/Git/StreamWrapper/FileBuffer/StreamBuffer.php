@@ -58,6 +58,7 @@ class StreamBuffer implements FileBuffer
      *
      * @param   string  $path    The path
      * @param   string  $mode    The file mode
+     * @throws  StreamException  If the stream cannot be opened in the given mode
      */
     public function __construct($path, $mode = 'r+')
     {

@@ -65,7 +65,7 @@ class Resolver
     /**
      * Adds a factory to the list of possible factories
      *
-     * @param   Factory     $class      The factory
+     * @param   Factory     $factory     The factory
      * @param   integer     $priority   The priority
      * @return  Resolver                The resolver
      */
@@ -81,10 +81,12 @@ class Resolver
      * @param   PathInformation     $path   The path information
      * @param   string              $mode   The mode used to open the path
      * @return  Factory                     The file buffer factory to handle the path
+     * @throws  \RuntimeException           If no factory is found to handle to the path
      */
     public function findFactory(PathInformation $path, $mode)
     {
         foreach ($this->factoryList as $factory) {
+            /** @var $factory Factory */
             if ($factory->canHandle($path, $mode)) {
                 return $factory;
             }

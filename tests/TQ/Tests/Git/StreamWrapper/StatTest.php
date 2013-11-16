@@ -37,51 +37,39 @@ class FileStatTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
-        mkdir(TESTS_TMP_PATH, 0777, true);
-        mkdir(TESTS_REPO_PATH_1, 0777, true);
+        Helper::createDirectory(TESTS_TMP_PATH);
+        Helper::createDirectory(TESTS_REPO_PATH_1);
 
         Helper::initEmptyRepository(TESTS_REPO_PATH_1);
 
         $path   = TESTS_REPO_PATH_1.'/test.txt';
         file_put_contents($path, 'File 1');
-        exec(sprintf('cd %s && %s add %s',
-            escapeshellarg(TESTS_REPO_PATH_1),
-            GIT_BINARY,
+        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('add %s',
             escapeshellarg($path)
         ));
 
-        exec(sprintf('cd %s && %s commit --message=%s',
-            escapeshellarg(TESTS_REPO_PATH_1),
-            GIT_BINARY,
+        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
             escapeshellarg('Commit 1')
         ));
 
         $path   = TESTS_REPO_PATH_1.'/directory';
-        mkdir($path, 0777);
+        Helper::createDirectory($path);
         file_put_contents($path.'/test.txt', 'Directory File 1');
-        exec(sprintf('cd %s && %s add %s',
-            escapeshellarg(TESTS_REPO_PATH_1),
-            GIT_BINARY,
+        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('add %s',
             escapeshellarg($path)
         ));
 
-        exec(sprintf('cd %s && %s commit --message=%s',
-            escapeshellarg(TESTS_REPO_PATH_1),
-            GIT_BINARY,
+        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
             escapeshellarg('Commit 2')
         ));
 
         $path   = TESTS_REPO_PATH_1.'/test.txt';
         file_put_contents($path, 'File 1 New');
-        exec(sprintf('cd %s && %s add %s',
-            escapeshellarg(TESTS_REPO_PATH_1),
-            GIT_BINARY,
+        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('add %s',
             escapeshellarg($path)
         ));
 
-        exec(sprintf('cd %s && %s commit --message=%s',
-            escapeshellarg(TESTS_REPO_PATH_1),
-            GIT_BINARY,
+        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
             escapeshellarg('Commit 3')
         ));
 

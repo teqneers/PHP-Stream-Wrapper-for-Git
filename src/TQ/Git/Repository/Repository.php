@@ -102,6 +102,8 @@ class Repository
      *                                                  creation mode, such as 0755  if the command
      *                                                  should create the directory and init the repository instead
      * @return  Repository
+     * @throws  \RuntimeException                       If the path cannot be created
+     * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid Git repository
      */
     public static function open($repositoryPath, Binary $binary = null, $createIfNotExists = false)
     {
@@ -355,6 +357,7 @@ class Repository
      */
     public function getCurrentCommit()
     {
+        /** @var $result CallResult */
         $result = $this->getBinary()->{'rev-parse'}($this->getRepositoryPath(), array(
              '--verify',
             'HEAD'
@@ -494,6 +497,7 @@ class Repository
      * @param   boolean         $recursive      Create intermediate directories recursively if required
      * @param   string|null     $author         The author
      * @return  string                          The current commit hash
+     * @throws  \RuntimeException               If the file could not be written
      */
     public function writeFile($path, $data, $commitMsg = null, $fileMode = null,
         $dirMode = null, $recursive = true, $author = null
@@ -614,11 +618,12 @@ class Repository
     /**
      * Returns a string containing information about the given commit
      *
-     * @return  string  $hash       The commit ref
+     * @param  string  $hash       The commit ref
      * @return  string
      */
     public function showCommit($hash)
     {
+        /** @var $result CallResult */
         $result = $this->getBinary()->show($this->getRepositoryPath(), array(
             '--format' => 'fuller',
             $hash
@@ -639,6 +644,7 @@ class Repository
      */
     public function showFile($file, $ref = 'HEAD')
     {
+        /** @var $result CallResult */
         $result = $this->getBinary()->show($this->getRepositoryPath(), array(
             sprintf('%s:%s', $ref, $file)
         ));
@@ -672,6 +678,7 @@ class Repository
             'size'  => 0
         );
 
+        /** @var $result CallResult */
         $result = $this->getBinary()->{'cat-file'}($this->getRepositoryPath(), array(
             '--batch-check'
         ), sprintf('%s:%s', $ref, $path));
@@ -711,7 +718,9 @@ class Repository
         $directory  = self::normalizeDirectorySeparator($directory);
         $directory  = rtrim($directory, '/').'/';
         $path       = $this->getRepositoryPath().'/'.$this->resolveLocalPath($directory);
-        $result     = $this->getBinary()->{'ls-tree'}($path, array(
+
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'ls-tree'}($path, array(
             '--name-only',
             '-z',
             $ref
@@ -728,7 +737,7 @@ class Repository
     }
 
     /**
-     * Returns the current status of the working directory and the stagin area
+     * Returns the current status of the working directory and the staging area
      *
      * The returned array structure is
      *      array(
@@ -742,6 +751,7 @@ class Repository
      */
     public function getStatus()
     {
+        /** @var $result CallResult */
         $result = $this->getBinary()->status($this->getRepositoryPath(), array(
             '--short'
         ));
@@ -788,6 +798,7 @@ class Repository
      */
     public function getCurrentBranch()
     {
+        /** @var $result CallResult */
         $result = $this->getBinary()->{'name-rev'}($this->getRepositoryPath(), array(
             '--name-only',
             'HEAD'
@@ -821,6 +832,7 @@ class Repository
             $arguments[] = '-r';
         }
 
+        /** @var $result CallResult */
         $result = $this->getBinary()->branch($this->getRepositoryPath(), $arguments);
         self::throwIfError($result,
             sprintf('Cannot retrieve branche from "%s"', $this->getRepositoryPath())
@@ -843,12 +855,13 @@ class Repository
 
     /**
      * Runs $function in a transactional scope committing all changes to the repository on success,
-     * but rolling back all changes in the event of an Exception beeing thrown in the closure
+     * but rolling back all changes in the event of an Exception being thrown in the closure
      *
      * The closure $function will be called with a {@see TQ\Git\Repository\Transaction} as its only argument
      *
-     * @param   \Closure   $function
+     * @param   \Closure   $function        The callback used inside the transaction
      * @return  Transaction
+     * @throws  \Exception                  Rethrows every exception happening inside the transaction
      */
     public function transactional(\Closure $function)
     {
@@ -879,10 +892,11 @@ class Repository
     }
 
     /**
-     * Internal method that checks if the CLI call has succeeded and throws an Excetion otherwise
+     * Internal method that checks if the CLI call has succeeded and throws an Exception otherwise
      *
      * @param   CallResult  $result         The CLI result
      * @param   string      $message        The exception message
+     * @throws  CallException               If there has been an error when executing
      */
     protected static function throwIfError(CallResult $result, $message)
     {
@@ -890,7 +904,7 @@ class Repository
             throw new CallException($message, $result);
         }
     }
-     
+
     /**
      * Returns the remote info
      *
@@ -898,19 +912,21 @@ class Repository
      */
     public function getCurrentRemote()
     {
+        /** @var $result CallResult */
         $result = $this->getBinary()->{'remote'}($this->getRepositoryPath(), array(
              '-v'
         ));
         self::throwIfError($result, sprintf('Cannot remote "%s"', $this->getRepositoryPath()));
-        
+
         $tmp = $result->getStdOut();
-        
-        preg_match_all("/([a-z]*)\h(.*)\h\((.*)\)/", $tmp, $matches);
-                
+
+        preg_match_all('/([a-z]*)\h(.*)\h\((.*)\)/', $tmp, $matches);
+
+        $retVar = array();
         foreach($matches[0] as $key => $value)
-            $retvar[$matches[3][$key]] = array($matches[1][$key] => $matches[2][$key]);
-                
-        return $retvar;
+            $retVar[$matches[3][$key]] = array($matches[1][$key] => $matches[2][$key]);
+
+        return $retVar;
     }
 }
 

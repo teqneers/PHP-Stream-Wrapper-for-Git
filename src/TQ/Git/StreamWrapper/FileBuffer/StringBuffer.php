@@ -82,9 +82,9 @@ class StringBuffer implements FileBuffer
     protected $mode;
 
     /**
-     * Creates a neww file buffer with the given contents
+     * Creates a new file buffer with the given contents
      *
-     * @param   string  $content    The contents
+     * @param   string  $buffer     The buffer content
      * @param   array   $objectInfo The object info
      * @param   string  $mode       The file mode
      */

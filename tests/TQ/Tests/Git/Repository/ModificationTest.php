@@ -37,8 +37,8 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
-        mkdir(TESTS_TMP_PATH, 0777, true);
-        mkdir(TESTS_REPO_PATH_1, 0777, true);
+        Helper::createDirectory(TESTS_TMP_PATH);
+        Helper::createDirectory(TESTS_REPO_PATH_1);
 
         Helper::initEmptyRepository(TESTS_REPO_PATH_1);
 
@@ -46,15 +46,11 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
             $file   = sprintf('file_%d.txt', $i);
             $path   = TESTS_REPO_PATH_1.'/'.$file;
             file_put_contents($path, sprintf('File %d', $i));
-            exec(sprintf('cd %s && %s add %s',
-                escapeshellarg(TESTS_REPO_PATH_1),
-                GIT_BINARY,
+            Helper::executeGit(TESTS_REPO_PATH_1, sprintf('add %s',
                 escapeshellarg($file)
             ));
         }
-        exec(sprintf('cd %s && %s commit --message=%s',
-            escapeshellarg(TESTS_REPO_PATH_1),
-            GIT_BINARY,
+        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
             escapeshellarg('Initial commit')
         ));
 

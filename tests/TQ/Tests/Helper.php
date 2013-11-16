@@ -25,6 +25,19 @@ namespace TQ\Tests;
 
 class Helper
 {
+    /**
+     * @param   string  $path
+     * @return  boolean
+     */
+    public static function createDirectory($path)
+    {
+         return mkdir($path, 0777, true);
+    }
+
+    /**
+     * @param   string  $path
+     * @throws  \InvalidArgumentException
+     */
     public static function removeDirectory($path)
     {
         clearstatcache();
@@ -46,6 +59,7 @@ class Helper
         );
 
         foreach ($it as $p => $f) {
+            /** @var $f \SplFileInfo */
             if ($f->isDir()) {
                 rmdir($p);
             } else if ($f->isFile()) {
@@ -56,25 +70,61 @@ class Helper
         rmdir($path);
     }
 
+    /**
+     * @param   string  $path
+     * @return  string
+     */
     public static function normalizeDirectorySeparator($path)
     {
         return str_replace(DIRECTORY_SEPARATOR, '/', $path);
     }
 
+    /**
+     * @param   string  $string
+     * @return  string
+     */
     public static function normalizeNewLines($string)
     {
         return str_replace("\r\n", "\n", $string);
     }
 
+    /**
+     * @param   string  $command
+     * @return  string
+     */
     public static function normalizeEscapeShellArg($command)
     {
         return str_replace("'", '"', $command);
     }
 
+    /**
+     * @param   string  $path
+     * @return  string
+     */
     public static function initEmptyRepository($path) {
-         exec(sprintf('cd %1$s && %2$s init && %2$s config user.email "test@example.com" && %2$s config user.name "test"',
-            escapeshellarg($path),
-            GIT_BINARY
-        ));
+         return exec(
+             sprintf(
+                'cd %1$s && %2$s init && %2$s config user.email "test@example.com" && %2$s config user.name "test"',
+                escapeshellarg($path),
+                GIT_BINARY
+            )
+         );
+    }
+
+    /**
+     * @param   string  $path
+     * @param   string  $command
+     * @return  string
+     */
+    public static function executeGit($path, $command)
+    {
+        return exec(
+            sprintf(
+                'cd %s && %s %s',
+                escapeshellarg($path),
+                GIT_BINARY,
+                $command
+            )
+        );
     }
 }

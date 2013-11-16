@@ -36,9 +36,9 @@ class SetupTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
-        mkdir(TESTS_TMP_PATH, 0777, true);
-        mkdir(TESTS_REPO_PATH_1, 0777, true);
-        mkdir(TESTS_REPO_PATH_2, 0777, true);
+        Helper::createDirectory(TESTS_TMP_PATH);
+        Helper::createDirectory(TESTS_REPO_PATH_1);
+        Helper::createDirectory(TESTS_REPO_PATH_2);
 
         Helper::initEmptyRepository(TESTS_REPO_PATH_1);
 
@@ -55,9 +55,8 @@ class SetupTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
      * @param   string          $path
-     * @paran   boolean|integer $create
+     * @param   boolean|integer $create
      * @return  Repository
      */
     protected function getRepository($path, $create = false)
@@ -66,11 +65,11 @@ class SetupTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
-    public function testRepositoryOpenOnNonExistantPath()
+    public function testRepositoryOpenOnNonExistentPath()
     {
-        $c  = $this->getRepository('/does/not/exist', false);
+        $this->getRepository('/does/not/exist', false);
     }
 
     public function testRepositoryOpenOnFile()
@@ -81,11 +80,11 @@ class SetupTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testRepositoryOpenOnNonRepositoryPath()
     {
-        $c  = $this->getRepository('/usr', false);
+        $this->getRepository('/usr', false);
     }
 
     public function testRepositoryOpenOnRepositoryPath()

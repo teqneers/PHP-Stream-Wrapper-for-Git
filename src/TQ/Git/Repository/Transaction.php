@@ -84,7 +84,7 @@ class Transaction
     /**
      * Creates a new transactional parameter
      *
-     * @param   Repository  $binary The Git repository
+     * @param   Repository  $repository     The Git repository
      */
     public function __construct(Repository $repository)
     {
@@ -197,7 +197,7 @@ class Transaction
     }
 
     /**
-     * Returns the hash identifiying the commit
+     * Returns the hash identifying the commit
      *
      * @return  string|null
      */
@@ -207,9 +207,9 @@ class Transaction
     }
 
     /**
-     * Sets the hash identifiying the commit
+     * Sets the hash identifying the commit
      *
-     * @param   string $result
+     * @param   string  $commitHash     The commit hash
      * @return  Transaction
      */
     public function setCommitHash($commitHash)

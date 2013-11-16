@@ -122,8 +122,10 @@ class StreamWrapper
     /**
      * Registers the stream wrapper with the given protocol
      *
-     * @param   string           $protocol      The protocol (auch as "git")
+     * @param   string           $protocol      The protocol (such as "git")
      * @param   Binary|string    $binary        The Git binary
+     * @throws  \InvalidArgumentException       If $binary is not a valid Git binary
+     * @throws  \RuntimeException               If $protocol is already registered
      */
     public static function register($protocol, $binary = null)
     {
@@ -190,6 +192,7 @@ class StreamWrapper
      *
      * @param   string  $option     The option to retrieve
      * @param   mixed   $default    The default value if $option is not found
+     * @return  mixed
      */
     protected function getContextOption($option, $default = null)
     {
@@ -219,6 +222,7 @@ class StreamWrapper
      *
      * @param   string  $parameter  The parameter to retrieve
      * @param   mixed   $default    The default value if $parameter is not found
+     * @return  mixed
      */
     protected function getContextParameter($parameter, $default = null)
     {
