@@ -124,22 +124,11 @@ class StreamWrapper
      *
      * @param   string           $protocol      The protocol (such as "git")
      * @param   Binary|string    $binary        The Git binary
-     * @throws  \InvalidArgumentException       If $binary is not a valid Git binary
      * @throws  \RuntimeException               If $protocol is already registered
      */
     public static function register($protocol, $binary = null)
     {
-        if ($binary === null || is_string($binary)) {
-            $binary  = new Binary($binary);
-        }
-        if (!($binary instanceof Binary)) {
-            throw new \InvalidArgumentException(sprintf('The $binary argument must either
-                be a TQ\Git\Binary instance or a path to the Git binary (%s given)',
-                (is_object($binary)) ? get_class($binary) : gettype($binary)
-            ));
-        }
-
-        self::$binary    = $binary;
+        self::$binary    = Binary::ensure($binary);
         if (!stream_wrapper_register($protocol, get_class(new static()))) {
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));

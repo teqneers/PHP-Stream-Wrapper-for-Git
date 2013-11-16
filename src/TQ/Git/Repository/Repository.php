@@ -94,22 +94,20 @@ class Repository
     protected $author;
 
     /**
-     * Opens a Git repository on the file system, optionally creates and inits a new repository
+     * Opens a Git repository on the file system, optionally creates and initializes a new repository
      *
-     * @param   string          $repositoryPath         The full path to the repository
-     * @param   Binary|null     $binary                 The Git binary
-     * @param   boolean|integer $createIfNotExists      False to fail on non-existing repositories, directory
-     *                                                  creation mode, such as 0755  if the command
-     *                                                  should create the directory and init the repository instead
+     * @param   string               $repositoryPath        The full path to the repository
+     * @param   Binary|string|null   $binary                The Git binary
+     * @param   boolean|integer      $createIfNotExists     False to fail on non-existing repositories, directory
+     *                                                      creation mode, such as 0755  if the command
+     *                                                      should create the directory and init the repository instead
      * @return  Repository
      * @throws  \RuntimeException                       If the path cannot be created
      * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid Git repository
      */
-    public static function open($repositoryPath, Binary $binary = null, $createIfNotExists = false)
+    public static function open($repositoryPath, $binary = null, $createIfNotExists = false)
     {
-        if (!$binary) {
-            $binary  = new Binary();
-        }
+        $binary = Binary::ensure($binary);
 
         if (!is_string($repositoryPath)) {
             throw new \InvalidArgumentException(sprintf(

@@ -54,9 +54,34 @@ class Binary
     protected $path;
 
     /**
+     * Ensures that the given arguments is a valid Git binary
+     *
+     * @param   Binary|string|null          $binary     The Git binary
+     * @return  Binary
+     * @throws  \InvalidArgumentException               If $binary is not a valid Git binary
+     */
+    public static function ensure($binary)
+    {
+        if ($binary === null || is_string($binary)) {
+            $binary  = new static($binary);
+        }
+        if (!($binary instanceof static)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'The $binary argument must either
+                     be a TQ\Git\Binary instance or a path to the Git binary (%s given)',
+                    (is_object($binary)) ? get_class($binary) : gettype($binary)
+                )
+            );
+        }
+        return $binary;
+    }
+
+
+    /**
      * Try to find the Git binary on the system
      *
-     * @todo    implement platform independant searching strategies
+     * @todo    implement platform independent searching strategies
      * @return  string
      */
     public static function locateBinary()
@@ -169,7 +194,7 @@ class Binary
      *
      * @param   string  $method             The Git command, e.g. show, commit or add
      * @param   array   $arguments          The command arguments with the path to the Git
-     *                                      repository beeing the first argument
+     *                                      repository being the first argument
      * @return  CallResult
      * @throws \InvalidArgumentException    If the method is called with less than one argument
      */
