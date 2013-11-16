@@ -129,7 +129,7 @@ class StreamWrapper
     public static function register($protocol, $binary = null)
     {
         self::$binary    = Binary::ensure($binary);
-        if (!stream_wrapper_register($protocol, get_class(new static()))) {
+        if (!stream_wrapper_register($protocol, get_called_class())) {
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
         }
@@ -145,13 +145,6 @@ class StreamWrapper
             throw new \RuntimeException(sprintf('The protocol "%s" cannot be unregistered
                 from the runtime', self::$protocol));
         }
-    }
-
-    /**
-     * Creates a new instance of the stream wrapper
-     */
-    public function __construct()
-    {
     }
 
     /**
