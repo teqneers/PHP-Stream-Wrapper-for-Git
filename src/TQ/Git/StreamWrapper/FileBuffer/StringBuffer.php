@@ -36,7 +36,7 @@
 namespace TQ\Git\StreamWrapper\FileBuffer;
 
 /**
- * Encapsulates a file revision buffer to be used in the streamwrapper
+ * Encapsulates a file revision buffer to be used in the stream wrapper
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ

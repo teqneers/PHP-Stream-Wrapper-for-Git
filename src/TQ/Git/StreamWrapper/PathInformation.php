@@ -38,7 +38,7 @@ use TQ\Git\Repository\Repository;
 use TQ\Git\Cli\Binary;
 
 /**
- * Handles decomposition of a given Git streamwrapper path
+ * Handles decomposition of a given Git stream wrapper path
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ

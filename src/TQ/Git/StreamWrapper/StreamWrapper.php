@@ -44,7 +44,7 @@ use TQ\Git\StreamWrapper\FileBuffer\Factory\HeadFileFactory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
 
 /**
- * The streamwrapper that hooks into PHP's stream infrastructure
+ * The stream wrapper that hooks into PHP's stream infrastructure
  *
  * @uses       TQ\Git\Cli\Binary
  * @uses       TQ\Git\Repository\Repository;
