@@ -392,7 +392,7 @@ class Repository
     /**
      * Resets the working directory and/or the staging area and discards all changes
      *
-     * @param   integer     $what       Bit mask to indicate which parts should be resetted
+     * @param   integer     $what       Bit mask to indicate which parts should be reset
      */
     public function reset($what = self::RESET_ALL)
     {
