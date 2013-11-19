@@ -21,41 +21,27 @@
  * THE SOFTWARE.
  */
 
-namespace TQ\Tests\Git\StreamWrapper;
+/**
+ * Git Stream Wrapper for PHP
+ *
+ * @category   TQ
+ * @package    TQ_Git
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
 
-use TQ\Git\StreamWrapper\DirectoryBuffer;
+/**
+ * @namespace
+ */
+namespace TQ\Vcs;
 
-class DirectoryBufferTest extends \PHPUnit_Framework_TestCase
-{
-    public function testIteration()
-    {
-        $listing    = array('a', 'b', 'c');
-        $iterator   = new DirectoryBuffer($listing);
-        $i          = 0;
-        while($iterator->valid()) {
-            $this->assertEquals($listing[$i], $iterator->current());
-            $this->assertEquals($i, $iterator->key());
-            $i++;
-            $iterator->next();
-        }
-        $this->assertEquals(count($listing), $i);
+/**
+ * A marker interface to mark component exceptions
+ *
+ * @author     Stefan Gehrig <gehrigteqneers.de>
+ * @category   TQ
+ * @package    TQ_Git
+ * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ */
+interface Exception {
 
-        $iterator->rewind();
-        $this->assertEquals(reset($listing), $iterator->current());
-        $this->assertEquals(key($listing), $iterator->key());
-    }
-
-    public function testForeach()
-    {
-        $listing    = array('a', 'b', 'c');
-        $iterator   = new DirectoryBuffer($listing);
-        $i          = 0;
-        foreach ($iterator as $k => $v) {
-            $this->assertEquals($listing[$i], $v);
-            $this->assertEquals($i, $k);
-            $i++;
-        }
-        $this->assertEquals(count($listing), $i);
-    }
 }
-

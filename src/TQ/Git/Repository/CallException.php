@@ -26,15 +26,17 @@
  *
  * @category   TQ
  * @package    TQ_Git
- * @subpackage StreamWrapper
+ * @subpackage Cli
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper\FileBuffer;
-use TQ\Git\Exception;
+namespace TQ\Git\Repository;
+use TQ\Vcs\Cli\CallResult;
+use TQ\Vcs\Exception as VcsException;
+use TQ\Git\Exception as GitException;
 
 /**
  * Exception thrown when an error occurred executing a CLI call
@@ -42,9 +44,31 @@ use TQ\Git\Exception;
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Git
- * @subpackage StreamWrapper
+ * @subpackage Cli
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class StreamException extends \RuntimeException implements Exception
+class CallException extends \RuntimeException implements VcsException, GitException
 {
+    /**
+     * The call result that caused the exception
+     *
+     * @var CallResult
+     */
+    protected $cliCallResult;
+
+    /**
+     * Creates a new exception
+     *
+     * @param string        $message        The exception message
+     * @param CallResult    $cliCallResult  The call result that caused the exception
+     */
+    public function __construct($message, CallResult $cliCallResult)
+    {
+        $this->cliCallResult    = $cliCallResult;
+
+        parent::__construct(
+            sprintf($message.' [%s]', $cliCallResult->getStdErr()),
+            $cliCallResult->getReturnCode()
+        );
+    }
 }

@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper;
+namespace TQ\Vcs\Buffer;
 
 /**
  * Simple class to iterate over the results of a directory listing

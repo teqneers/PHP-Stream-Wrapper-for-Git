@@ -34,6 +34,8 @@
  * @namespace
  */
 namespace TQ\Git\Cli;
+use TQ\Vcs\Cli\Binary as VcsBinary;
+use TQ\Vcs\Cli\Call;
 
 /**
  * Encapsulates access to th Git command line binary
@@ -44,40 +46,8 @@ namespace TQ\Git\Cli;
  * @subpackage Cli
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class Binary
+class Binary extends VcsBinary
 {
-    /**
-     * The file system path to the Git binary
-     *
-     * @var string
-     */
-    protected $path;
-
-    /**
-     * Ensures that the given arguments is a valid Git binary
-     *
-     * @param   Binary|string|null          $binary     The Git binary
-     * @return  Binary
-     * @throws  \InvalidArgumentException               If $binary is not a valid Git binary
-     */
-    public static function ensure($binary)
-    {
-        if ($binary === null || is_string($binary)) {
-            $binary  = new static($binary);
-        }
-        if (!($binary instanceof static)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The $binary argument must either
-                     be a TQ\Git\Binary instance or a path to the Git binary (%s given)',
-                    (is_object($binary)) ? get_class($binary) : gettype($binary)
-                )
-            );
-        }
-        return $binary;
-    }
-
-
     /**
      * Try to find the Git binary on the system
      *
@@ -94,44 +64,31 @@ class Binary
     }
 
     /**
-     * Checks if the current system is Windows
-     *
-     * @return  boolean     True if we're on a Windows machine
-     */
-    protected static function isWindows()
-    {
-        return (strpos(PHP_OS, 'WIN') !== false);
-    }
-
-    /**
      * Creates a Git binary interface
      *
      * If no path is given the class tries to find the correct
      * binary {@see locateBinary()}
      *
      * @param   string|null $path           The path to the Git binary or NULL to auto-detect
-     * @throws  \InvalidArgumentException   If no Git binary is found
+     * @throws  \InvalidArgumentException   If no binary is found
      */
     public function __construct($path = null)
     {
         if (!$path) {
             $path  = self::locateBinary();
         }
-        if (!is_string($path) || empty($path)) {
-            throw new \InvalidArgumentException('No path to the Git binary found');
-        }
-        $this->path    = $path;
+        parent::__construct($path);
     }
 
     /**
-     * Create a call to the Git binary for later execution
+     * Create a call to the VCS binary for later execution
      *
-     * @param   string  $path           The full path to the Git repository
-     * @param   string  $command        The Git command, e.g. show, commit or add
+     * @param   string  $path           The full path to the VCS repository
+     * @param   string  $command        The VCS command, e.g. show, commit or add
      * @param   array   $arguments      The command arguments
      * @return  Call
      */
-    public function createGitCall($path, $command, array $arguments)
+    public function createCall($path, $command, array $arguments)
     {
         $handleArg  = function($key, $value) {
             $key  = ltrim($key, '-');
@@ -187,44 +144,6 @@ class Binary
 
         $call   = Call::create($cmd, $path);
         return $call;
-    }
-
-    /**
-     * Method overloading - allows calling Git commands directly as class methods
-     *
-     * @param   string  $method             The Git command, e.g. show, commit or add
-     * @param   array   $arguments          The command arguments with the path to the Git
-     *                                      repository being the first argument
-     * @return  CallResult
-     * @throws \InvalidArgumentException    If the method is called with less than one argument
-     */
-    public function __call($method, array $arguments)
-    {
-        if (count($arguments) < 1) {
-            throw new \InvalidArgumentException(sprintf(
-                '"%s" must be called with at least one argument denoting the path', $method
-            ));
-        }
-        $path   = array_shift($arguments);
-        $args   = array();
-        $stdIn  = null;
-
-        if (count($arguments) > 0) {
-            $args   = array_shift($arguments);
-            if (!is_array($args)) {
-                $args   = array($args);
-            }
-
-            if (count($arguments) > 0) {
-                $stdIn  = array_shift($arguments);
-                if (!is_string($stdIn)) {
-                    $stdIn   = null;
-                }
-            }
-        }
-
-        $call   = $this->createGitCall($path, $method, $args);
-        return $call->execute($stdIn);
     }
 }
 

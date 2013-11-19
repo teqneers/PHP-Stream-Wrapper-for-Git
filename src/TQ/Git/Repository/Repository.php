@@ -35,8 +35,7 @@
  */
 namespace TQ\Git\Repository;
 use TQ\Git\Cli\Binary;
-use TQ\Git\Cli\CallResult;
-use TQ\Git\Cli\CallException;
+use TQ\Vcs\Cli\CallResult;
 
 /**
  * Provides access to a Git repository
@@ -600,6 +599,7 @@ class Repository
             $arguments['--skip']    = (int)$skip;
         }
 
+        /** @var $result CallResult */
         $result = $this->getBinary()->log($this->getRepositoryPath(), $arguments);
         self::throwIfError($result, sprintf('Cannot retrieve log from "%s"',
             $this->getRepositoryPath()

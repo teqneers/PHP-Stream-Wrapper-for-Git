@@ -33,12 +33,11 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Vcs\Buffer\FileBuffer;
-use TQ\Git\StreamWrapper\PathInformation;
+namespace TQ\Vcs\Buffer;
+use TQ\Vcs\Exception;
 
 /**
- * Interface to which file stream factories must adhere
+ * Exception thrown when an error occurred reading a stream buffer
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -46,24 +45,6 @@ use TQ\Git\StreamWrapper\PathInformation;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-interface Factory
+class StreamBufferException extends \RuntimeException implements Exception
 {
-    /**
-     * Returns true if this factory can handle the requested path
-     *
-     * @param   PathInformation     $path   The path information
-     * @param   string              $mode   The mode used to open the file
-     * @return  boolean                     True if this factory can handle the path
-     */
-    function canHandle(PathInformation $path, $mode);
-
-    /**
-     * Returns the file stream to handle the requested path
-     *
-     * @param   PathInformation     $path   The path information
-     * @param   string              $mode   The mode used to open the path
-     * @return  FileBuffer                  The file buffer to handle the path
-     */
-    function createFileBuffer(PathInformation $path, $mode);
-
 }

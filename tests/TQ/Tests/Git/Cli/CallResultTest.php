@@ -24,14 +24,13 @@
 namespace TQ\Tests\Git\Cli;
 
 use TQ\Git\Cli\Binary;
-use TQ\Git\Cli\CallResult;
 
 class CallResultTest extends \PHPUnit_Framework_TestCase
 {
     public function testSuccessfulCall()
     {
         $binary = new Binary(GIT_BINARY);
-        $call   = $binary->createGitCall('/', '', array(
+        $call   = $binary->createCall('/', '', array(
             '--version'
         ));
         $result = $call->execute();
@@ -47,7 +46,7 @@ class CallResultTest extends \PHPUnit_Framework_TestCase
     public function testFailedCall()
     {
         $binary = new Binary(GIT_BINARY);
-        $call   = $binary->createGitCall('/', 'unknowncommand', array());
+        $call   = $binary->createCall('/', 'unknowncommand', array());
         $result = $call->execute();
 
         $this->assertFalse($result->hasStdOut());

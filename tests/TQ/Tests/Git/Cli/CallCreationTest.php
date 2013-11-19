@@ -39,7 +39,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testHandleSingleDash()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             '-a'
         ));
         $this->assertCliCommandEquals("/usr/bin/git 'command' -'a'", $call->getCmd());
@@ -48,7 +48,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testHandleDoubleDash()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             '--argument'
         ));
         $this->assertCliCommandEquals("/usr/bin/git 'command' --'argument'", $call->getCmd());
@@ -57,7 +57,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testHandleSingleDashWithValue()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             '-a' => 'value'
         ));
         $this->assertCliCommandEquals("/usr/bin/git 'command' -'a' 'value'", $call->getCmd());
@@ -66,7 +66,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testHandleDoubleDashWithValue()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             '--argument' => 'value'
         ));
         $this->assertCliCommandEquals("/usr/bin/git 'command' --'argument'='value'", $call->getCmd());
@@ -75,7 +75,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testIgnoreLoneDoubleDash()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             '--'
         ));
         $this->assertCliCommandEquals("/usr/bin/git 'command'", $call->getCmd());
@@ -84,7 +84,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testSimpleArgument()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             'option'
         ));
         $this->assertCliCommandEquals("/usr/bin/git 'command' 'option'", $call->getCmd());
@@ -93,7 +93,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testFilePathAsArgument()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             '/path/to/file'
         ));
         $this->assertCliCommandEquals("/usr/bin/git 'command' '/path/to/file'", $call->getCmd());
@@ -102,7 +102,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testFileModeSwitch()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             'option',
             '--',
             'path/to/file'
@@ -113,7 +113,7 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     public function testFileModeSwitchWithFileArgument()
     {
         $binary = new Binary('/usr/bin/git');
-        $call   = $binary->createGitCall('/', 'command', array(
+        $call   = $binary->createCall('/', 'command', array(
             'option',
             '/path/to/file',
             '--',

@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Git\Cli;
+namespace TQ\Vcs\Cli;
 
 /**
  * Represents a single CLI call
@@ -73,7 +73,7 @@ class Call
      * @param   string      $cmd    The CLI command to execute
      * @param   string|null $cwd    The working directory in which the call will be executed
      * @param   array|null  $env    Environment variables - defaults to the current environment
-     * @return  Call
+     * @return  static
      */
     public static function create($cmd, $cwd = null, array $env = null)
     {

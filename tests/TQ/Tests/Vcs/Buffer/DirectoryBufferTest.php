@@ -21,52 +21,41 @@
  * THE SOFTWARE.
  */
 
-/**
- * Git Stream Wrapper for PHP
- *
- * @category   TQ
- * @package    TQ_Git
- * @subpackage Cli
- * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
- */
+namespace TQ\Tests\Vcs\Buffer;
 
-/**
- * @namespace
- */
-namespace TQ\Git\Cli;
-use TQ\Git\Exception;
+use TQ\Vcs\Buffer\DirectoryBuffer;
 
-/**
- * Exception thrown when an error occurred executing a CLI call
- *
- * @author     Stefan Gehrig <gehrigteqneers.de>
- * @category   TQ
- * @package    TQ_Git
- * @subpackage Cli
- * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
- */
-class CallException extends \RuntimeException implements Exception
+class DirectoryBufferTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * The call result that caused the exception
-     *
-     * @var CallResult
-     */
-    protected $cliCallResult;
-
-    /**
-     * Creates a new exception
-     *
-     * @param string        $message        The exception message
-     * @param CallResult    $cliCallResult  The call result that caused the exception
-     */
-    public function __construct($message, CallResult $cliCallResult)
+    public function testIteration()
     {
-        $this->cliCallResult    = $cliCallResult;
+        $listing    = array('a', 'b', 'c');
+        $iterator   = new DirectoryBuffer($listing);
+        $i          = 0;
+        while($iterator->valid()) {
+            $this->assertEquals($listing[$i], $iterator->current());
+            $this->assertEquals($i, $iterator->key());
+            $i++;
+            $iterator->next();
+        }
+        $this->assertEquals(count($listing), $i);
 
-        parent::__construct(
-            sprintf($message.' [%s]', $cliCallResult->getStdErr()),
-            $cliCallResult->getReturnCode()
-        );
+        $iterator->rewind();
+        $this->assertEquals(reset($listing), $iterator->current());
+        $this->assertEquals(key($listing), $iterator->key());
+    }
+
+    public function testForeach()
+    {
+        $listing    = array('a', 'b', 'c');
+        $iterator   = new DirectoryBuffer($listing);
+        $i          = 0;
+        foreach ($iterator as $k => $v) {
+            $this->assertEquals($listing[$i], $v);
+            $this->assertEquals($i, $k);
+            $i++;
+        }
+        $this->assertEquals(count($listing), $i);
     }
 }
+

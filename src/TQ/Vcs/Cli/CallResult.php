@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Git\Cli;
+namespace TQ\Vcs\Cli;
 
 /**
  * The result of a CLI call - provides access to stdout, stderror and the return code
