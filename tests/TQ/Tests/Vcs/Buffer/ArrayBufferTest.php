@@ -23,14 +23,14 @@
 
 namespace TQ\Tests\Vcs\Buffer;
 
-use TQ\Vcs\Buffer\DirectoryBuffer;
+use TQ\Vcs\Buffer\ArrayBuffer;
 
-class DirectoryBufferTest extends \PHPUnit_Framework_TestCase
+class ArrayBufferTest extends \PHPUnit_Framework_TestCase
 {
     public function testIteration()
     {
         $listing    = array('a', 'b', 'c');
-        $iterator   = new DirectoryBuffer($listing);
+        $iterator   = new ArrayBuffer($listing);
         $i          = 0;
         while($iterator->valid()) {
             $this->assertEquals($listing[$i], $iterator->current());
@@ -48,7 +48,7 @@ class DirectoryBufferTest extends \PHPUnit_Framework_TestCase
     public function testForeach()
     {
         $listing    = array('a', 'b', 'c');
-        $iterator   = new DirectoryBuffer($listing);
+        $iterator   = new ArrayBuffer($listing);
         $i          = 0;
         foreach ($iterator as $k => $v) {
             $this->assertEquals($listing[$i], $v);

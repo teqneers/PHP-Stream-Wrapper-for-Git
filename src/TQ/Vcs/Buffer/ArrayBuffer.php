@@ -36,7 +36,7 @@
 namespace TQ\Vcs\Buffer;
 
 /**
- * Simple class to iterate over the results of a directory listing
+ * Simple class to iterate over an array
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -44,24 +44,24 @@ namespace TQ\Vcs\Buffer;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class DirectoryBuffer implements \Iterator
+class ArrayBuffer implements \Iterator
 {
     /**
-     * The directory listing
+     * The array
      *
      * @var array
      */
-    protected $listing;
+    protected $array;
 
     /**
-     * Creates a directory buffer from an array
+     * Creates an array buffer from an array
      *
-     * @param   array   $listing    The directory listing
+     * @param   array   $array    The array
      */
-    public function __construct(array $listing)
+    public function __construct(array $array)
     {
-        $this->listing  = $listing;
-        reset($this->listing);
+        $this->array  = $array;
+        reset($this->array);
     }
 
     /**
@@ -72,7 +72,7 @@ class DirectoryBuffer implements \Iterator
      */
     public function current()
     {
-        return current($this->listing);
+        return current($this->array);
     }
 
     /**
@@ -82,7 +82,7 @@ class DirectoryBuffer implements \Iterator
      */
     public function next()
     {
-        next($this->listing);
+        next($this->array);
     }
 
     /**
@@ -93,7 +93,7 @@ class DirectoryBuffer implements \Iterator
      */
     public function key()
     {
-        return key($this->listing);
+        return key($this->array);
     }
 
     /**
@@ -104,7 +104,7 @@ class DirectoryBuffer implements \Iterator
      */
     public function valid()
     {
-        return (key($this->listing) !== null);
+        return (key($this->array) !== null);
     }
 
     /**
@@ -114,6 +114,6 @@ class DirectoryBuffer implements \Iterator
      */
     public function rewind()
     {
-        reset($this->listing);
+        reset($this->array);
     }
 }

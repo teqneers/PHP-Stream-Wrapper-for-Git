@@ -36,7 +36,7 @@
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
 use TQ\Vcs\Buffer\FileBuffer;
-use TQ\Vcs\Buffer\DirectoryBuffer;
+use TQ\Vcs\Buffer\ArrayBuffer;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\CommitFactory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;
@@ -92,7 +92,7 @@ class StreamWrapper
     /**
      * The directory buffer if used on a directory
      *
-     * @var DirectoryBuffer
+     * @var ArrayBuffer
      */
     protected $dirBuffer;
 
@@ -243,7 +243,7 @@ class StreamWrapper
             $path               = $this->getPath($path);
             $repo               = $path->getRepository();
             $listing            = $repo->listDirectory($path->getLocalPath(), $path->getRef());
-            $this->dirBuffer    = new DirectoryBuffer($listing);
+            $this->dirBuffer    = new ArrayBuffer($listing);
             $this->path         = $path;
             return true;
         } catch (\Exception $e) {
