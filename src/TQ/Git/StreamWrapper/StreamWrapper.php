@@ -35,8 +35,8 @@
  */
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
-use TQ\Vcs\Buffer\FileBuffer;
-use TQ\Vcs\Buffer\DirectoryBuffer;
+use TQ\VCS\Buffer\FileBuffer;
+use TQ\VCS\Buffer\DirectoryBuffer;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\CommitFactory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;

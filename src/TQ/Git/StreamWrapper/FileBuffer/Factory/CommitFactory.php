@@ -34,9 +34,9 @@
  * @namespace
  */
 namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Vcs\Buffer\FileBuffer;
+use TQ\VCS\Buffer\FileBuffer;
 use TQ\Git\StreamWrapper\PathInformation;
-use TQ\Vcs\Buffer\StringBuffer;
+use TQ\VCS\Buffer\StringBuffer;
 
 /**
  * Factory to create a commit buffer

@@ -32,7 +32,7 @@
 /**
  * @namespace
  */
-namespace TQ\Vcs;
+namespace TQ\VCS;
 
 /**
  * A marker interface to mark component exceptions

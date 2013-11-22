@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Vcs\Cli;
+namespace TQ\VCS\Cli;
 
 /**
  * The result of a CLI call - provides access to stdout, stderror and the return code

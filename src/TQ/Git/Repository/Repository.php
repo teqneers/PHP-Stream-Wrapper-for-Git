@@ -35,7 +35,7 @@
  */
 namespace TQ\Git\Repository;
 use TQ\Git\Cli\Binary;
-use TQ\Vcs\Cli\CallResult;
+use TQ\VCS\Cli\CallResult;
 
 /**
  * Provides access to a Git repository

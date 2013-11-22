@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Vcs\Buffer;
+namespace TQ\VCS\Buffer;
 
 /**
  * Simple class to iterate over the results of a directory listing

@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Vcs\Buffer;
+namespace TQ\VCS\Buffer;
 
 /**
  * Interface for file buffers used in the stream wrapper

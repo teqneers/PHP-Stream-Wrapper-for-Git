@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Vcs\Cli;
+namespace TQ\VCS\Cli;
 
 /**
  * Encapsulates access to the a VCS command line binary
@@ -69,7 +69,7 @@ abstract class Binary
             throw new \InvalidArgumentException(
                 sprintf(
                     'The $binary argument must either
-                     be a TQ\Vcs\Binary instance or a path to the VCS binary (%s given)',
+                     be a TQ\VCS\Binary instance or a path to the VCS binary (%s given)',
                     (is_object($binary)) ? get_class($binary) : gettype($binary)
                 )
             );

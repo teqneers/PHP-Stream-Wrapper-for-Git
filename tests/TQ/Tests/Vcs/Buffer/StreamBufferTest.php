@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace TQ\Tests\Vcs\Buffer;
+namespace TQ\Tests\VCS\Buffer;
 
-use TQ\Vcs\Buffer\StreamBuffer;
+use TQ\VCS\Buffer\StreamBuffer;
 use TQ\Tests\Helper;
 
 class StreamBufferTest extends \PHPUnit_Framework_TestCase

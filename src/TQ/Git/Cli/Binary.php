@@ -34,8 +34,8 @@
  * @namespace
  */
 namespace TQ\Git\Cli;
-use TQ\Vcs\Cli\Binary as VcsBinary;
-use TQ\Vcs\Cli\Call;
+use TQ\VCS\Cli\Binary as VcsBinary;
+use TQ\VCS\Cli\Call;
 
 /**
  * Encapsulates access to th Git command line binary

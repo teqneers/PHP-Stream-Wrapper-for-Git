@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Vcs\Cli;
+namespace TQ\VCS\Cli;
 
 /**
  * Represents a single CLI call
