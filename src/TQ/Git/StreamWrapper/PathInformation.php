@@ -91,28 +91,28 @@ class PathInformation
     protected $arguments;
 
     /**
-     * Returns path information for a given stream URL
+     * Returns path information for a given stream path
      *
-     * @param   string      $url        The URL
+     * @param   string      $path       The path
      * @param   string      $protocol   The protocol registered
      * @return  array                   An array containing information about the path
      */
-    public static function parseUrl($url, $protocol)
+    public static function parsePath($path, $protocol)
     {
         // normalize directory separators
-        $path   = str_replace(DIRECTORY_SEPARATOR, '/', $url);
+        $path   = str_replace(DIRECTORY_SEPARATOR, '/', $path);
         $path   = ltrim(substr($path, strlen($protocol) + 3), '/');
         //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
         $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
-        $url    = parse_url($protocol.'://'.$path);
+        $info   = parse_url($protocol.'://'.$path);
 
         if (preg_match('~^\w:.+~', $path)) {
-            $url['path']    = $url['host'].':'.$url['path'];
+            $info['path']    = $info['host'].':'.$info['path'];
         } else {
-            $url['path']    = '/'.$url['host'].$url['path'];
+            $info['path']    = '/'.$info['host'].$info['path'];
         }
-        unset($url['host']);
-        return $url;
+        unset($info['host']);
+        return $info;
     }
 
     /**
@@ -124,7 +124,7 @@ class PathInformation
      */
     public function __construct($url, $protocol, Binary $binary)
     {
-        $url                = self::parseUrl($url, $protocol);
+        $url                = self::parsePath($url, $protocol);
         $this->fullPath     = $url['path'];
         $this->repository   = Repository::open($this->fullPath, $binary, false);
         $this->localPath    = $this->repository->resolveLocalPath($this->fullPath);

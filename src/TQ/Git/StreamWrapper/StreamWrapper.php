@@ -335,7 +335,7 @@ class StreamWrapper
                 throw new \Exception(sprintf('Path %s is not a file', $pathFrom->getFullPath()));
             }
 
-            $pathTo = PathInformation::parseUrl($path_to, self::$protocol);
+            $pathTo = PathInformation::parsePath($path_to, self::$protocol);
             $pathTo = $pathTo['path'];
 
             if (strpos($pathTo, $pathFrom->getRepositoryPath()) !== 0) {
