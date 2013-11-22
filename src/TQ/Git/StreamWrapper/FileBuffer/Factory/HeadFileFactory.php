@@ -34,9 +34,9 @@
  * @namespace
  */
 namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\VCS\Buffer\FileBuffer;
+use TQ\Vcs\Buffer\FileBuffer;
 use TQ\Git\StreamWrapper\PathInformation;
-use TQ\VCS\Buffer\StreamBuffer;
+use TQ\Vcs\Buffer\StreamBuffer;
 
 /**
  * Factory to create a HEAD file buffer

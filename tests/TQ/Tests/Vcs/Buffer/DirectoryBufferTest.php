@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace TQ\Tests\VCS\Buffer;
+namespace TQ\Tests\Vcs\Buffer;
 
-use TQ\VCS\Buffer\DirectoryBuffer;
+use TQ\Vcs\Buffer\DirectoryBuffer;
 
 class DirectoryBufferTest extends \PHPUnit_Framework_TestCase
 {

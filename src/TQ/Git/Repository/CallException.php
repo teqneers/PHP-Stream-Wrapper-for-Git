@@ -34,8 +34,8 @@
  * @namespace
  */
 namespace TQ\Git\Repository;
-use TQ\VCS\Cli\CallResult;
-use TQ\VCS\Exception as VcsException;
+use TQ\Vcs\Cli\CallResult;
+use TQ\Vcs\Exception as VcsException;
 use TQ\Git\Exception as GitException;
 
 /**

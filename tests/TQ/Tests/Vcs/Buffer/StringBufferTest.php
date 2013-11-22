@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace TQ\Tests\VCS\Buffer;
+namespace TQ\Tests\Vcs\Buffer;
 
-use TQ\VCS\Buffer\StringBuffer;
+use TQ\Vcs\Buffer\StringBuffer;
 
 class StringBufferTest extends \PHPUnit_Framework_TestCase
 {

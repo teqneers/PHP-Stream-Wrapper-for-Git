@@ -33,8 +33,8 @@
 /**
  * @namespace
  */
-namespace TQ\VCS\Buffer;
-use TQ\VCS\Exception;
+namespace TQ\Vcs\Buffer;
+use TQ\Vcs\Exception;
 
 /**
  * Exception thrown when an error occurred reading a stream buffer

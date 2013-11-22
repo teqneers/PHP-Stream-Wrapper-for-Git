@@ -33,7 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\VCS\Buffer;
+namespace TQ\Vcs\Buffer;
 
 /**
  * Encapsulates a file revision buffer to be used in the stream wrapper
