@@ -110,24 +110,127 @@ abstract class Binary
      * @param   array   $arguments      The command arguments
      * @return  Call
      */
-    abstract public function createCall($path, $command, array $arguments);
+    public function createCall($path, $command, array $arguments)
+    {
+        if (!self::isWindows()) {
+            $binary = escapeshellcmd($this->path);
+        } else {
+            $binary = $this->path;
+        }
+        if (!empty($command)) {
+            $command    = escapeshellarg($command);
+        }
+
+        list($args, $files) = $this->sanitizeCommandArguments($arguments);
+        $cmd                = $this->createCallCommand($binary, $command, $args, $files);
+        $call               = $this->doCreateCall($cmd, $path);
+        return $call;
+    }
 
     /**
-     * Method overloading - allows calling VCS commands directly as class methods
+     * The call factory
+     *
+     * @param   string  $cmd        The command string to be executed
+     * @param   string  $path       The working directory
+     * @return  Call
+     */
+    protected function doCreateCall($cmd, $path)
+    {
+        return Call::create($cmd, $path);
+    }
+
+    /**
+     * Creates the command string to be executed
+     *
+     * @param   string      $binary     The path to the binary
+     * @param   string      $command    The VCS command
+     * @param   array       $args       The list of command line arguments (sanitized)
+     * @param   array       $files      The list of files to be added to the command line call
+     * @return  string                  The command string to be executed
+     */
+    protected function createCallCommand($binary, $command, array $args, array $files)
+    {
+        $cmd    = trim(sprintf('%s %s %s', $binary, $command, implode(' ', $args)));
+        if (count($files) > 0) {
+            $cmd    .= ' -- '.implode(' ', $files);
+        }
+        return $cmd;
+    }
+
+    /**
+     * Sanitizes a command line argument
+     *
+     * @param   string      $key        The argument key
+     * @param   string      $value      The argument value (can be empty)
+     * @return  string
+     */
+    protected function sanitizeCommandArgument($key, $value)
+    {
+        $key  = ltrim($key, '-');
+        if (strlen($key) == 1 || is_numeric($key)) {
+            $arg = sprintf('-%s', escapeshellarg($key));
+            if ($value !== null) {
+                $arg    .= ' '.escapeshellarg($value);
+            }
+        } else {
+            $arg = sprintf('--%s', escapeshellarg($key));
+            if ($value !== null) {
+                $arg    .= '='.escapeshellarg($value);
+            }
+        }
+        return $arg;
+    }
+
+    /**
+     * Sanitizes a list of command line arguments and splits them into args and files
+     *
+     * @param   array       $arguments      The list of arguments
+     * @return  array                       An array with (args, files)
+     */
+    protected function sanitizeCommandArguments(array $arguments)
+    {
+        $args       = array();
+        $files      = array();
+        $fileMode   = false;
+        foreach ($arguments as $k => $v) {
+            if ($v === '--' || $k === '--') {
+                $fileMode   = true;
+                continue;
+            }
+            if (is_int($k)) {
+                if (strpos($v, '-') === 0) {
+                    $args[]  = $this->sanitizeCommandArgument($v, null);
+                } else if ($fileMode) {
+                    $files[] = escapeshellarg($v);
+                } else {
+                    $args[]  = escapeshellarg($v);
+                }
+            } else {
+                if (strpos($k, '-') === 0) {
+                    $args[] = $this->sanitizeCommandArgument($k, $v);
+                }
+            }
+        }
+        return array($args, $files);
+    }
+
+    /**
+     * Extracts the CLI call parameters from the arguments to a magic method call
      *
      * @param   string  $method             The VCS command, e.g. show, commit or add
      * @param   array   $arguments          The command arguments with the path to the VCS
      *                                      repository being the first argument
-     * @return  CallResult
+     * @return  array                       An array with (path, method, args, stdIn)
      * @throws \InvalidArgumentException    If the method is called with less than one argument
      */
-    public function __call($method, array $arguments)
+    protected function extractCallParametersFromMagicCall($method, array $arguments)
     {
         if (count($arguments) < 1) {
             throw new \InvalidArgumentException(sprintf(
                 '"%s" must be called with at least one argument denoting the path', $method
             ));
         }
+
         $path   = array_shift($arguments);
         $args   = array();
         $stdIn  = null;
@@ -145,6 +248,20 @@ abstract class Binary
                 }
             }
         }
+        return array($path, $method, $args, $stdIn);
+    }
+
+    /**
+     * Method overloading - allows calling VCS commands directly as class methods
+     *
+     * @param   string  $method             The VCS command, e.g. show, commit or add
+     * @param   array   $arguments          The command arguments with the path to the VCS
+     *                                      repository being the first argument
+     * @return  CallResult
+     */
+    public function __call($method, array $arguments)
+    {
+        list($path, $method, $args, $stdIn) = $this->extractCallParametersFromMagicCall($method, $arguments);
 
         $call   = $this->createCall($path, $method, $args);
         return $call->execute($stdIn);
