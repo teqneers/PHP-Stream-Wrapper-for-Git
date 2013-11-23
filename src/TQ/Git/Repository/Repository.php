@@ -189,7 +189,8 @@ class Repository
         while (count($pathParts) > 0 && $found === null) {
             $path   = implode('/', $pathParts);
             $gitDir = $path.'/'.'.git';
-            if (file_exists($gitDir) && is_dir($gitDir)) {
+            if (   (file_exists($gitDir) && is_dir($gitDir))
+                || (file_exists($path.'/config') && preg_match('/^\[core\]/', file_get_contents($path.'/config')) == true)) {
                 $found  = $path;
             }
             array_pop($pathParts);
