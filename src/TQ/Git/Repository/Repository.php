@@ -199,7 +199,6 @@ class Repository
             if (   (file_exists($gitDir) && is_dir($gitDir))
                 || (file_exists($path.'/config') && preg_match('/^\[core\]/', file_get_contents($path.'/config')) == true)) {
                 $found  = $path;
-                var_dump($found);
             }
             array_pop($pathParts);
         }
