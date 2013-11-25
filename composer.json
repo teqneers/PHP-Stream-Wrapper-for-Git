@@ -17,7 +17,8 @@
     },
     "autoload":    {
         "psr-0": {
-            "TQ\\Git": "src"
+            "TQ\\Git": "src",
+            "TQ\\Vcs": "src"
         }
     }
 }
