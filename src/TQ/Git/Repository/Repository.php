@@ -100,11 +100,13 @@ class Repository
      * @param   boolean|integer      $createIfNotExists     False to fail on non-existing repositories, directory
      *                                                      creation mode, such as 0755  if the command
      *                                                      should create the directory and init the repository instead
+     * @param   boolean $createBare                         Should the new repository be a bare repo, or not. Only relevant
+     *                                                      if $createIfNotExists is true.
      * @return  Repository
      * @throws  \RuntimeException                       If the path cannot be created
      * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid Git repository
      */
-    public static function open($repositoryPath, $binary = null, $createIfNotExists = false)
+    public static function open($repositoryPath, $binary = null, $createIfNotExists = false, $createBare = false)
     {
         $binary = Binary::ensure($binary);
 
@@ -131,7 +133,7 @@ class Repository
                         '"%s" is not a valid path', $repositoryPath
                     ));
                 }
-                self::initRepository($binary, $repositoryPath);
+                self::initRepository($binary, $repositoryPath, $createBare);
                 $repositoryRoot = $repositoryPath;
             }
         }
@@ -150,10 +152,14 @@ class Repository
      *
      * @param   Binary   $binary        The Git binary
      * @param   string   $path          The repository path
+     * @param   boolean  $bare          Should the repository be bare
      */
-    protected static function initRepository(Binary $binary, $path)
+    protected static function initRepository(Binary $binary, $path, $bare = false)
     {
-        $result = $binary->init($path);
+        $arguments = array();
+        if ($bare) {$arguments[] = '--bare'; }
+
+        $result = $binary->init($path, $arguments);
         self::throwIfError($result, sprintf('Cannot initialize a Git repository in "%s"', $path));
     }
 
@@ -189,7 +195,9 @@ class Repository
         while (count($pathParts) > 0 && $found === null) {
             $path   = implode('/', $pathParts);
             $gitDir = $path.'/'.'.git';
-            if (file_exists($gitDir) && is_dir($gitDir)) {
+
+            if (   (file_exists($gitDir) && is_dir($gitDir))
+                || (file_exists($path.'/config') && preg_match('/^\[core\]/', file_get_contents($path.'/config')) == true)) {
                 $found  = $path;
             }
             array_pop($pathParts);
@@ -356,7 +364,7 @@ class Repository
     {
         /** @var $result CallResult */
         $result = $this->getBinary()->{'rev-parse'}($this->getRepositoryPath(), array(
-             '--verify',
+            '--verify',
             'HEAD'
         ));
         self::throwIfError($result, sprintf('Cannot rev-parse "%s"', $this->getRepositoryPath()));
@@ -497,7 +505,7 @@ class Repository
      * @throws  \RuntimeException               If the file could not be written
      */
     public function writeFile($path, $data, $commitMsg = null, $fileMode = null,
-        $dirMode = null, $recursive = true, $author = null
+                              $dirMode = null, $recursive = true, $author = null
     ) {
         $file       = $this->resolveFullPath($path);
 
@@ -912,7 +920,7 @@ class Repository
     {
         /** @var $result CallResult */
         $result = $this->getBinary()->{'remote'}($this->getRepositoryPath(), array(
-             '-v'
+            '-v'
         ));
         self::throwIfError($result, sprintf('Cannot remote "%s"', $this->getRepositoryPath()));
 
