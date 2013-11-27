@@ -51,7 +51,6 @@ class Binary extends VcsBinary
     /**
      * Try to find the Git binary on the system
      *
-     * @todo    implement platform independent searching strategies
      * @return  string
      */
     public static function locateBinary()
