@@ -49,6 +49,11 @@ use TQ\Git\Cli\Binary;
 class PathInformation
 {
     /**
+     * The host name used for global paths
+     */
+    const GLOBAL_PATH_HOST  = '__global__';
+
+    /**
      * The Git repository
      *
      * @var Repository
@@ -100,18 +105,19 @@ class PathInformation
     public static function parsePath($path, $protocol)
     {
         // normalize directory separators
-        $path   = str_replace(DIRECTORY_SEPARATOR, '/', $path);
-        $path   = ltrim(substr($path, strlen($protocol) + 3), '/');
+        $path   = str_replace(array('\\', '/'), '/', $path);
         //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
         $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
-        $info   = parse_url($protocol.'://'.$path);
 
-        if (preg_match('~^\w:.+~', $path)) {
-            $info['path']    = $info['host'].':'.$info['path'];
-        } else {
-            $info['path']    = '/'.$info['host'].$info['path'];
+        /// fix /// paths to __global__ "host"
+        if (strpos($path, $protocol.':///') === 0) {
+            $path   = str_replace($protocol.':///', $protocol.'://'.self::GLOBAL_PATH_HOST.'/', $path);
         }
-        unset($info['host']);
+
+        $info   = parse_url($path);
+        if (isset($info['path']) && preg_match('~^/\w:.+~', $info['path'])) {
+            $info['path']   = ltrim($info['path'], '/');
+        }
         return $info;
     }
 
@@ -128,10 +134,10 @@ class PathInformation
         $this->fullPath     = $url['path'];
         $this->repository   = Repository::open($this->fullPath, $binary, false);
         $this->localPath    = $this->repository->resolveLocalPath($this->fullPath);
-        $this->ref          = (array_key_exists('fragment', $url)) ? $url['fragment'] : 'HEAD';
+        $this->ref          = isset($url['fragment']) ? $url['fragment'] : 'HEAD';
 
         $arguments  = array();
-        if (array_key_exists('query', $url)) {
+        if (isset($url['query'])) {
             parse_str($url['query'], $arguments);
         }
         $this->arguments    = $arguments;

@@ -76,7 +76,7 @@ class Helper
      */
     public static function normalizeDirectorySeparator($path)
     {
-        return str_replace(DIRECTORY_SEPARATOR, '/', $path);
+        return str_replace(array('\\', '/'), '/', $path);
     }
 
     /**

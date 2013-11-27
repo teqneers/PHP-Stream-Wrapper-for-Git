@@ -26,58 +26,85 @@
  *
  * @category   TQ
  * @package    TQ_Git
- * @subpackage Cli
+ * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
 /**
  * @namespace
  */
-namespace TQ\Git\Cli;
-use TQ\Vcs\Cli\Binary as VcsBinary;
-use TQ\Vcs\Cli\Call;
+namespace TQ\Git\StreamWrapper;
+use TQ\Git\Repository\Repository;
 
 /**
- * Encapsulates access to th Git command line binary
+ * Manages multiples repositories by keys
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Git
- * @subpackage Cli
+ * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class Binary extends VcsBinary
+class PathRepositoryMap
 {
     /**
-     * Try to find the Git binary on the system
+     * The repository map
      *
-     * @todo    implement platform independent searching strategies
-     * @return  string
+     * @var array
      */
-    public static function locateBinary()
+    protected $map  = array();
+
+    /**
+     * Adds a single repository
+     *
+     * @param   string      $key        The key
+     * @param   Repository  $repository The repository
+     * @return  PathRepositoryMap
+     */
+    public function addRepository($key, Repository $repository)
     {
-        if (!self::isWindows()) {
-            $result = Call::create('which git')->execute();
-            return $result->getStdOut();
-        }
-        return '';
+        $this->map[$key]    = $repository;
+        return $this;
     }
 
     /**
-     * Creates a Git binary interface
+     * Adds multiple repositories
      *
-     * If no path is given the class tries to find the correct
-     * binary {@see locateBinary()}
-     *
-     * @param   string|null $path           The path to the Git binary or NULL to auto-detect
-     * @throws  \InvalidArgumentException   If no binary is found
+     * @param   array      $repositories    The repositories (key => repository)
+     * @return  PathRepositoryMap
      */
-    public function __construct($path = null)
+    public function addRepositories(array $repositories)
     {
-        if (!$path) {
-            $path  = self::locateBinary();
+        foreach ($repositories as $key => $repository) {
+            $this->addRepository($key, $repository);
         }
-        parent::__construct($path);
+        return $this;
+    }
+
+    /**
+     * Returns true if the repository is registered in the map
+     *
+     * @param   string      $key        The key
+     * @return  boolean
+     */
+    public function hasRepository($key)
+    {
+        return isset($this->map[$key]);
+    }
+
+    /**
+     * Returns the repository if it is registered in the map, NULL otherwise
+     *
+     * @param   string      $key        The key
+     * @return  Repository|null
+     */
+    public function getRepository($key)
+    {
+        if ($this->hasRepository($key)) {
+            return $this->map[$key];
+        } else {
+            return null;
+        }
+
     }
 }
-

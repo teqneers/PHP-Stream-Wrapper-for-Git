@@ -49,6 +49,7 @@ class PathInformationTest extends \PHPUnit_Framework_TestCase
                 'git:///path/to/file',
                 array(
                     'scheme' => 'git',
+                    'host'   => '__global__',
                     'path'   => '/path/to/file'
                 )
             ),
@@ -56,6 +57,7 @@ class PathInformationTest extends \PHPUnit_Framework_TestCase
                 'git:///path/to/file#HEAD^',
                 array(
                     'scheme'   => 'git',
+                    'host'     => '__global__',
                     'path'     => '/path/to/file',
                     'fragment' => 'HEAD^'
                 )
@@ -64,10 +66,19 @@ class PathInformationTest extends \PHPUnit_Framework_TestCase
                 'git:///path/to/file?commit',
                 array(
                     'scheme' => 'git',
+                    'host'   => '__global__',
                     'path'   => '/path/to/file',
                     'query'  => 'commit'
                 )
-            )
+            ),
+            array(
+                'git:///C:\path\to\file',
+                array(
+                    'scheme' => 'git',
+                    'host'   => '__global__',
+                    'path'   => 'C:/path/to/file'
+                )
+            ),
         );
     }
 }

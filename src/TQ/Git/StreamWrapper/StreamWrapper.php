@@ -69,6 +69,13 @@ class StreamWrapper
     protected static $protocol;
 
     /**
+     * The path factory
+     *
+     * @var PathFactory
+     */
+    protected static $pathFactory;
+
+    /**
      * The stream context if set
      *
      * @var resource
@@ -124,7 +131,8 @@ class StreamWrapper
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
         }
-        self::$protocol = $protocol;
+        self::$protocol     = $protocol;
+        self::$pathFactory  = new PathFactory(self::$protocol, self::$binary, null);
     }
 
     /**
@@ -215,7 +223,7 @@ class StreamWrapper
      */
     protected function getPath($streamUrl)
     {
-        return new PathInformation($streamUrl, self::$protocol, self::$binary);
+        return self::$pathFactory->createPathInformation($streamUrl);
     }
 
     /**

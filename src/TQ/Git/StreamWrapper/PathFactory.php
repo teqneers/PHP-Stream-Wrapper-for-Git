@@ -26,58 +26,80 @@
  *
  * @category   TQ
  * @package    TQ_Git
- * @subpackage Cli
+ * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
 /**
  * @namespace
  */
-namespace TQ\Git\Cli;
-use TQ\Vcs\Cli\Binary as VcsBinary;
-use TQ\Vcs\Cli\Call;
+namespace TQ\Git\StreamWrapper;
+use TQ\Git\Cli\Binary;
 
 /**
- * Encapsulates access to th Git command line binary
+ * Creates path information for a given stream URL
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Git
- * @subpackage Cli
+ * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class Binary extends VcsBinary
+class PathFactory
 {
     /**
-     * Try to find the Git binary on the system
+     * The path repository map
      *
-     * @todo    implement platform independent searching strategies
-     * @return  string
+     * @var PathRepositoryMap
      */
-    public static function locateBinary()
+    protected $map;
+
+    /**
+     * The Git binary
+     *
+     * @var Binary
+     */
+    protected $binary;
+
+    /**
+     * The registered protocol
+     *
+     * @var string
+     */
+    protected $protocol;
+
+    /**
+     * Registers the stream wrapper with the given protocol
+     *
+     * @param   string              $protocol    The protocol (such as "git")
+     * @param   Binary|string|null  $binary      The Git binary
+     * @param   PathRepositoryMap   $map         The path repository map
+     */
+    public function __construct($protocol, $binary = null, PathRepositoryMap $map = null)
     {
-        if (!self::isWindows()) {
-            $result = Call::create('which git')->execute();
-            return $result->getStdOut();
-        }
-        return '';
+        $this->protocol = $protocol;
+        $this->binary   = Binary::ensure($binary);
+        $this->map      = $map ?: new PathRepositoryMap();
     }
 
     /**
-     * Creates a Git binary interface
+     * Returns the path repository map
      *
-     * If no path is given the class tries to find the correct
-     * binary {@see locateBinary()}
-     *
-     * @param   string|null $path           The path to the Git binary or NULL to auto-detect
-     * @throws  \InvalidArgumentException   If no binary is found
+     * @return  PathRepositoryMap
      */
-    public function __construct($path = null)
+    public function getMap()
     {
-        if (!$path) {
-            $path  = self::locateBinary();
-        }
-        parent::__construct($path);
+        return $this->map;
+    }
+
+    /**
+     * Returns the path information for a given stream URL
+     *
+     * @param   string  $streamUrl      The URL given to the stream function
+     * @return  PathInformation         The path information representing the stream URL
+     */
+    public function createPathInformation($streamUrl)
+    {
+        return new PathInformation($streamUrl, $this->protocol, $this->binary);
     }
 }
-
