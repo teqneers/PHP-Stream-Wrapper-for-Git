@@ -33,8 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper;
-use TQ\Git\Repository\Repository;
+namespace TQ\Git\Repository;
 
 /**
  * Manages multiples repositories by keys
@@ -45,7 +44,7 @@ use TQ\Git\Repository\Repository;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class PathRepositoryMap
+class RepositoryRegistry implements \Countable
 {
     /**
      * The repository map
@@ -59,7 +58,7 @@ class PathRepositoryMap
      *
      * @param   string      $key        The key
      * @param   Repository  $repository The repository
-     * @return  PathRepositoryMap
+     * @return  RepositoryRegistry
      */
     public function addRepository($key, Repository $repository)
     {
@@ -71,7 +70,7 @@ class PathRepositoryMap
      * Adds multiple repositories
      *
      * @param   array      $repositories    The repositories (key => repository)
-     * @return  PathRepositoryMap
+     * @return  RepositoryRegistry
      */
     public function addRepositories(array $repositories)
     {
@@ -106,5 +105,16 @@ class PathRepositoryMap
             return null;
         }
 
+    }
+
+    /**
+     * Count elements of an object
+     *
+     * @link    http://php.net/manual/en/countable.count.php
+     * @return  integer     The custom count as an integer
+     */
+    public function count()
+    {
+        return count($this->map);
     }
 }

@@ -35,6 +35,7 @@
  */
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
+use TQ\Git\Repository\RepositoryRegistry;
 
 /**
  * Creates path information for a given stream URL
@@ -48,9 +49,9 @@ use TQ\Git\Cli\Binary;
 class PathFactory
 {
     /**
-     * The path repository map
+     * The repository registry
      *
-     * @var PathRepositoryMap
+     * @var RepositoryRegistry
      */
     protected $map;
 
@@ -73,21 +74,21 @@ class PathFactory
      *
      * @param   string              $protocol    The protocol (such as "git")
      * @param   Binary|string|null  $binary      The Git binary
-     * @param   PathRepositoryMap   $map         The path repository map
+     * @param   RepositoryRegistry  $map         The repository registry
      */
-    public function __construct($protocol, $binary = null, PathRepositoryMap $map = null)
+    public function __construct($protocol, $binary = null, RepositoryRegistry $map = null)
     {
         $this->protocol = $protocol;
         $this->binary   = Binary::ensure($binary);
-        $this->map      = $map ?: new PathRepositoryMap();
+        $this->map      = $map ?: new RepositoryRegistry();
     }
 
     /**
-     * Returns the path repository map
+     * Returns the repository registry
      *
-     * @return  PathRepositoryMap
+     * @return  RepositoryRegistry
      */
-    public function getMap()
+    public function getRegistry()
     {
         return $this->map;
     }

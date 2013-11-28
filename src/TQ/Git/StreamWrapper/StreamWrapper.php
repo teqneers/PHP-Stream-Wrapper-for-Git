@@ -35,6 +35,7 @@
  */
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
+use TQ\Git\Repository\RepositoryRegistry;
 use TQ\Vcs\Buffer\FileBuffer;
 use TQ\Vcs\Buffer\ArrayBuffer;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
@@ -54,13 +55,6 @@ use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
  */
 class StreamWrapper
 {
-    /**
-     * The Git binary
-     *
-     * @var Binary
-     */
-    protected static $binary;
-
     /**
      * The registered protocol
      *
@@ -120,19 +114,24 @@ class StreamWrapper
     /**
      * Registers the stream wrapper with the given protocol
      *
-     * @param   string              $protocol    The protocol (such as "git")
-     * @param   Binary|string|null  $binary      The Git binary
-     * @throws  \RuntimeException                If $protocol is already registered
+     * @param   string                          $protocol    The protocol (such as "git")
+     * @param   Binary|string|null|PathFactory  $binary      The Git binary or a path factory
+     * @throws  \RuntimeException                            If $protocol is already registered
      */
     public static function register($protocol, $binary = null)
     {
-        self::$binary    = Binary::ensure($binary);
+        self::$protocol = $protocol;
+        if ($binary instanceof PathFactory) {
+            self::$pathFactory  = $binary;
+        } else {
+            $binary             = Binary::ensure($binary);
+            self::$pathFactory  = new PathFactory(self::$protocol, $binary, null);
+        }
+
         if (!stream_wrapper_register($protocol, get_called_class())) {
             throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
                 runtime or it cannot be registered', $protocol));
         }
-        self::$protocol     = $protocol;
-        self::$pathFactory  = new PathFactory(self::$protocol, self::$binary, null);
     }
 
     /**
@@ -144,6 +143,16 @@ class StreamWrapper
             throw new \RuntimeException(sprintf('The protocol "%s" cannot be unregistered
                 from the runtime', self::$protocol));
         }
+    }
+
+    /**
+     * Returns the repository registry
+     *
+     * @return  RepositoryRegistry
+     */
+    public static function getRepositoryMap()
+    {
+        return self::$pathFactory->getRegistry();
     }
 
     /**
