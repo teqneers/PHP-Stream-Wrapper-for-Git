@@ -39,10 +39,6 @@ use TQ\Git\Repository\RepositoryRegistry;
 use TQ\Vcs\Buffer\FileBuffer;
 use TQ\Vcs\Buffer\ArrayBuffer;
 use TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\CommitFactory;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\HeadFileFactory;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
 use TQ\Vcs\StreamWrapper\AbstractStreamWrapper;
 
 /**
@@ -85,9 +81,9 @@ class StreamWrapper extends AbstractStreamWrapper
     protected $path;
 
     /**
-     * The buffer resolver
+     * The buffer factory
      *
-     * @var Resolver
+     * @var Factory
      */
     protected $bufferFactory;
 
@@ -149,18 +145,12 @@ class StreamWrapper extends AbstractStreamWrapper
     /**
      * Creates the buffer factory
      *
-     * @return  Resolver
+     * @return  Factory
      */
     protected function getBufferFactory()
     {
         if ($this->bufferFactory === null) {
-            $factory    = new Factory();
-            $factory->addFactory(new CommitFactory(), 100)
-                    ->addFactory(new LogFactory(), 90)
-                    ->addFactory(new HeadFileFactory(), 80)
-                    ->addFactory(new DefaultFactory(), -100);
-
-            $this->bufferFactory   = $factory;
+            $this->bufferFactory   = Factory::getDefault();
         }
         return $this->bufferFactory;
     }

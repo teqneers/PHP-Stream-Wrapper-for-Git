@@ -37,6 +37,10 @@ namespace TQ\Git\StreamWrapper\FileBuffer;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\Factory as FactoryInterface;
 use TQ\Git\StreamWrapper\PathInformation;
 use TQ\Vcs\Buffer\FileBuffer;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\CommitFactory;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\HeadFileFactory;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
 
 /**
  * Resolves the file stream factory to use on a stream_open call
@@ -55,6 +59,27 @@ class Factory implements FactoryInterface
      * @var \SplPriorityQueue
      */
     protected $factoryList;
+
+    /**
+     * Returns a default factory
+     *
+     * includes:
+     * - CommitFactory
+     * - LogFactory
+     * - HeadFileFactory
+     * - DefaultFactory
+     *
+     * @return  Factory
+     */
+    public static function getDefault()
+    {
+        $factory    = new self();
+        $factory->addFactory(new CommitFactory(), 100)
+                ->addFactory(new LogFactory(), 90)
+                ->addFactory(new HeadFileFactory(), 80)
+                ->addFactory(new DefaultFactory(), -100);
+        return $factory;
+    }
 
     /**
      * Creates a new factory resolver
