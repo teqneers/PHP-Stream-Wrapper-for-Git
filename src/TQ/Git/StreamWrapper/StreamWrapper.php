@@ -38,11 +38,12 @@ use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\RepositoryRegistry;
 use TQ\Vcs\Buffer\FileBuffer;
 use TQ\Vcs\Buffer\ArrayBuffer;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
+use TQ\Git\StreamWrapper\FileBuffer\Factory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\CommitFactory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\HeadFileFactory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
+use TQ\Vcs\StreamWrapper\AbstractStreamWrapper;
 
 /**
  * The stream wrapper that hooks into PHP's stream infrastructure
@@ -53,42 +54,14 @@ use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class StreamWrapper
+class StreamWrapper extends AbstractStreamWrapper
 {
-    /**
-     * The registered protocol
-     *
-     * @var string
-     */
-    protected static $protocol;
-
     /**
      * The path factory
      *
      * @var PathFactory
      */
     protected static $pathFactory;
-
-    /**
-     * The stream context if set
-     *
-     * @var resource
-     */
-    public $context;
-
-    /**
-     * The parsed stream context options
-     *
-     * @var array
-     */
-    protected $contextOptions;
-
-    /**
-     * The parsed stream context parameters
-     *
-     * @var array
-     */
-    protected $contextParameters;
 
     /**
      * The directory buffer if used on a directory
@@ -112,6 +85,13 @@ class StreamWrapper
     protected $path;
 
     /**
+     * The buffer resolver
+     *
+     * @var Resolver
+     */
+    protected $bufferFactory;
+
+    /**
      * Registers the stream wrapper with the given protocol
      *
      * @param   string                          $protocol    The protocol (such as "git")
@@ -120,12 +100,12 @@ class StreamWrapper
      */
     public static function register($protocol, $binary = null)
     {
-        self::$protocol = $protocol;
+        static::$protocol = $protocol;
         if ($binary instanceof PathFactory) {
-            self::$pathFactory  = $binary;
+            static::$pathFactory  = $binary;
         } else {
-            $binary             = Binary::ensure($binary);
-            self::$pathFactory  = new PathFactory(self::$protocol, $binary, null);
+            $binary              = Binary::ensure($binary);
+            static::$pathFactory  = new PathFactory(static::$protocol, $binary, null);
         }
 
         if (!stream_wrapper_register($protocol, get_called_class())) {
@@ -139,9 +119,9 @@ class StreamWrapper
      */
     public static function unregister()
     {
-        if (!stream_wrapper_unregister(self::$protocol)) {
+        if (!stream_wrapper_unregister(static::$protocol)) {
             throw new \RuntimeException(sprintf('The protocol "%s" cannot be unregistered
-                from the runtime', self::$protocol));
+                from the runtime', static::$protocol));
         }
     }
 
@@ -152,76 +132,7 @@ class StreamWrapper
      */
     public static function getRepositoryMap()
     {
-        return self::$pathFactory->getRegistry();
-    }
-
-    /**
-     * Parses the passed stream context and returns the context options
-     * relevant for this stream wrapper
-     *
-     * @param   boolean $all    Return all options instead of just the relevant options
-     * @return  array           The context options
-     */
-    protected function getContextOptions($all = false)
-    {
-        if ($this->contextOptions === null) {
-            $this->contextOptions   = stream_context_get_options($this->context);
-        }
-
-        if (!$all && array_key_exists(self::$protocol, $this->contextOptions)) {
-            return $this->contextOptions[self::$protocol];
-        } else if ($all) {
-            return $this->contextOptions;
-        } else {
-            return array();
-        }
-    }
-
-    /**
-     * Returns a context option - $default if option is not found
-     *
-     * @param   string  $option     The option to retrieve
-     * @param   mixed   $default    The default value if $option is not found
-     * @return  mixed
-     */
-    protected function getContextOption($option, $default = null)
-    {
-        $options    = $this->getContextOptions();
-        if (array_key_exists($option, $options)) {
-            return $options[$option];
-        } else {
-            return $default;
-        }
-    }
-
-    /**
-     * Parses the passed stream context and returns the context parameters
-     *
-     * @return  array       The context parameters
-     */
-    protected function getContextParameters()
-    {
-        if ($this->contextParameters === null) {
-            $this->contextParameters    = stream_context_get_params($this->context);
-        }
-        return $this->contextParameters;
-    }
-
-    /**
-     * Returns a context parameter - $default if parameter is not found
-     *
-     * @param   string  $parameter  The parameter to retrieve
-     * @param   mixed   $default    The default value if $parameter is not found
-     * @return  mixed
-     */
-    protected function getContextParameter($parameter, $default = null)
-    {
-        $parameters    = $this->getContextParameters();
-        if (array_key_exists($parameter, $parameters)) {
-            return $parameters[$parameter];
-        } else {
-            return $default;
-        }
+        return static::$pathFactory->getRegistry();
     }
 
     /**
@@ -233,6 +144,25 @@ class StreamWrapper
     protected function getPath($streamUrl)
     {
         return self::$pathFactory->createPathInformation($streamUrl);
+    }
+
+    /**
+     * Creates the buffer factory
+     *
+     * @return  Resolver
+     */
+    protected function getBufferFactory()
+    {
+        if ($this->bufferFactory === null) {
+            $factory    = new Factory();
+            $factory->addFactory(new CommitFactory(), 100)
+                    ->addFactory(new LogFactory(), 90)
+                    ->addFactory(new HeadFileFactory(), 80)
+                    ->addFactory(new DefaultFactory(), -100);
+
+            $this->bufferFactory   = $factory;
+        }
+        return $this->bufferFactory;
     }
 
     /**
@@ -413,19 +343,6 @@ class StreamWrapper
     }
 
     /**
-     * streamWrapper::stream_cast — Retrieve the underlaying resource
-     *
-     * @param   integer  $cast_as   Can be STREAM_CAST_FOR_SELECT when stream_select() is calling stream_cast()
-     *                              or STREAM_CAST_AS_STREAM when stream_cast() is called for other uses.
-     * @return  resource            Should return the underlying stream resource used by the wrapper, or FALSE.
-     */
-/*
-    public function stream_cast($cast_as)
-    {
-    }
-*/
-
-    /**
      * streamWrapper::stream_close — Close an resource
      */
     public function stream_close()
@@ -467,48 +384,6 @@ class StreamWrapper
     }
 
     /**
-     * streamWrapper::stream_lock — Advisory file locking
-     *
-     * @param   integer  $operation     operation is one of the following:
-     *                                      LOCK_SH to acquire a shared lock (reader).
-     *                                      LOCK_EX to acquire an exclusive lock (writer).
-     *                                      LOCK_UN to release a lock (shared or exclusive).
-     *                                      LOCK_NB if you don't want flock() to block while locking. (not supported on Windows)
-     * @return  boolean                 Returns TRUE on success or FALSE on failure.
-     */
-/*
-    public function stream_lock($operation)
-    {
-    }
-*/
-
-    /**
-     * streamWrapper::stream_metadata — Change stream options
-     *
-     * @param   string   $path      The file path or URL to set metadata. Note that in the case of a URL,
-     *                              it must be a :// delimited URL. Other URL forms are not supported.
-     * @param   integer  $option    One of:
-     *                                  PHP_STREAM_META_TOUCH (The method was called in response to touch())
-     *                                  PHP_STREAM_META_OWNER_NAME (The method was called in response to chown() with string parameter)
-     *                                  PHP_STREAM_META_OWNER (The method was called in response to chown())
-     *                                  PHP_STREAM_META_GROUP_NAME (The method was called in response to chgrp())
-     *                                  PHP_STREAM_META_GROUP (The method was called in response to chgrp())
-     *                                  PHP_STREAM_META_ACCESS (The method was called in response to chmod())
-     * @param   integer  $var       If option is
-     *                                  PHP_STREAM_META_TOUCH: Array consisting of two arguments of the touch() function.
-     *                                  PHP_STREAM_META_OWNER_NAME or PHP_STREAM_META_GROUP_NAME: The name of the owner
-     *                                      user/group as string.
-     *                                  PHP_STREAM_META_OWNER or PHP_STREAM_META_GROUP: The value owner user/group argument as integer.
-     *                                  PHP_STREAM_META_ACCESS: The argument of the chmod() as integer.
-     * @return  boolean             Returns TRUE on success or FALSE on failure. If option is not implemented, FALSE should be returned.
-     */
-/*
-    public function stream_metadata($path, $option, $var)
-    {
-    }
-*/
-
-    /**
      * streamWrapper::stream_open — Opens file or URL
      *
      * @param   string   $path          Specifies the URL that was passed to the original function.
@@ -530,8 +405,7 @@ class StreamWrapper
         try {
             $path   = $this->getPath($path);
 
-            $resolver           = $this->createBufferFactoryResolver();
-            $factory            = $resolver->findFactory($path, $mode);
+            $factory            = $this->getBufferFactory();
             $this->fileBuffer   = $factory->createFileBuffer($path, $mode);
             $this->path         = $path;
 
@@ -546,21 +420,6 @@ class StreamWrapper
             }
             return false;
         }
-    }
-
-    /**
-     * Creates the factory resolver
-     *
-     * @return  Resolver
-     */
-    protected function createBufferFactoryResolver()
-    {
-        $resolver    = new Resolver();
-        $resolver->addFactory(new CommitFactory(), 100)
-                 ->addFactory(new LogFactory(), 90)
-                 ->addFactory(new HeadFileFactory(), 80)
-                 ->addFactory(new DefaultFactory(), -100);
-        return $resolver;
     }
 
     /**
@@ -593,30 +452,6 @@ class StreamWrapper
     {
         return $this->fileBuffer->setPosition($offset, $whence);
     }
-
-    /**
-     * streamWrapper::stream_set_option
-     *
-     * @param   integer  $option    One of:
-     *                                  STREAM_OPTION_BLOCKING (The method was called in response to stream_set_blocking())
-     *                                  STREAM_OPTION_READ_TIMEOUT (The method was called in response to stream_set_timeout())
-     *                                  STREAM_OPTION_WRITE_BUFFER (The method was called in response to stream_set_write_buffer())
-     * @param   integer  $arg1      If option is
-     *                                  STREAM_OPTION_BLOCKING: requested blocking mode (1 meaning block 0 not blocking).
-     *                                  STREAM_OPTION_READ_TIMEOUT: the timeout in seconds.
-     *                                  STREAM_OPTION_WRITE_BUFFER: buffer mode (STREAM_BUFFER_NONE or STREAM_BUFFER_FULL).
-     * @param   integer  $arg2      If option is
-     *                                  STREAM_OPTION_BLOCKING: This option is not set.
-     *                                  STREAM_OPTION_READ_TIMEOUT: the timeout in microseconds.
-     *                                  STREAM_OPTION_WRITE_BUFFER: the requested buffer size.
-     * @return  boolean             Returns TRUE on success or FALSE on failure. If option is not implemented,
-     *                              FALSE should be returned.
-     */
-/*
-    public function stream_set_option($option, $arg1, $arg2)
-    {
-    }
-*/
 
     /**
      * streamWrapper::stream_stat — Retrieve information about a file resource
@@ -775,18 +610,5 @@ class StreamWrapper
             }
             return false;
         }
-    }
-
-    /**
-     * Checks if a bitmask has a specific flag set
-     *
-     * @param   integer     $mask   The bitmask
-     * @param   integer     $flag   The flag to check
-     * @return  boolean
-     */
-    protected static function maskHasFlag($mask, $flag)
-    {
-        $flag   = (int)$flag;
-        return ((int)$mask & $flag) === $flag;
     }
 }

@@ -23,11 +23,10 @@
 
 namespace TQ\Tests\Git\StreamWrapper\FileBuffer\Factory;
 
-use TQ\Git\StreamWrapper\FileBuffer\Factory\Resolver;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\Factory;
+use TQ\Git\StreamWrapper\FileBuffer\Factory;
 use TQ\Git\StreamWrapper\PathInformation;
 
-class ResolverTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @return  PathInformation
@@ -44,7 +43,7 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return  Factory
+     * @return  \TQ\Git\StreamWrapper\FileBuffer\Factory\Factory
      */
     protected function createFactoryMock()
     {
@@ -56,7 +55,7 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testReturnsFactoryWhichIsResponsible()
     {
-        $resolver   = new Resolver();
+        $factory   = new Factory();
 
         $factory1   = $this->createFactoryMock();
         $factory1->expects($this->any())
@@ -67,17 +66,17 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
                  ->method('canHandle')
                  ->will($this->returnValue(false));
 
-        $resolver->addFactory($factory1, 10);
-        $resolver->addFactory($factory2, 30);
+        $factory->addFactory($factory1, 10);
+        $factory->addFactory($factory2, 30);
 
         $path   = $this->createPathMock();
 
-        $this->assertSame($factory1, $resolver->findFactory($path, 'r+'));
+        $this->assertSame($factory1, $factory->findFactory($path, 'r+'));
     }
 
     public function testReturnsFactoryWithHigherPriority()
     {
-        $resolver   = new Resolver();
+        $factory   = new Factory();
 
         $factory1   = $this->createFactoryMock();
         $factory1->expects($this->any())
@@ -88,12 +87,12 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
                  ->method('canHandle')
                  ->will($this->returnValue(true));
 
-        $resolver->addFactory($factory1, 10);
-        $resolver->addFactory($factory2, 30);
+        $factory->addFactory($factory1, 10);
+        $factory->addFactory($factory2, 30);
 
         $path   = $this->createPathMock();
 
-        $this->assertSame($factory2, $resolver->findFactory($path, 'r+'));
+        $this->assertSame($factory2, $factory->findFactory($path, 'r+'));
     }
 
     /**
@@ -101,7 +100,7 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testFailsWithoutAnyFactoryResponsible()
     {
-        $resolver   = new Resolver();
+        $factory   = new Factory();
 
         $factory1   = $this->createFactoryMock();
         $factory1->expects($this->any())
@@ -112,12 +111,12 @@ class ResolverTest extends \PHPUnit_Framework_TestCase
                  ->method('canHandle')
                  ->will($this->returnValue(false));
 
-        $resolver->addFactory($factory1, 10);
-        $resolver->addFactory($factory2, 30);
+        $factory->addFactory($factory1, 10);
+        $factory->addFactory($factory2, 30);
 
         $path   = $this->createPathMock();
 
-        $resolver->findFactory($path, 'r+');
+        $factory->findFactory($path, 'r+');
     }
 }
 

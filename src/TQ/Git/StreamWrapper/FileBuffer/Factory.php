@@ -33,8 +33,10 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
+namespace TQ\Git\StreamWrapper\FileBuffer;
+use TQ\Git\StreamWrapper\FileBuffer\Factory\Factory as FactoryInterface;
 use TQ\Git\StreamWrapper\PathInformation;
+use TQ\Vcs\Buffer\FileBuffer;
 
 /**
  * Resolves the file stream factory to use on a stream_open call
@@ -45,7 +47,7 @@ use TQ\Git\StreamWrapper\PathInformation;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class Resolver
+class Factory implements FactoryInterface
 {
     /**
      * The list containing the possible factories
@@ -65,11 +67,11 @@ class Resolver
     /**
      * Adds a factory to the list of possible factories
      *
-     * @param   Factory     $factory     The factory
-     * @param   integer     $priority   The priority
-     * @return  Resolver                The resolver
+     * @param   FactoryInterface    $factory    The factory to add
+     * @param   integer             $priority   The priority
+     * @return  Factory                         The factory
      */
-    public function addFactory(Factory $factory, $priority = 10)
+    public function addFactory(FactoryInterface $factory, $priority = 10)
     {
         $this->factoryList->insert($factory, $priority);
         return $this;
@@ -85,12 +87,43 @@ class Resolver
      */
     public function findFactory(PathInformation $path, $mode)
     {
-        foreach ($this->factoryList as $factory) {
+        $factoryList    = clone $this->factoryList;
+        foreach ($factoryList as $factory) {
             /** @var $factory Factory */
             if ($factory->canHandle($path, $mode)) {
                 return $factory;
             }
         }
         throw new \RuntimeException('No factory found to handle the requested path');
+    }
+
+    /**
+     * Returns true if this factory can handle the requested path
+     *
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the file
+     * @return  boolean                     True if this factory can handle the path
+     */
+    function canHandle(PathInformation $path, $mode)
+    {
+        try {
+            $this->findFactory($path, $mode);
+            return true;
+        } catch (\RuntimeException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns the file stream to handle the requested path
+     *
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the path
+     * @return  FileBuffer                  The file buffer to handle the path
+     */
+    function createFileBuffer(PathInformation $path, $mode)
+    {
+        $factory    = $this->findFactory($path, $mode);
+        return $factory->createFileBuffer($path, $mode);
     }
 }
