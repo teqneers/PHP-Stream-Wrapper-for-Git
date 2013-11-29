@@ -126,7 +126,7 @@ class StreamWrapper extends AbstractStreamWrapper
      *
      * @return  RepositoryRegistry
      */
-    public static function getRepositoryMap()
+    public static function getRepositoryRegistry()
     {
         return static::$pathFactory->getRegistry();
     }
@@ -272,7 +272,7 @@ class StreamWrapper extends AbstractStreamWrapper
                 throw new \Exception(sprintf('Path %s is not a file', $pathFrom->getFullPath()));
             }
 
-            $pathTo = PathInformation::parsePath($path_to, self::$protocol);
+            $pathTo = self::$pathFactory->parsePath($path_to);
             $pathTo = $pathTo['path'];
 
             if (strpos($pathTo, $pathFrom->getRepositoryPath()) !== 0) {

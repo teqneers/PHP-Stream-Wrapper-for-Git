@@ -35,10 +35,9 @@
  */
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Repository\Repository;
-use TQ\Git\Cli\Binary;
 
 /**
- * Handles decomposition of a given Git stream wrapper path
+ * Represents a given stream wrapper path
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -54,14 +53,14 @@ class PathInformation
     const GLOBAL_PATH_HOST  = '__global__';
 
     /**
-     * The Git repository
+     * The repository
      *
      * @var Repository
      */
     protected $repository;
 
     /**
-     * The Git URL
+     * The URL
      *
      * @var string
      */
@@ -73,13 +72,6 @@ class PathInformation
      * @var string
      */
     protected $fullPath;
-
-    /**
-     * The relative path to the resource based on the repository path
-     *
-     * @var string
-     */
-    protected $localPath;
 
     /**
      * The version ref
@@ -96,59 +88,34 @@ class PathInformation
     protected $arguments;
 
     /**
-     * Returns path information for a given stream path
+     * The relative path to the resource based on the repository path
      *
-     * @param   string      $path       The path
-     * @param   string      $protocol   The protocol registered
-     * @return  array                   An array containing information about the path
+     * Lazy instantiated
+     *
+     * @var string
      */
-    public static function parsePath($path, $protocol)
-    {
-        // normalize directory separators
-        $path   = str_replace(array('\\', '/'), '/', $path);
-        //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
-        $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
-
-        /// fix /// paths to __global__ "host"
-        if (strpos($path, $protocol.':///') === 0) {
-            $path   = str_replace($protocol.':///', $protocol.'://'.self::GLOBAL_PATH_HOST.'/', $path);
-        }
-
-        $info   = parse_url($path);
-        if (isset($info['path']) && preg_match('~^/\w:.+~', $info['path'])) {
-            $info['path']   = ltrim($info['path'], '/');
-        }
-        return $info;
-    }
+    protected $localPath;
 
     /**
      * Creates a new path information instance from a given URL
      *
-     * @param   string      $url        The URL
-     * @param   string      $protocol   The protocol registered
-     * @param   Binary      $binary     The Git binary
+     * @param   Repository  $repository     The repository instance
+     * @param   string      $url            The URL
+     * @param   string      $fullPath       The absolute path to the resource
+     * @param   string      $ref            The version ref
+     * @param   array       $arguments      The additional arguments given
      */
-    public function __construct($url, $protocol, Binary $binary)
+    public function __construct(Repository $repository, $url, $fullPath, $ref, array $arguments)
     {
-        $url                = self::parsePath($url, $protocol);
-        $this->fullPath     = $url['path'];
-        $this->repository   = Repository::open($this->fullPath, $binary, false);
-        $this->localPath    = $this->repository->resolveLocalPath($this->fullPath);
-        $this->ref          = isset($url['fragment']) ? $url['fragment'] : 'HEAD';
-
-        $arguments  = array();
-        if (isset($url['query'])) {
-            parse_str($url['query'], $arguments);
-        }
+        $this->repository   = $repository;
+        $this->url          = (string)$url;
+        $this->fullPath     = (string)$fullPath;
+        $this->ref          = (string)$ref;
         $this->arguments    = $arguments;
-
-        $this->url          =  $protocol.'://'.$this->fullPath
-                              .'#'.$this->ref
-                              .'?'.http_build_query($this->arguments);
     }
 
     /**
-     * Returns the Git URL
+     * Returns the URL
      *
      * @return  string
      */
@@ -158,7 +125,7 @@ class PathInformation
     }
 
     /**
-     * Returns the Git repository instance
+     * Returns the repository instance
      *
      * @return  Repository
      */
@@ -194,6 +161,9 @@ class PathInformation
      */
     public function getLocalPath()
     {
+        if (!$this->localPath) {
+           $this->localPath = $this->repository->resolveLocalPath($this->fullPath);
+        }
         return $this->localPath;
     }
 

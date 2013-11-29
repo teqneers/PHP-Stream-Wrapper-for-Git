@@ -23,9 +23,10 @@
 
 namespace TQ\Tests\Git\StreamWrapper;
 
-use TQ\Git\StreamWrapper\PathInformation;
+use TQ\Git\Cli\Binary;
+use TQ\Git\StreamWrapper\PathFactory;
 
-class PathInformationTest extends \PHPUnit_Framework_TestCase
+class PathFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider parsePathDataProvider
@@ -35,7 +36,8 @@ class PathInformationTest extends \PHPUnit_Framework_TestCase
      */
     public function testParsePath($path, array $expected)
     {
-        $actual = PathInformation::parsePath($path, 'git');
+        $factory    = new PathFactory('git', new Binary(GIT_BINARY));
+        $actual     = $factory->parsePath($path);
         $this->assertEquals($expected, $actual);
     }
 

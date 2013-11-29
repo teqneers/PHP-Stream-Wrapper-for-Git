@@ -35,6 +35,7 @@
  */
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
+use TQ\Git\Repository\Repository;
 use TQ\Git\Repository\RepositoryRegistry;
 
 /**
@@ -101,6 +102,46 @@ class PathFactory
      */
     public function createPathInformation($streamUrl)
     {
-        return new PathInformation($streamUrl, $this->protocol, $this->binary);
+        $pathInfo     = $this->parsePath($streamUrl);
+        $fullPath     = $pathInfo['path'];
+        $repository   = Repository::open($fullPath, $this->binary, false);
+        $ref          = isset($pathInfo['fragment']) ? $pathInfo['fragment'] : 'HEAD';
+
+        $arguments  = array();
+        if (isset($pathInfo['query'])) {
+            parse_str($pathInfo['query'], $arguments);
+        }
+
+        $url    =  $this->protocol.'://'.$fullPath
+                  .'#'.$ref
+                  .'?'.http_build_query($arguments);
+
+        return new PathInformation($repository, $url, $fullPath, $ref, $arguments);
+    }
+
+    /**
+     * Returns path information for a given stream path
+     *
+     * @param   string      $streamUrl      The URL given to the stream function
+     * @return  array                       An array containing information about the path
+     */
+    public function parsePath($streamUrl)
+    {
+        // normalize directory separators
+        $path   = str_replace(array('\\', '/'), '/', $streamUrl);
+        //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
+        $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
+
+        /// fix /// paths to __global__ "host"
+        $protocol   = $this->protocol;
+        if (strpos($path, $protocol.':///') === 0) {
+            $path   = str_replace($protocol.':///', $protocol.'://'.PathInformation::GLOBAL_PATH_HOST.'/', $path);
+        }
+
+        $info   = parse_url($path);
+        if (isset($info['path']) && preg_match('~^/\w:.+~', $info['path'])) {
+            $info['path']   = ltrim($info['path'], '/');
+        }
+        return $info;
     }
 }
