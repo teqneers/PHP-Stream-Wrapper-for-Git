@@ -33,9 +33,7 @@
 /**
  * @namespace
  */
-namespace TQ\Git\Repository;
-use TQ\Vcs\Repository\Repository as RepositoryInterface;
-use TQ\Vcs\Repository\RepositoryRegistry as RepositoryRegistryInterface;
+namespace TQ\Vcs\Repository;
 
 /**
  * Manages multiples repositories by keys
@@ -46,27 +44,16 @@ use TQ\Vcs\Repository\RepositoryRegistry as RepositoryRegistryInterface;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class RepositoryRegistry implements RepositoryRegistryInterface
+interface RepositoryRegistry extends \Countable
 {
-    /**
-     * The repository map
-     *
-     * @var array
-     */
-    protected $map  = array();
-
     /**
      * Adds a single repository
      *
-     * @param   string               $key        The key
-     * @param   RepositoryInterface  $repository The repository
+     * @param   string      $key        The key
+     * @param   Repository  $repository The repository
      * @return  RepositoryRegistry
      */
-    public function addRepository($key, RepositoryInterface $repository)
-    {
-        $this->map[$key]    = $repository;
-        return $this;
-    }
+    public function addRepository($key, Repository $repository);
 
     /**
      * Adds multiple repositories
@@ -74,13 +61,7 @@ class RepositoryRegistry implements RepositoryRegistryInterface
      * @param   array      $repositories    The repositories (key => repository)
      * @return  RepositoryRegistry
      */
-    public function addRepositories(array $repositories)
-    {
-        foreach ($repositories as $key => $repository) {
-            $this->addRepository($key, $repository);
-        }
-        return $this;
-    }
+    public function addRepositories(array $repositories);
 
     /**
      * Returns true if the repository is registered in the map
@@ -88,10 +69,7 @@ class RepositoryRegistry implements RepositoryRegistryInterface
      * @param   string      $key        The key
      * @return  boolean
      */
-    public function hasRepository($key)
-    {
-        return isset($this->map[$key]);
-    }
+    public function hasRepository($key);
 
     /**
      * Returns the repository if it is registered in the map, NULL otherwise
@@ -99,24 +77,5 @@ class RepositoryRegistry implements RepositoryRegistryInterface
      * @param   string      $key        The key
      * @return  Repository|null
      */
-    public function getRepository($key)
-    {
-        if ($this->hasRepository($key)) {
-            return $this->map[$key];
-        } else {
-            return null;
-        }
-
-    }
-
-    /**
-     * Count elements of an object
-     *
-     * @link    http://php.net/manual/en/countable.count.php
-     * @return  integer     The custom count as an integer
-     */
-    public function count()
-    {
-        return count($this->map);
-    }
+    public function getRepository($key);
 }

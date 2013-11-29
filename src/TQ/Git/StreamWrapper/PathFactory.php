@@ -37,6 +37,7 @@ namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 use TQ\Git\Repository\RepositoryRegistry;
+use TQ\Vcs\StreamWrapper\PathFactory as PathFactoryInterface;
 
 /**
  * Creates path information for a given stream URL
@@ -47,7 +48,7 @@ use TQ\Git\Repository\RepositoryRegistry;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class PathFactory
+class PathFactory implements PathFactoryInterface
 {
     /**
      * The repository registry

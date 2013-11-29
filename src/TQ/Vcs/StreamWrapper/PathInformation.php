@@ -33,9 +33,8 @@
 /**
  * @namespace
  */
-namespace TQ\Git\StreamWrapper;
+namespace TQ\Vcs\StreamWrapper;
 use TQ\Vcs\Repository\Repository;
-use TQ\Vcs\StreamWrapper\PathInformation as PathInformationInterface;
 
 /**
  * Represents a given stream wrapper path
@@ -46,142 +45,61 @@ use TQ\Vcs\StreamWrapper\PathInformation as PathInformationInterface;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class PathInformation implements PathInformationInterface
+interface PathInformation
 {
     /**
-     * The repository
-     *
-     * @var Repository
+     * The host name used for global paths
      */
-    protected $repository;
-
-    /**
-     * The URL
-     *
-     * @var string
-     */
-    protected $url;
-
-    /**
-     * The absolute path to the resource
-     *
-     * @var string
-     */
-    protected $fullPath;
-
-    /**
-     * The version ref
-     *
-     * @var string
-     */
-    protected $ref;
-
-    /**
-     * Additional arguments
-     *
-     * @var array
-     */
-    protected $arguments;
-
-    /**
-     * The relative path to the resource based on the repository path
-     *
-     * Lazy instantiated
-     *
-     * @var string
-     */
-    protected $localPath;
-
-    /**
-     * Creates a new path information instance from a given URL
-     *
-     * @param   Repository  $repository     The repository instance
-     * @param   string      $url            The URL
-     * @param   string      $fullPath       The absolute path to the resource
-     * @param   string      $ref            The version ref
-     * @param   array       $arguments      The additional arguments given
-     */
-    public function __construct(Repository $repository, $url, $fullPath, $ref, array $arguments)
-    {
-        $this->repository   = $repository;
-        $this->url          = (string)$url;
-        $this->fullPath     = (string)$fullPath;
-        $this->ref          = (string)$ref;
-        $this->arguments    = $arguments;
-    }
+    const GLOBAL_PATH_HOST  = '__global__';
 
     /**
      * Returns the URL
      *
      * @return  string
      */
-    public function getUrl()
-    {
-        return $this->url;
-    }
+    public function getUrl();
 
     /**
      * Returns the repository instance
      *
      * @return  Repository
      */
-    public function getRepository()
-    {
-        return $this->repository;
-    }
+    public function getRepository();
 
     /**
      * Returns the absolute repository path
      *
      * @return  string
      */
-    public function getRepositoryPath()
-    {
-        return $this->getRepository()->getRepositoryPath();
-    }
+    public function getRepositoryPath();
 
     /**
      * Returns the absolute path to the resource
      *
      * @return  string
      */
-    public function getFullPath()
-    {
-        return $this->fullPath;
-    }
+    public function getFullPath();
 
     /**
      * Returns the relative path to the resource based on the repository path
      *
      * @return  string
      */
-    public function getLocalPath()
-    {
-        if (!$this->localPath) {
-           $this->localPath = $this->repository->resolveLocalPath($this->fullPath);
-        }
-        return $this->localPath;
-    }
+    public function getLocalPath();
 
     /**
      * Returns the version ref
      *
      * @return  string
      */
-    public function getRef()
-    {
-        return $this->ref;
-    }
+    public function getRef();
 
     /**
      * Returns the additional arguments given
      *
      * @return  array
      */
-    public function getArguments()
-    {
-        return $this->arguments;
-    }
+    public function getArguments();
 
     /**
      * Checks if the given argument exists
@@ -189,10 +107,7 @@ class PathInformation implements PathInformationInterface
      * @param   string  $argument   The argument name
      * @return  boolean
      */
-    public function hasArgument($argument)
-    {
-        return array_key_exists($argument, $this->arguments);
-    }
+    public function hasArgument($argument);
 
     /**
      * Returns the given argument from the argument collection
@@ -200,8 +115,5 @@ class PathInformation implements PathInformationInterface
      * @param   string  $argument   The argument name
      * @return  string|null         The argument value or NULL if the argument does not exist
      */
-    public function getArgument($argument)
-    {
-        return ($this->hasArgument($argument)) ? $this->arguments[$argument] : null;
-    }
+    public function getArgument($argument);
 }
