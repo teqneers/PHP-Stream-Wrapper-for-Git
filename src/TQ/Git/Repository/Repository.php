@@ -34,6 +34,7 @@
  * @namespace
  */
 namespace TQ\Git\Repository;
+use TQ\Vcs\Repository\Repository as RepositoryInterface;
 use TQ\Git\Cli\Binary;
 use TQ\Vcs\Cli\CallResult;
 
@@ -47,7 +48,7 @@ use TQ\Vcs\Cli\CallResult;
  * @subpackage Repository
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class Repository
+class Repository implements RepositoryInterface
 {
     const RESET_STAGED  = 1;
     const RESET_WORKING = 2;
@@ -153,7 +154,7 @@ class Repository
      */
     protected static function initRepository(Binary $binary, $path)
     {
-        $result = $binary->init($path);
+        $result = $binary->{'init'}($path);
         self::throwIfError($result, sprintf('Cannot initialize a Git repository in "%s"', $path));
     }
 
@@ -384,7 +385,7 @@ class Repository
             $args   = array_merge($args, $this->resolveLocalPath($file));
         }
 
-        $result = $this->getBinary()->commit($this->getRepositoryPath(), $args);
+        $result = $this->getBinary()->{'commit'}($this->getRepositoryPath(), $args);
         self::throwIfError($result, sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
     }
 
@@ -397,12 +398,12 @@ class Repository
     {
         $what   = (int)$what;
         if (($what & self::RESET_STAGED) == self::RESET_STAGED) {
-            $result = $this->getBinary()->reset($this->getRepositoryPath(), array('--hard'));
+            $result = $this->getBinary()->{'reset'}($this->getRepositoryPath(), array('--hard'));
             self::throwIfError($result, sprintf('Cannot reset "%s"', $this->getRepositoryPath()));
         }
 
         if (($what & self::RESET_WORKING) == self::RESET_WORKING) {
-            $result = $this->getBinary()->clean($this->getRepositoryPath(), array(
+            $result = $this->getBinary()->{'clean'}($this->getRepositoryPath(), array(
                 '--force',
                 '-x',
                 '-d'
@@ -430,7 +431,7 @@ class Repository
             $args[] = '--all';
         }
 
-        $result = $this->getBinary()->add($this->getRepositoryPath(), $args);
+        $result = $this->getBinary()->{'add'}($this->getRepositoryPath(), $args);
         self::throwIfError($result, sprintf('Cannot add "%s" to "%s"',
             ($file !== null) ? implode(', ', $file) : '*', $this->getRepositoryPath()
         ));
@@ -455,7 +456,7 @@ class Repository
         $args[] = '--';
         $args   = array_merge($args, $this->resolveLocalPath($file));
 
-        $result = $this->getBinary()->rm($this->getRepositoryPath(), $args);
+        $result = $this->getBinary()->{'rm'}($this->getRepositoryPath(), $args);
         self::throwIfError($result, sprintf('Cannot remove "%s" from "%s"',
             implode(', ', $file), $this->getRepositoryPath()
         ));
@@ -477,7 +478,7 @@ class Repository
         $args[] = $this->resolveLocalPath($fromPath);
         $args[] = $this->resolveLocalPath($toPath);
 
-        $result = $this->getBinary()->mv($this->getRepositoryPath(), $args);
+        $result = $this->getBinary()->{'mv'}($this->getRepositoryPath(), $args);
         self::throwIfError($result, sprintf('Cannot move "%s" to "%s" in "%s"',
             $fromPath, $toPath, $this->getRepositoryPath()
         ));
@@ -487,7 +488,7 @@ class Repository
      * Writes data to a file and commit the changes immediately
      *
      * @param   string          $path           The file path
-     * @param   scalar|array    $data           The data to write to the file
+     * @param   string|array    $data           The data to write to the file
      * @param   string|null     $commitMsg      The commit message used when committing the changes
      * @param   integer|null    $fileMode       The mode for creating the file
      * @param   integer|null    $dirMode        The mode for creating the intermediate directories
@@ -600,7 +601,7 @@ class Repository
         }
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->log($this->getRepositoryPath(), $arguments);
+        $result = $this->getBinary()->{'log'}($this->getRepositoryPath(), $arguments);
         self::throwIfError($result, sprintf('Cannot retrieve log from "%s"',
             $this->getRepositoryPath()
         ));
@@ -622,7 +623,7 @@ class Repository
     public function showCommit($hash)
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->show($this->getRepositoryPath(), array(
+        $result = $this->getBinary()->{'show'}($this->getRepositoryPath(), array(
             '--format' => 'fuller',
             $hash
         ));
@@ -643,7 +644,7 @@ class Repository
     public function showFile($file, $ref = 'HEAD')
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->show($this->getRepositoryPath(), array(
+        $result = $this->getBinary()->{'show'}($this->getRepositoryPath(), array(
             sprintf('%s:%s', $ref, $file)
         ));
         self::throwIfError($result, sprintf('Cannot show "%s" at "%s" from "%s"',
@@ -750,7 +751,7 @@ class Repository
     public function getStatus()
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->status($this->getRepositoryPath(), array(
+        $result = $this->getBinary()->{'status'}($this->getRepositoryPath(), array(
             '--short'
         ));
         self::throwIfError($result,
@@ -831,7 +832,7 @@ class Repository
         }
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->branch($this->getRepositoryPath(), $arguments);
+        $result = $this->getBinary()->{'branch'}($this->getRepositoryPath(), $arguments);
         self::throwIfError($result,
             sprintf('Cannot retrieve branche from "%s"', $this->getRepositoryPath())
         );
