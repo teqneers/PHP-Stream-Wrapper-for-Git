@@ -1,5 +1,5 @@
 {
-    "name":        "teqneers/PHP-Stream-Wrapper-for-Git",
+    "name":        "teqneers/php-stream-wrapper-for-git",
     "description": "Git Stream Wrapper for PHP",
     "keywords":    ["git", "streamwrapper", "stream-wrapper"],
     "homepage":    "https://github.com/teqneers/PHP-Stream-Wrapper-for-Git",
