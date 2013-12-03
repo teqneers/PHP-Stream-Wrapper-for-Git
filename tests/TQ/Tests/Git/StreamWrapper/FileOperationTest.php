@@ -93,7 +93,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testUnlinkFileNonHead()
     {
@@ -102,7 +102,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testUnlinkNonExistantFile()
     {
@@ -111,7 +111,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testUnlinkNonFile()
     {
@@ -155,7 +155,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testRenameFileNonHead()
     {
@@ -165,7 +165,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testRenameNonExistantFile()
     {
@@ -175,7 +175,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testRenameNonFile()
     {
@@ -224,7 +224,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testRmdirDirectoryNonHead()
     {
@@ -236,7 +236,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testRmdirNonExistantDirectory()
     {
@@ -245,7 +245,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testRmdirNonDirectory()
     {
@@ -289,7 +289,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testMkdirDirectoryNonHead()
     {
@@ -298,7 +298,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testMkdirExistantDirectory()
     {
@@ -324,7 +324,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedException \PHPUnit_Framework_Error_Warning
      */
     public function testMkdirDirectoryRecursivelyFailsIfNotRequested()
     {

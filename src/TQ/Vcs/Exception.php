@@ -42,6 +42,7 @@ namespace TQ\Vcs;
  * @package    TQ_Git
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-interface Exception {
+interface Exception
+{
 
 }

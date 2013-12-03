@@ -35,11 +35,11 @@
  */
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
-use TQ\Git\Repository\RepositoryRegistry;
 use TQ\Vcs\Buffer\FileBuffer;
 use TQ\Vcs\Buffer\ArrayBuffer;
 use TQ\Git\StreamWrapper\FileBuffer\Factory;
 use TQ\Vcs\StreamWrapper\AbstractStreamWrapper;
+use TQ\Vcs\StreamWrapper\RepositoryRegistry;
 
 /**
  * The stream wrapper that hooks into PHP's stream infrastructure

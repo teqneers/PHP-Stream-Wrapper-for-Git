@@ -34,6 +34,7 @@
  * @namespace
  */
 namespace TQ\Git\Repository;
+use TQ\Vcs\FileSystem;
 use TQ\Vcs\Repository\Repository as RepositoryInterface;
 use TQ\Git\Cli\Binary;
 use TQ\Vcs\Cli\CallResult;
@@ -154,19 +155,9 @@ class Repository implements RepositoryInterface
      */
     protected static function initRepository(Binary $binary, $path)
     {
+        /** @var $result CallResult */
         $result = $binary->{'init'}($path);
-        self::throwIfError($result, sprintf('Cannot initialize a Git repository in "%s"', $path));
-    }
-
-    /**
-     * Normalizes the directory separator to /
-     *
-     * @param   string  $path       The path
-     * @return  string              The normalized path
-     */
-    public static function normalizeDirectorySeparator($path)
-    {
-        return str_replace(array('\\', '/'), '/', $path);
+        $result->assertSuccess(sprintf('Cannot initialize a Git repository in "%s"', $path));
     }
 
     /**
@@ -177,30 +168,10 @@ class Repository implements RepositoryInterface
      */
     public static function findRepositoryRoot($path)
     {
-        $found   = null;
-        $path    = self::normalizeDirectorySeparator($path);
-
-        $drive  = null;
-        if (preg_match('~^(\w:)(.+)~', $path, $parts)) {
-            $drive  = $parts[1];
-            $path   = $parts[2];
-        }
-
-        $pathParts  = explode('/', $path);
-        while (count($pathParts) > 0 && $found === null) {
-            $path   = implode('/', $pathParts);
-            $gitDir = $path.'/'.'.git';
-            if (file_exists($gitDir) && is_dir($gitDir)) {
-                $found  = $path;
-            }
-            array_pop($pathParts);
-        }
-
-        if ($drive && $found) {
-            $found  = $drive.$found;
-        }
-
-        return $found;
+        return FileSystem::bubble($path, function($p) {
+            $gitDir = $p.'/'.'.git';
+            return file_exists($gitDir) && is_dir($gitDir);
+        });
     }
 
     /**
@@ -316,7 +287,7 @@ class Repository implements RepositoryInterface
             }
             return $paths;
         } else {
-            $path   = self::normalizeDirectorySeparator($path);
+            $path   = FileSystem::normalizeDirectorySeparator($path);
             if (strpos($path, $this->getRepositoryPath()) === 0) {
                 $path  = substr($path, strlen($this->getRepositoryPath()));
             }
@@ -342,7 +313,7 @@ class Repository implements RepositoryInterface
             if (strpos($path, $this->getRepositoryPath()) === 0) {
                 return $path;
             }
-            $path  = self::normalizeDirectorySeparator($path);
+            $path  = FileSystem::normalizeDirectorySeparator($path);
             $path  = ltrim($path, '/');
             return $this->getRepositoryPath().'/'.$path;
         }
@@ -360,7 +331,7 @@ class Repository implements RepositoryInterface
              '--verify',
             'HEAD'
         ));
-        self::throwIfError($result, sprintf('Cannot rev-parse "%s"', $this->getRepositoryPath()));
+        $result->assertSuccess(sprintf('Cannot rev-parse "%s"', $this->getRepositoryPath()));
         return $result->getStdOut();
     }
 
@@ -385,8 +356,9 @@ class Repository implements RepositoryInterface
             $args   = array_merge($args, $this->resolveLocalPath($file));
         }
 
+        /** @var $result CallResult */
         $result = $this->getBinary()->{'commit'}($this->getRepositoryPath(), $args);
-        self::throwIfError($result, sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
+        $result->assertSuccess(sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
     }
 
     /**
@@ -398,17 +370,19 @@ class Repository implements RepositoryInterface
     {
         $what   = (int)$what;
         if (($what & self::RESET_STAGED) == self::RESET_STAGED) {
+            /** @var $result CallResult */
             $result = $this->getBinary()->{'reset'}($this->getRepositoryPath(), array('--hard'));
-            self::throwIfError($result, sprintf('Cannot reset "%s"', $this->getRepositoryPath()));
+            $result->assertSuccess(sprintf('Cannot reset "%s"', $this->getRepositoryPath()));
         }
 
         if (($what & self::RESET_WORKING) == self::RESET_WORKING) {
+            /** @var $result CallResult */
             $result = $this->getBinary()->{'clean'}($this->getRepositoryPath(), array(
                 '--force',
                 '-x',
                 '-d'
             ));
-            self::throwIfError($result, sprintf('Cannot clean "%s"', $this->getRepositoryPath()));
+            $result->assertSuccess(sprintf('Cannot clean "%s"', $this->getRepositoryPath()));
         }
     }
 
@@ -431,8 +405,9 @@ class Repository implements RepositoryInterface
             $args[] = '--all';
         }
 
+        /** @var $result CallResult */
         $result = $this->getBinary()->{'add'}($this->getRepositoryPath(), $args);
-        self::throwIfError($result, sprintf('Cannot add "%s" to "%s"',
+        $result->assertSuccess(sprintf('Cannot add "%s" to "%s"',
             ($file !== null) ? implode(', ', $file) : '*', $this->getRepositoryPath()
         ));
     }
@@ -456,8 +431,9 @@ class Repository implements RepositoryInterface
         $args[] = '--';
         $args   = array_merge($args, $this->resolveLocalPath($file));
 
+        /** @var $result CallResult */
         $result = $this->getBinary()->{'rm'}($this->getRepositoryPath(), $args);
-        self::throwIfError($result, sprintf('Cannot remove "%s" from "%s"',
+        $result->assertSuccess(sprintf('Cannot remove "%s" from "%s"',
             implode(', ', $file), $this->getRepositoryPath()
         ));
     }
@@ -478,8 +454,9 @@ class Repository implements RepositoryInterface
         $args[] = $this->resolveLocalPath($fromPath);
         $args[] = $this->resolveLocalPath($toPath);
 
+        /** @var $result CallResult */
         $result = $this->getBinary()->{'mv'}($this->getRepositoryPath(), $args);
-        self::throwIfError($result, sprintf('Cannot move "%s" to "%s" in "%s"',
+        $result->assertSuccess(sprintf('Cannot move "%s" to "%s" in "%s"',
             $fromPath, $toPath, $this->getRepositoryPath()
         ));
     }
@@ -602,7 +579,7 @@ class Repository implements RepositoryInterface
 
         /** @var $result CallResult */
         $result = $this->getBinary()->{'log'}($this->getRepositoryPath(), $arguments);
-        self::throwIfError($result, sprintf('Cannot retrieve log from "%s"',
+        $result->assertSuccess(sprintf('Cannot retrieve log from "%s"',
             $this->getRepositoryPath()
         ));
 
@@ -627,7 +604,7 @@ class Repository implements RepositoryInterface
             '--format' => 'fuller',
             $hash
         ));
-        self::throwIfError($result, sprintf('Cannot retrieve commit "%s" from "%s"',
+        $result->assertSuccess(sprintf('Cannot retrieve commit "%s" from "%s"',
             $hash, $this->getRepositoryPath()
         ));
 
@@ -647,7 +624,7 @@ class Repository implements RepositoryInterface
         $result = $this->getBinary()->{'show'}($this->getRepositoryPath(), array(
             sprintf('%s:%s', $ref, $file)
         ));
-        self::throwIfError($result, sprintf('Cannot show "%s" at "%s" from "%s"',
+        $result->assertSuccess(sprintf('Cannot show "%s" at "%s" from "%s"',
             $file, $ref, $this->getRepositoryPath()
         ));
 
@@ -681,7 +658,7 @@ class Repository implements RepositoryInterface
         $result = $this->getBinary()->{'cat-file'}($this->getRepositoryPath(), array(
             '--batch-check'
         ), sprintf('%s:%s', $ref, $path));
-        self::throwIfError($result, sprintf('Cannot cat-file "%s" at "%s" from "%s"',
+        $result->assertSuccess(sprintf('Cannot cat-file "%s" at "%s" from "%s"',
             $path, $ref, $this->getRepositoryPath()
         ));
         $output = trim($result->getStdOut());
@@ -714,7 +691,7 @@ class Repository implements RepositoryInterface
      */
     public function listDirectory($directory = '.', $ref = 'HEAD')
     {
-        $directory  = self::normalizeDirectorySeparator($directory);
+        $directory  = FileSystem::normalizeDirectorySeparator($directory);
         $directory  = rtrim($directory, '/').'/';
         $path       = $this->getRepositoryPath().'/'.$this->resolveLocalPath($directory);
 
@@ -724,7 +701,7 @@ class Repository implements RepositoryInterface
             '-z',
             $ref
         ));
-        self::throwIfError($result, sprintf('Cannot list directory "%s" at "%s" from "%s"',
+        $result->assertSuccess(sprintf('Cannot list directory "%s" at "%s" from "%s"',
             $directory, $ref, $this->getRepositoryPath()
         ));
 
@@ -754,7 +731,7 @@ class Repository implements RepositoryInterface
         $result = $this->getBinary()->{'status'}($this->getRepositoryPath(), array(
             '--short'
         ));
-        self::throwIfError($result,
+        $result->assertSuccess(
             sprintf('Cannot retrieve status from "%s"', $this->getRepositoryPath())
         );
 
@@ -802,7 +779,7 @@ class Repository implements RepositoryInterface
             '--name-only',
             'HEAD'
         ));
-        self::throwIfError($result,
+        $result->assertSuccess(
             sprintf('Cannot retrieve current branch from "%s"', $this->getRepositoryPath())
         );
 
@@ -833,8 +810,8 @@ class Repository implements RepositoryInterface
 
         /** @var $result CallResult */
         $result = $this->getBinary()->{'branch'}($this->getRepositoryPath(), $arguments);
-        self::throwIfError($result,
-            sprintf('Cannot retrieve branche from "%s"', $this->getRepositoryPath())
+        $result->assertSuccess(
+            sprintf('Cannot retrieve branch from "%s"', $this->getRepositoryPath())
         );
 
         $output = rtrim($result->getStdOut());
@@ -891,20 +868,6 @@ class Repository implements RepositoryInterface
     }
 
     /**
-     * Internal method that checks if the CLI call has succeeded and throws an Exception otherwise
-     *
-     * @param   CallResult  $result         The CLI result
-     * @param   string      $message        The exception message
-     * @throws  CallException               If there has been an error when executing
-     */
-    protected static function throwIfError(CallResult $result, $message)
-    {
-        if ($result->getReturnCode() > 0) {
-            throw new CallException($message, $result);
-        }
-    }
-
-    /**
      * Returns the remote info
      *
      * @return  array
@@ -915,7 +878,7 @@ class Repository implements RepositoryInterface
         $result = $this->getBinary()->{'remote'}($this->getRepositoryPath(), array(
              '-v'
         ));
-        self::throwIfError($result, sprintf('Cannot remote "%s"', $this->getRepositoryPath()));
+        $result->assertSuccess(sprintf('Cannot remote "%s"', $this->getRepositoryPath()));
 
         $tmp = $result->getStdOut();
 

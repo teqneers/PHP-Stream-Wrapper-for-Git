@@ -26,56 +26,66 @@
  *
  * @category   TQ
  * @package    TQ_Git
- * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
 /**
  * @namespace
  */
-namespace TQ\Vcs\Repository;
+namespace TQ\Vcs;
 
 /**
- * Manages multiples repositories by keys
+ * A collection of methods used for interacting with the file system
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Git
- * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-interface RepositoryRegistry extends \Countable
+class FileSystem
 {
     /**
-     * Adds a single repository
+     * Normalizes the directory separator to /
      *
-     * @param   string      $key        The key
-     * @param   Repository  $repository The repository
-     * @return  RepositoryRegistry
+     * @param   string  $path       The path
+     * @return  string              The normalized path
      */
-    public function addRepository($key, Repository $repository);
+    public static function normalizeDirectorySeparator($path)
+    {
+        return str_replace(array('\\', '/'), '/', $path);
+    }
 
     /**
-     * Adds multiple repositories
+     * Bubbles up a path until $comparator returns true
      *
-     * @param   array      $repositories    The repositories (key => repository)
-     * @return  RepositoryRegistry
+     * @param   string      $path              The path
+     * @param   \Closure    $comparator        The callback used inside when bubbling to determine a finding
+     * @return  string|null                    The path that is found or NULL otherwise
      */
-    public function addRepositories(array $repositories);
+    public static function bubble($path, \Closure $comparator)
+    {
+        $found   = null;
+        $path    = FileSystem::normalizeDirectorySeparator($path);
 
-    /**
-     * Returns true if the repository is registered in the map
-     *
-     * @param   string      $key        The key
-     * @return  boolean
-     */
-    public function hasRepository($key);
+        $drive  = null;
+        if (preg_match('~^(\w:)(.+)~', $path, $parts)) {
+            $drive  = $parts[1];
+            $path   = $parts[2];
+        }
 
-    /**
-     * Returns the repository if it is registered in the map, NULL otherwise
-     *
-     * @param   string      $key        The key
-     * @return  Repository|null
-     */
-    public function getRepository($key);
+        $pathParts  = explode('/', $path);
+        while (count($pathParts) > 0 && $found === null) {
+            $path   = implode('/', $pathParts);
+            if ($comparator($path)) {
+                $found  = $path;
+            }
+            array_pop($pathParts);
+        }
+
+        if ($drive && $found) {
+            $found  = $drive.$found;
+        }
+
+        return $found;
+    }
 }

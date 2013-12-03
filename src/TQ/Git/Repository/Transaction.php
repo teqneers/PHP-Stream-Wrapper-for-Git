@@ -149,7 +149,7 @@ class Transaction
     }
 
     /**
-     * Returns the author that will be used when comitting the transaction
+     * Returns the author that will be used when committing the transaction
      *
      * @return  string|null
      */
@@ -159,7 +159,7 @@ class Transaction
     }
 
     /**
-     * Sets  the author that will be used when comitting the transaction
+     * Sets  the author that will be used when committing the transaction
      *
      * @param   string|null     $author      The author
      * @return  Transaction

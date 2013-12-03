@@ -108,7 +108,7 @@ class FileReadTest extends \PHPUnit_Framework_TestCase
     {
         $filePath   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
         $file       = fopen($filePath, 'r');
-        $expected   = 'File 0';
+        /* $expected   = 'File 0'; */
 
         fseek($file, -1, SEEK_END);
         $this->assertEquals('0', fgetc($file));

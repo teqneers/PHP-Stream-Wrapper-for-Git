@@ -95,7 +95,7 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
 
         $logUrl  = sprintf('git://%s?log', TESTS_REPO_PATH_1);
         $log     = file_get_contents($logUrl);
-        foreach ($commits as $c => $commitHash) {
+        foreach ($commits as $commitHash) {
             $this->assertContains('commit '.$commitHash, $log);
         }
 

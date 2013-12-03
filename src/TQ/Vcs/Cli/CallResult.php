@@ -220,5 +220,30 @@ class CallResult
             $this->stdErr   = null;
         }
     }
+
+    /**
+     * Checks if the CLI call has succeeded and throws an Exception otherwise
+     *
+     * @param   string      $message        The exception message
+     * @throws  CallException               If there has been an error when executing
+     */
+    public function assertSuccess($message)
+    {
+        self::throwIfError($this, $message);
+    }
+
+    /**
+     * Checks if the CLI call has succeeded and throws an Exception otherwise
+     *
+     * @param   CallResult  $result         The CLI result
+     * @param   string      $message        The exception message
+     * @throws  CallException               If there has been an error when executing
+     */
+    public static function throwIfError(CallResult $result, $message)
+    {
+        if ($result->getReturnCode() > 0) {
+            throw new CallException($message, $result);
+        }
+    }
 }
 

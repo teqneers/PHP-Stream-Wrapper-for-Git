@@ -269,7 +269,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
 
 
         try {
-            $result = $c->transactional(function(Transaction $t) {
+            $c->transactional(function(Transaction $t) {
                 for ($i = 0; $i < 5; $i++) {
                     $file   = $t->getRepositoryPath().'/'.sprintf('test_%s.txt', $i);
                     file_put_contents($file, 'Test');

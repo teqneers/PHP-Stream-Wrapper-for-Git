@@ -33,9 +33,8 @@
 /**
  * @namespace
  */
-namespace TQ\Git\Repository;
-use TQ\Vcs\Repository\Repository as RepositoryInterface;
-use TQ\Vcs\Repository\RepositoryRegistry as RepositoryRegistryInterface;
+namespace TQ\Vcs\StreamWrapper;
+use TQ\Vcs\Repository\Repository;
 
 /**
  * Manages multiples repositories by keys
@@ -46,7 +45,7 @@ use TQ\Vcs\Repository\RepositoryRegistry as RepositoryRegistryInterface;
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class RepositoryRegistry implements RepositoryRegistryInterface
+class RepositoryRegistry
 {
     /**
      * The repository map
@@ -59,10 +58,10 @@ class RepositoryRegistry implements RepositoryRegistryInterface
      * Adds a single repository
      *
      * @param   string               $key        The key
-     * @param   RepositoryInterface  $repository The repository
+     * @param   Repository           $repository The repository
      * @return  RepositoryRegistry
      */
-    public function addRepository($key, RepositoryInterface $repository)
+    public function addRepository($key, Repository $repository)
     {
         $this->map[$key]    = $repository;
         return $this;
@@ -94,12 +93,28 @@ class RepositoryRegistry implements RepositoryRegistryInterface
     }
 
     /**
+     * Returns the repository if it is registered in the map, throws exception otherwise
+     *
+     * @param   string      $key        The key
+     * @return  Repository
+     * @throws  \OutOfBoundsException   If the key does not exist
+     */
+    public function getRepository($key)
+    {
+        $repository = $this->tryGetRepository($key);
+        if ($repository === null) {
+            throw new \OutOfBoundsException($key.' does not exist in the registry');
+        }
+        return $repository;
+    }
+
+    /**
      * Returns the repository if it is registered in the map, NULL otherwise
      *
      * @param   string      $key        The key
      * @return  Repository|null
      */
-    public function getRepository($key)
+    public function tryGetRepository($key)
     {
         if ($this->hasRepository($key)) {
             return $this->map[$key];

@@ -147,6 +147,16 @@ $context = stream_context_create(array(
 ));
 file_put_contents('git:///path/to/your/repository/test.txt', 'Test', FILE_APPEND, $context);
 
+// it is now possible to register repository-specific paths on the stream wrapper
+StreamWrapper::getRepositoryRegistry()->addRepositories(
+    array(
+        'repo1' => Repository::open('/path/to/repository/1', '/usr/bin/git', false),
+        'repo2' => Repository::open('/path/to/repository/2', '/usr/bin/git', false),
+    )
+);
+$content1 = file_get_contents('git://repo1/file_0.txt');
+$content2 = file_get_contents('git://repo2/file_0.txt');
+
 // unregister the wrapper if needed
 StreamWrapper::unregister();
 ```

@@ -34,7 +34,6 @@
  * @namespace
  */
 namespace TQ\Vcs\StreamWrapper;
-use TQ\Git\Repository\RepositoryRegistry;
 
 /**
  * Creates path information for a given stream URL

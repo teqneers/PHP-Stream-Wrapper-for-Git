@@ -36,7 +36,7 @@
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
-use TQ\Git\Repository\RepositoryRegistry;
+use TQ\Vcs\StreamWrapper\RepositoryRegistry;
 use TQ\Vcs\StreamWrapper\PathFactory as PathFactoryInterface;
 
 /**
@@ -96,6 +96,21 @@ class PathFactory implements PathFactoryInterface
     }
 
     /**
+     * Returns the repository for the given path information
+     *
+     * @param   array       $pathInfo       An array containing information about the path
+     * @return  Repository
+     */
+    protected function getRepository(array $pathInfo)
+    {
+        if ($pathInfo['host'] === PathInformation::GLOBAL_PATH_HOST) {
+            return Repository::open($pathInfo['path'], $this->binary, false);
+        } else {
+            return $this->map->getRepository($pathInfo['host']);
+        }
+    }
+
+    /**
      * Returns the path information for a given stream URL
      *
      * @param   string  $streamUrl      The URL given to the stream function
@@ -104,8 +119,7 @@ class PathFactory implements PathFactoryInterface
     public function createPathInformation($streamUrl)
     {
         $pathInfo     = $this->parsePath($streamUrl);
-        $fullPath     = $pathInfo['path'];
-        $repository   = Repository::open($fullPath, $this->binary, false);
+        $repository   = $this->getRepository($pathInfo);
         $ref          = isset($pathInfo['fragment']) ? $pathInfo['fragment'] : 'HEAD';
 
         $arguments  = array();
@@ -113,9 +127,10 @@ class PathFactory implements PathFactoryInterface
             parse_str($pathInfo['query'], $arguments);
         }
 
-        $url    =  $this->protocol.'://'.$fullPath
-                  .'#'.$ref
-                  .'?'.http_build_query($arguments);
+        $fullPath   = $repository->resolveFullPath($pathInfo['path']);
+        $url        =  $this->protocol.'://'.$fullPath
+                      .'#'.$ref
+                      .'?'.http_build_query($arguments);
 
         return new PathInformation($repository, $url, $fullPath, $ref, $arguments);
     }
@@ -142,6 +157,8 @@ class PathFactory implements PathFactoryInterface
         $info   = parse_url($path);
         if (isset($info['path']) && preg_match('~^/\w:.+~', $info['path'])) {
             $info['path']   = ltrim($info['path'], '/');
+        } else if (!isset( $info['path'])) {
+             $info['path']  = '/';
         }
         return $info;
     }

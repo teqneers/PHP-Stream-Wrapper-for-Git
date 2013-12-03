@@ -33,10 +33,8 @@
 /**
  * @namespace
  */
-namespace TQ\Git\Repository;
-use TQ\Vcs\Cli\CallResult;
-use TQ\Vcs\Exception as VcsException;
-use TQ\Git\Exception as GitException;
+namespace TQ\Vcs\Cli;
+use TQ\Vcs\Exception;
 
 /**
  * Exception thrown when an error occurred executing a CLI call
@@ -47,7 +45,7 @@ use TQ\Git\Exception as GitException;
  * @subpackage Cli
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class CallException extends \RuntimeException implements VcsException, GitException
+class CallException extends \RuntimeException implements Exception
 {
     /**
      * The call result that caused the exception
