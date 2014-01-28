@@ -39,7 +39,7 @@ class CallResultTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($result->hasStdErr());
         $this->assertEmpty($result->getStdErr());
         $this->assertEquals(0, $result->getReturnCode());
-        $this->assertStringStartsWith('svn, Version', $result->getStdOut());
+        $this->assertStringStartsWith('svn, version', strtolower($result->getStdOut()));
         $this->assertSame($call, $result->getCliCall());
     }
 
