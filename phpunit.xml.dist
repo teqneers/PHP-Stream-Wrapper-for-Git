@@ -14,6 +14,7 @@
     <php>
         <const name="GIT_BINARY" value="/usr/bin/git"/>
         <const name="SVN_BINARY" value="/usr/bin/svn"/>
+        <const name="SVN_ADMIN_BINARY" value="/usr/bin/svnadmin"/>
         <const name="TEST_REPO_PATH" value="false"/>
     </php>
     <testsuites>

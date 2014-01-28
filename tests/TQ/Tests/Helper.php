@@ -127,4 +127,51 @@ class Helper
             )
         );
     }
+
+    /**
+     * @param   string  $path
+     * @return  string
+     */
+    public static function initEmptySvnRepository($path) {
+        $workingDir = $path;
+        $repoDir    = dirname($path).'/'.basename($path).'_repo';
+
+        self::createDirectory($repoDir);
+
+        $result     = array();
+        $result[]   = exec(
+             sprintf(
+                'cd %1$s && %2$s create .',
+                escapeshellarg($repoDir),
+                SVN_ADMIN_BINARY
+            )
+         );
+        $result[]   = exec(
+             sprintf(
+                'cd %1$s && %2$s checkout %3$s .',
+                escapeshellarg($workingDir),
+                SVN_BINARY,
+                'file://'.$repoDir
+            )
+         );
+
+         return implode(', ', $result);
+    }
+
+    /**
+     * @param   string  $path
+     * @param   string  $command
+     * @return  string
+     */
+    public static function executeSvn($path, $command)
+    {
+        return exec(
+            sprintf(
+                'cd %s && %s %s',
+                escapeshellarg($path),
+                SVN_BINARY,
+                $command
+            )
+        );
+    }
 }
