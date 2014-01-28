@@ -33,7 +33,11 @@
 /**
  * @namespace
  */
-namespace TQ\Vcs\Repository;
+namespace TQ\Svn\Repository;
+use TQ\Vcs\FileSystem;
+use TQ\Vcs\Repository\AbstractRepository;
+use TQ\Svn\Cli\Binary;
+use TQ\Vcs\Cli\CallResult;
 
 /**
  * Provides access to a Git repository
@@ -45,37 +49,90 @@ namespace TQ\Vcs\Repository;
  * @subpackage Repository
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-interface Repository
+class Repository extends AbstractRepository
 {
     /**
-     * Returns the full file system path to the repository
+     * The SVN binary
      *
-     * @return  string
+     * @var Binary
      */
-    public function getRepositoryPath();
+    protected $binary;
 
     /**
-     * Resolves an absolute path into a path relative to the repository path
+     * Opens a SVN repository on the file system
      *
-     * @param   string|array  $path         A file system path (or an array of paths)
-     * @return  string
+     * @param   string               $repositoryPath        The full path to the repository
+     * @param   Binary|string|null   $binary                The SVN binary
+     * @return  Repository
+     * @throws  \RuntimeException                       If the path cannot be created
+     * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid SVN repository
      */
-    public function resolveLocalPath($path);
+    public static function open($repositoryPath, $binary = null)
+    {
+        $binary = Binary::ensure($binary);
+
+        if (!is_string($repositoryPath)) {
+            throw new \InvalidArgumentException(sprintf(
+                '"%s" is not a valid path', $repositoryPath
+            ));
+        }
+
+        $repositoryRoot = self::findRepositoryRoot($repositoryPath);
+
+        if ($repositoryRoot === null) {
+            throw new \InvalidArgumentException(sprintf(
+                '"%s" is not a valid SVN repository', $repositoryPath
+            ));
+        }
+
+        return new static($repositoryRoot, $binary);
+    }
 
     /**
-     * Resolves a path relative to the repository into an absolute path
+     * Tries to find the root directory for a given repository path
      *
-     * @param   string|array  $path     A local path (or an array of paths)
-     * @return  string
+     * @param   string      $path       The file system path
+     * @return  string|null             NULL if the root cannot be found, the root path otherwise
      */
-    public function resolveFullPath($path);
+    public static function findRepositoryRoot($path)
+    {
+        return FileSystem::bubble($path, function($p) {
+            $gitDir = $p.'/'.'.svn';
+            return file_exists($gitDir) && is_dir($gitDir);
+        });
+    }
+
+    /**
+     * Creates a new repository instance - use {@see open()} instead
+     *
+     * @param   string     $repositoryPath
+     * @param   Binary     $binary
+     */
+    protected function __construct($repositoryPath, Binary $binary)
+    {
+        $this->binary   = $binary;
+        parent::__construct($repositoryPath);
+    }
+
+    /**
+     * Returns the SVN binary
+     *
+     * @return  Binary
+     */
+    public function getBinary()
+    {
+        return $this->binary;
+    }
 
     /**
      * Returns the current commit hash
      *
      * @return  string
      */
-    public function getCurrentCommit();
+    public function getCurrentCommit()
+    {
+
+    }
 
     /**
      * Commits the currently staged changes into the repository
@@ -84,12 +141,17 @@ interface Repository
      * @param   array|null   $file              Restrict commit to the given files or NULL to commit all staged changes
      * @param   string|null  $author            The author
      */
-    public function commit($commitMsg, array $file = null, $author = null);
+    public function commit($commitMsg, array $file = null, $author = null)
+    {
+
+    }
 
     /**
      * Resets the working directory and/or the staging area and discards all changes
      */
-    public function reset();
+    public function reset()
+    {
+    }
 
     /**
      * Adds one or more files to the staging area
@@ -97,7 +159,34 @@ interface Repository
      * @param   array   $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
      * @param   boolean $force
      */
-    public function add(array $file = null, $force = false);
+    public function add(array $file = null, $force = false)
+    {
+
+    }
+
+    /**
+     * Removes one or more files from the repository but does not commit the changes
+     *
+     * @param   array   $file           The file(s) to be removed
+     * @param   boolean $recursive      True to recursively remove subdirectories
+     * @param   boolean $force          True to continue even though Git reports a possible conflict
+     */
+    public function remove(array $file, $recursive = false, $force = false)
+    {
+
+    }
+
+    /**
+     * Renames a file but does not commit the changes
+     *
+     * @param   string  $fromPath   The source path
+     * @param   string  $toPath     The destination path
+     * @param   boolean $force      True to continue even though Git reports a possible conflict
+     */
+    public function move($fromPath, $toPath, $force = false)
+    {
+
+    }
 
     /**
      * Writes data to a file and commit the changes immediately
@@ -114,7 +203,9 @@ interface Repository
      */
     public function writeFile($path, $data, $commitMsg = null, $fileMode = null,
         $dirMode = null, $recursive = true, $author = null
-    );
+    ) {
+
+    }
 
     /**
      * Removes a file and commit the changes immediately
@@ -126,7 +217,10 @@ interface Repository
      * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */
-    public function removeFile($path, $commitMsg = null, $recursive = false, $force = false, $author = null);
+    public function removeFile($path, $commitMsg = null, $recursive = false, $force = false, $author = null)
+    {
+
+    }
 
     /**
      * Renames a file and commit the changes immediately
@@ -138,7 +232,10 @@ interface Repository
      * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */
-    public function renameFile($fromPath, $toPath, $commitMsg = null, $force = false, $author = null);
+    public function renameFile($fromPath, $toPath, $commitMsg = null, $force = false, $author = null)
+    {
+
+    }
 
     /**
      * Returns the current repository log
@@ -147,7 +244,10 @@ interface Repository
      * @param   integer|null    $skip       Number of log entries that are skipped from the beginning
      * @return  string
      */
-    public function getLog($limit = null, $skip = null);
+    public function getLog($limit = null, $skip = null)
+    {
+
+    }
 
     /**
      * Returns a string containing information about the given commit
@@ -155,7 +255,10 @@ interface Repository
      * @param  string  $hash       The commit ref
      * @return  string
      */
-    public function showCommit($hash);
+    public function showCommit($hash)
+    {
+
+    }
 
     /**
      * Returns the content of a file at a given version
@@ -164,7 +267,10 @@ interface Repository
      * @param   string  $ref        The version ref
      * @return  string
      */
-    public function showFile($file, $ref = 'HEAD');
+    public function showFile($file, $ref = 'HEAD')
+    {
+
+    }
 
     /**
      * Returns information about an object at a given version
@@ -180,7 +286,10 @@ interface Repository
      * @param   string  $ref        The version ref
      * @return  array               The object info
      */
-    public function getObjectInfo($path, $ref = 'HEAD');
+    public function getObjectInfo($path, $ref = 'HEAD')
+    {
+
+    }
 
     /**
      * List the directory at a given version
@@ -189,13 +298,38 @@ interface Repository
      * @param   string  $ref            The version ref
      * @return  array
      */
-    public function listDirectory($directory = '.', $ref = 'HEAD');
+    public function listDirectory($directory = '.', $ref = 'HEAD')
+    {
+
+    }
+
+    /**
+     * Returns the current status of the working directory and the staging area
+     *
+     * The returned array structure is
+     *      array(
+     *          'file'      => '...',
+     *          'x'         => '.',
+     *          'y'         => '.',
+     *          'renamed'   => null/'...'
+     *      )
+     *
+     * @return  array
+     */
+    public function getStatus()
+    {
+
+    }
 
     /**
      * Returns true if there are uncommitted changes in the working directory and/or the staging area
      *
      * @return  boolean
      */
-    public function isDirty();
+    public function isDirty()
+    {
+        $status = $this->getStatus();
+        return !empty($status);
+    }
 }
 

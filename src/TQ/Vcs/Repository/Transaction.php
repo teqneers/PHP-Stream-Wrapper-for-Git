@@ -33,10 +33,10 @@
 /**
  * @namespace
  */
-namespace TQ\Git\Repository;
+namespace TQ\Vcs\Repository;
 
 /**
- * Encapsulates arguments passed to and from a transactional piece of coce
+ * Encapsulates arguments passed to and from a transactional piece of code
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -47,7 +47,7 @@ namespace TQ\Git\Repository;
 class Transaction
 {
     /**
-     * The Git repository
+     * The Vcs repository
      *
      * @var Repository
      */
@@ -84,7 +84,7 @@ class Transaction
     /**
      * Creates a new transactional parameter
      *
-     * @param   Repository  $repository     The Git repository
+     * @param   Repository  $repository     The Vcs repository
      */
     public function __construct(Repository $repository)
     {
@@ -92,7 +92,7 @@ class Transaction
     }
 
     /**
-     * Returns the Git repository
+     * Returns the Vcs repository
      *
      * @return  Repository
      */
@@ -102,7 +102,7 @@ class Transaction
     }
 
     /**
-     * Returns the full file system path to the Git repository
+     * Returns the full file system path to the Vcs repository
      *
      * @return  string
      */
@@ -123,7 +123,7 @@ class Transaction
     }
 
     /**
-     * Returns the commit message that will be used when comitting the transaction
+     * Returns the commit message that will be used when committing the transaction
      *
      * @return  string|null
      */
@@ -133,7 +133,7 @@ class Transaction
     }
 
     /**
-     * Sets  the commit message that will be used when comitting the transaction
+     * Sets  the commit message that will be used when committing the transaction
      *
      * @param   string|null $commitMsg      The commit message
      * @return  Transaction

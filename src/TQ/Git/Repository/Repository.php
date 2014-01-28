@@ -35,7 +35,7 @@
  */
 namespace TQ\Git\Repository;
 use TQ\Vcs\FileSystem;
-use TQ\Vcs\Repository\Repository as RepositoryInterface;
+use TQ\Vcs\Repository\AbstractRepository;
 use TQ\Git\Cli\Binary;
 use TQ\Vcs\Cli\CallResult;
 
@@ -49,7 +49,7 @@ use TQ\Vcs\Cli\CallResult;
  * @subpackage Repository
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
-class Repository implements RepositoryInterface
+class Repository extends AbstractRepository
 {
     const RESET_STAGED  = 1;
     const RESET_WORKING = 2;
@@ -65,27 +65,6 @@ class Repository implements RepositoryInterface
      * @var Binary
      */
     protected $binary;
-
-    /**
-     * The repository path
-     *
-     * @var string
-     */
-    protected $repositoryPath;
-
-    /**
-     * The mode used to create files when requested
-     *
-     * @var integer
-     */
-    protected $fileCreationMode  = 0644;
-
-    /**
-     * The mode used to create directories when requested
-     *
-     * @var integer
-     */
-    protected $directoryCreationMode = 0755;
 
     /**
      * The author used when committing changes
@@ -182,8 +161,8 @@ class Repository implements RepositoryInterface
      */
     protected function __construct($repositoryPath, Binary $binary)
     {
-        $this->binary           = $binary;
-        $this->repositoryPath   = rtrim($repositoryPath, '/');
+        $this->binary   = $binary;
+        parent::__construct($repositoryPath);
     }
 
     /**
@@ -194,60 +173,6 @@ class Repository implements RepositoryInterface
     public function getBinary()
     {
         return $this->binary;
-    }
-
-    /**
-     * Returns the full file system path to the repository
-     *
-     * @return  string
-     */
-    public function getRepositoryPath()
-    {
-        return $this->repositoryPath;
-    }
-
-    /**
-     * Returns the mode used to create files when requested
-     *
-     * @return  integer
-     */
-    public function getFileCreationMode()
-    {
-        return $this->fileCreationMode;
-    }
-
-    /**
-     * Sets the mode used to create files when requested
-     *
-     * @param   integer     $fileCreationMode   The mode, e.g. 644
-     * @return  Repository
-     */
-    public function setFileCreationMode($fileCreationMode)
-    {
-        $this->fileCreationMode  = (int)$fileCreationMode;
-        return $this;
-    }
-
-    /**
-     * Returns the mode used to create directories when requested
-     *
-     * @return  integer
-     */
-    public function getDirectoryCreationMode()
-    {
-        return $this->directoryCreationMode;
-    }
-
-    /**
-     * Sets the mode used to create directories when requested
-     *
-     * @param   integer     $directoryCreationMode   The mode, e.g. 755
-     * @return  Repository
-     */
-    public function setDirectoryCreationMode($directoryCreationMode)
-    {
-        $this->directoryCreationMode  = (int)$directoryCreationMode;
-        return $this;
     }
 
     /**
@@ -270,53 +195,6 @@ class Repository implements RepositoryInterface
     {
         $this->author  = (string)$author;
         return $this;
-    }
-
-    /**
-     * Resolves an absolute path into a path relative to the repository path
-     *
-     * @param   string|array  $path         A file system path (or an array of paths)
-     * @return  string
-     */
-    public function resolveLocalPath($path)
-    {
-        if (is_array($path)) {
-            $paths  = array();
-            foreach ($path as $p) {
-                $paths[]    = $this->resolveLocalPath($p);
-            }
-            return $paths;
-        } else {
-            $path   = FileSystem::normalizeDirectorySeparator($path);
-            if (strpos($path, $this->getRepositoryPath()) === 0) {
-                $path  = substr($path, strlen($this->getRepositoryPath()));
-            }
-            return ltrim($path, '/');
-        }
-    }
-
-    /**
-     * Resolves a path relative to the repository into an absolute path
-     *
-     * @param   string|array  $path     A local path (or an array of paths)
-     * @return  string
-     */
-    public function resolveFullPath($path)
-    {
-        if (is_array($path)) {
-            $paths  = array();
-            foreach ($path as $p) {
-                $paths[]    = $this->resolveFullPath($p);
-            }
-            return $paths;
-        } else {
-            if (strpos($path, $this->getRepositoryPath()) === 0) {
-                return $path;
-            }
-            $path  = FileSystem::normalizeDirectorySeparator($path);
-            $path  = ltrim($path, '/');
-            return $this->getRepositoryPath().'/'.$path;
-        }
     }
 
     /**
@@ -827,44 +705,6 @@ class Repository implements RepositoryInterface
             return $line;
         }, explode("\n", $output));
         return $branches;
-    }
-
-    /**
-     * Runs $function in a transactional scope committing all changes to the repository on success,
-     * but rolling back all changes in the event of an Exception being thrown in the closure
-     *
-     * The closure $function will be called with a {@see TQ\Git\Repository\Transaction} as its only argument
-     *
-     * @param   \Closure   $function        The callback used inside the transaction
-     * @return  Transaction
-     * @throws  \Exception                  Rethrows every exception happening inside the transaction
-     */
-    public function transactional(\Closure $function)
-    {
-        try {
-            $transaction    = new Transaction($this);
-            $result         = $function($transaction);
-
-            $this->add(null);
-            if ($this->isDirty()) {
-                $commitMsg  = $transaction->getCommitMsg();
-                if (empty($commitMsg)) {
-                    $commitMsg  = sprintf(
-                        '%s did a transactional commit in "%s"',
-                        __CLASS__,
-                        $this->getRepositoryPath()
-                    );
-                }
-                $this->commit($commitMsg, null, $transaction->getAuthor());
-            }
-            $commitHash  = $this->getCurrentCommit();
-            $transaction->setCommitHash($commitHash);
-            $transaction->setResult($result);
-            return $transaction;
-        } catch (\Exception $e) {
-            $this->reset();
-            throw $e;
-        }
     }
 
     /**

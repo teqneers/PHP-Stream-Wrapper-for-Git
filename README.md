@@ -53,7 +53,7 @@ $commit = $git->removeFile('file_*', 'Removed all files not needed any more');
 $commit = $c->renameFile('test.txt', 'test.txt-old', 'Made a backup copy');
 
 // do some file operations and commit all changes at once
-$result = $git->transactional(function(TQ\Git\Repository\Transaction $t) {
+$result = $git->transactional(function(TQ\Vcs\Repository\Transaction $t) {
     file_put_contents($t->getRepositoryPath().'/text1.txt', 'Test 1');
     file_put_contents($t->getRepositoryPath().'/text2.txt', 'Test 2');
 
@@ -62,7 +62,7 @@ $result = $git->transactional(function(TQ\Git\Repository\Transaction $t) {
 
     $t->setCommitMsg('Don\'t know what to write here');
 
-    // if we throw an execption from within the callback the changes are discarded
+    // if we throw an exception from within the callback the changes are discarded
     // throw new Exception('No we don\'t want to to these changes');
     // note: the exception will be re-thrown by the repository so you have to catch
     // the exception yourself outside the transactional scope.

@@ -25,7 +25,7 @@ namespace TQ\Tests\Git\Repository;
 
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
-use TQ\Git\Repository\Transaction;
+use TQ\Vcs\Repository\Transaction;
 use TQ\Tests\Helper;
 
 class ModificationTest extends \PHPUnit_Framework_TestCase
