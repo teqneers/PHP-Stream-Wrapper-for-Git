@@ -178,7 +178,7 @@ class Repository implements RepositoryInterface
      * Creates a new repository instance - use {@see open()} instead
      *
      * @param   string     $repositoryPath
-     * @param   Binary  $binary
+     * @param   Binary     $binary
      */
     protected function __construct($repositoryPath, Binary $binary)
     {
