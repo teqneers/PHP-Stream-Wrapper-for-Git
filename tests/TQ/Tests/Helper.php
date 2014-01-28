@@ -101,7 +101,7 @@ class Helper
      * @param   string  $path
      * @return  string
      */
-    public static function initEmptyRepository($path) {
+    public static function initEmptyGitRepository($path) {
          return exec(
              sprintf(
                 'cd %1$s && %2$s init && %2$s config user.email "test@example.com" && %2$s config user.name "test"',

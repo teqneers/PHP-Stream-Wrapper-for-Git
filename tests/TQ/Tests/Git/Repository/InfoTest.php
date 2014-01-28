@@ -39,7 +39,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         Helper::createDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_REPO_PATH_1);
 
-        Helper::initEmptyRepository(TESTS_REPO_PATH_1);
+        Helper::initEmptyGitRepository(TESTS_REPO_PATH_1);
 
         for ($i = 0; $i < 5; $i++) {
             $file   = sprintf('file_%d.txt', $i);

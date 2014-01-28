@@ -40,7 +40,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
         Helper::createDirectory(TESTS_REPO_PATH_1);
         Helper::createDirectory(TESTS_REPO_PATH_2);
 
-        Helper::initEmptyRepository(TESTS_REPO_PATH_1);
+        Helper::initEmptyGitRepository(TESTS_REPO_PATH_1);
 
         clearstatcache();
     }

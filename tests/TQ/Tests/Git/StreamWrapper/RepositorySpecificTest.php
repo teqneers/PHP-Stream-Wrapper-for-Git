@@ -43,7 +43,7 @@ class RepositorySpecificTest extends \PHPUnit_Framework_TestCase
 
         foreach ($repositories as $n => $repository) {
             Helper::createDirectory($repository);
-            Helper::initEmptyRepository($repository);
+            Helper::initEmptyGitRepository($repository);
 
              for ($i = 0; $i < 5; $i++) {
                 $file   = sprintf('file_%d.txt', $i);

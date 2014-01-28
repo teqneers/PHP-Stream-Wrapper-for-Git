@@ -40,7 +40,7 @@ class FileStatTest extends \PHPUnit_Framework_TestCase
         Helper::createDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_REPO_PATH_1);
 
-        Helper::initEmptyRepository(TESTS_REPO_PATH_1);
+        Helper::initEmptyGitRepository(TESTS_REPO_PATH_1);
 
         $path   = TESTS_REPO_PATH_1.'/test.txt';
         file_put_contents($path, 'File 1');
