@@ -220,7 +220,7 @@ class Repository extends AbstractRepository
      * @param   array|null   $file              Restrict commit to the given files or NULL to commit all staged changes
      * @param   string|null  $author            The author
      */
-    public function commit($commitMsg, array $file = null, $author = null)
+    public function commit($commitMsg, array $file = null, $author = null, $extra_args = array())
     {
         $author = $author ?: $this->getAuthor();
         $args   = array(
@@ -229,6 +229,13 @@ class Repository extends AbstractRepository
         if ($author !== null) {
             $args['--author']  = $author;
         }
+        
+        if(count($extra_args)) {
+            foreach($extra_args as $value) {
+                $args[] = $value;
+            }
+        }
+        
         if ($file !== null) {
             $args[] = '--';
             $args   = array_merge($args, $this->resolveLocalPath($file));
