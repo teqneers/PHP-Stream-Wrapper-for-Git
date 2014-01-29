@@ -82,9 +82,10 @@ interface Repository
      *
      * @param   string       $commitMsg         The commit message
      * @param   array|null   $file              Restrict commit to the given files or NULL to commit all staged changes
+     * @params  array        $extra_args        All the user to pass extra args eg array('-i') 
      * @param   string|null  $author            The author
      */
-    public function commit($commitMsg, array $file = null, $author = null);
+    public function commit($commitMsg, array $file = null, $author = null, $extra_args = array());
 
     /**
      * Resets the working directory and/or the staging area and discards all changes
