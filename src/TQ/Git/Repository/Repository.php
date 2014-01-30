@@ -67,13 +67,6 @@ class Repository extends AbstractRepository
     protected $binary;
 
     /**
-     * The author used when committing changes
-     *
-     * @var string
-     */
-    protected $author;
-
-    /**
      * Opens a Git repository on the file system, optionally creates and initializes a new repository
      *
      * @param   string               $repositoryPath        The full path to the repository
@@ -173,28 +166,6 @@ class Repository extends AbstractRepository
     public function getBinary()
     {
         return $this->binary;
-    }
-
-    /**
-     * Returns the author used when committing changes
-     *
-     * @return  string
-     */
-    public function getAuthor()
-    {
-        return $this->author;
-    }
-
-    /**
-     * Sets the author used when committing changes
-     *
-     * @param   string     $author      The author used when committing changes
-     * @return  Repository
-     */
-    public function setAuthor($author)
-    {
-        $this->author  = (string)$author;
-        return $this;
     }
 
     /**

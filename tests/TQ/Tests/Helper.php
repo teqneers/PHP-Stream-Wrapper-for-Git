@@ -68,6 +68,11 @@ class Helper
             }
         }
         rmdir($path);
+
+        $svnRepoPath    = dirname($path).'/'.basename($path).'_repo';
+        if (file_exists($svnRepoPath)) {
+            self::removeDirectory($svnRepoPath);
+        }
     }
 
     /**

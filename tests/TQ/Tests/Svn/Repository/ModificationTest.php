@@ -27,7 +27,7 @@ use TQ\Svn\Cli\Binary;
 use TQ\Svn\Repository\Repository;
 use TQ\Tests\Helper;
 
-class InfoTest extends \PHPUnit_Framework_TestCase
+class ModificationTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
@@ -74,8 +74,17 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         return Repository::open(TESTS_REPO_PATH_1, new Binary(SVN_BINARY));
     }
 
-    public function testDummy() {
+    public function testAddFile()
+    {
+        $c          = $this->getRepository();
+        $revision   = $c->writeFile('test.txt', 'Test');
+        $this->assertEquals(2, $revision);
 
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
+        $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
+
+        //$commit = $c->showCommit($revision);
+        //$this->assertContains('+++ b/test.txt', $commit);
     }
 }
 

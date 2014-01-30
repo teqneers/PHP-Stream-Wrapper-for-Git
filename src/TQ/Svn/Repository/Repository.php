@@ -131,7 +131,7 @@ class Repository extends AbstractRepository
      */
     public function getCurrentCommit()
     {
-
+        return '';
     }
 
     /**
@@ -143,7 +143,42 @@ class Repository extends AbstractRepository
      */
     public function commit($commitMsg, array $file = null, $author = null)
     {
+        $author = $author ?: $this->getAuthor();
+        $args   = array(
+            '--message'   => $commitMsg
+        );
+        if ($author !== null) {
+            $args['--username']  = $author;
+        }
+        if ($file !== null) {
+            $args[] = '--';
+            $args   = array_merge($args, $this->resolveLocalPath($file));
+        }
 
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'commit'}($this->getRepositoryPath(), $args);
+        $result->assertSuccess(sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
+
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'update'}($this->getRepositoryPath(), array());
+        $result->assertSuccess(sprintf('Cannot update "%s"', $this->getRepositoryPath()));
+
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'info'}($this->getRepositoryPath(), array('--xml'));
+        $result->assertSuccess(sprintf('Cannot get info for "%s"', $this->getRepositoryPath()));
+
+        $xml    = simplexml_load_string($result->getStdOut());
+        if (!$xml) {
+            $result->assertSuccess(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
+        }
+
+        $commit = $xml->xpath('/info/entry/commit[@revision]');
+        if (empty($commit)) {
+            $result->assertSuccess(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
+        }
+
+        $commit = reset($commit);
+        return (string)($commit['revision']);
     }
 
     /**
@@ -161,7 +196,22 @@ class Repository extends AbstractRepository
      */
     public function add(array $file = null, $force = false)
     {
+        $args   = array();
+        if ($force) {
+            $args[]  = '--force';
+        }
+        if ($file !== null) {
+            $args[] = '--';
+            $args   = array_merge($args, $this->resolveLocalPath($file));
+        } else {
+            $args['--depth'] = 'infinity';
+        }
 
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'add'}($this->getRepositoryPath(), $args);
+        $result->assertSuccess(sprintf('Cannot add "%s" to "%s"',
+            ($file !== null) ? implode(', ', $file) : '*', $this->getRepositoryPath()
+        ));
     }
 
     /**
@@ -204,7 +254,36 @@ class Repository extends AbstractRepository
     public function writeFile($path, $data, $commitMsg = null, $fileMode = null,
         $dirMode = null, $recursive = true, $author = null
     ) {
+        $file       = $this->resolveFullPath($path);
 
+        $fileMode   = $fileMode ?: $this->getFileCreationMode();
+        $dirMode    = $dirMode ?: $this->getDirectoryCreationMode();
+
+        $directory  = dirname($file);
+        if (!file_exists($directory) && !mkdir($directory, (int)$dirMode, $recursive)) {
+            throw new \RuntimeException(sprintf('Cannot create "%s"', $directory));
+        } else if (!file_exists($file)) {
+            if (!touch($file)) {
+                throw new \RuntimeException(sprintf('Cannot create "%s"', $file));
+            }
+            if (!chmod($file, (int)$fileMode)) {
+                throw new \RuntimeException(sprintf('Cannot chmod "%s" to %d', $file, (int)$fileMode));
+            }
+        }
+
+        if (file_put_contents($file, $data) === false) {
+            throw new \RuntimeException(sprintf('Cannot write to "%s"', $file));
+        }
+
+        $this->add(array($file));
+
+        if ($commitMsg === null) {
+            $commitMsg  = sprintf('%s created or changed file "%s"', __CLASS__, $path);
+        }
+
+        $this->commit($commitMsg, array($file), $author);
+
+        return $this->getCurrentCommit();
     }
 
     /**

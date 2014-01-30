@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace TQ\Tests\Git\Repository;
+namespace TQ\Tests\Svn\Repository;
 
-use TQ\Git\Cli\Binary;
-use TQ\Git\Repository\Repository;
+use TQ\Svn\Cli\Binary;
+use TQ\Svn\Repository\Repository;
 use TQ\Tests\Helper;
 
 class SetupTest extends \PHPUnit_Framework_TestCase
@@ -40,7 +40,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
         Helper::createDirectory(TESTS_REPO_PATH_1);
         Helper::createDirectory(TESTS_REPO_PATH_2);
 
-        Helper::initEmptyGitRepository(TESTS_REPO_PATH_1);
+        Helper::initEmptySvnRepository(TESTS_REPO_PATH_1);
 
         clearstatcache();
     }
@@ -56,12 +56,11 @@ class SetupTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param   string          $path
-     * @param   boolean|integer $create
      * @return  Repository
      */
-    protected function getRepository($path, $create = false)
+    protected function getRepository($path)
     {
-        return Repository::open($path, new Binary(GIT_BINARY), $create);
+        return Repository::open($path, new Binary(SVN_BINARY));
     }
 
     /**
@@ -69,14 +68,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
      */
     public function testRepositoryOpenOnNonExistentPath()
     {
-        $this->getRepository('/does/not/exist', false);
-    }
-
-    public function testRepositoryOpenOnFile()
-    {
-        $c  = $this->getRepository(__FILE__, false);
-        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
-        $this->assertEquals(PROJECT_PATH, $c->getRepositoryPath());
+        $this->getRepository('/does/not/exist');
     }
 
     /**
@@ -84,38 +76,23 @@ class SetupTest extends \PHPUnit_Framework_TestCase
      */
     public function testRepositoryOpenOnNonRepositoryPath()
     {
-        $this->getRepository(TESTS_REPO_PATH_2, false);
+        $this->getRepository(TESTS_REPO_PATH_2);
     }
 
     public function testRepositoryOpenOnRepositoryPath()
     {
-        $c  = $this->getRepository(TESTS_REPO_PATH_1, false);
-        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
+        $c  = $this->getRepository(TESTS_REPO_PATH_1);
+        $this->assertInstanceOf('TQ\Svn\Repository\Repository', $c);
+        $this->assertEquals(TESTS_REPO_PATH_1, $c->getRepositoryPath());
     }
 
-    public function testRepositoryCreateOnExistingRepositoryPath()
+    public function testRepositoryOpenOnSubPathOfRepositoryPath()
     {
-        $c  = $this->getRepository(TESTS_REPO_PATH_1, 0755);
-        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
-    }
+        Helper::createDirectory(TESTS_REPO_PATH_1.'/test');
 
-    public function testRepositoryCreateOnFile()
-    {
-        $c  = $this->getRepository(__FILE__, 0755);
-        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
-        $this->assertEquals(PROJECT_PATH, $c->getRepositoryPath());
-    }
-
-    public function testRepositoryCreateOnExistingPath()
-    {
-        $c  = $this->getRepository(TESTS_REPO_PATH_2, 0755);
-        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
-    }
-
-    public function testRepositoryCreateOnCreateablePath()
-    {
-        $c  = $this->getRepository(TESTS_REPO_PATH_3, 0755);
-        $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
+        $c  = $this->getRepository(TESTS_REPO_PATH_1.'/test');
+        $this->assertInstanceOf('TQ\Svn\Repository\Repository', $c);
+        $this->assertEquals(TESTS_REPO_PATH_1, $c->getRepositoryPath());
     }
 }
 

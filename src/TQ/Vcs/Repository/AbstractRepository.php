@@ -70,6 +70,13 @@ abstract class AbstractRepository implements Repository
     protected $directoryCreationMode = 0755;
 
     /**
+     * The author used when committing changes
+     *
+     * @var string
+     */
+    protected $author;
+
+    /**
      * Creates a new repository instance - use {@see open()} instead
      *
      * @param   string     $repositoryPath
@@ -130,6 +137,28 @@ abstract class AbstractRepository implements Repository
     public function setDirectoryCreationMode($directoryCreationMode)
     {
         $this->directoryCreationMode  = (int)$directoryCreationMode;
+        return $this;
+    }
+
+    /**
+     * Returns the author used when committing changes
+     *
+     * @return  string
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /**
+     * Sets the author used when committing changes
+     *
+     * @param   string     $author      The author used when committing changes
+     * @return  Repository
+     */
+    public function setAuthor($author)
+    {
+        $this->author  = (string)$author;
         return $this;
     }
 
