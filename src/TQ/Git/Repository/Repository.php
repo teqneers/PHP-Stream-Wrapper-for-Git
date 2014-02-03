@@ -221,7 +221,7 @@ class Repository extends AbstractRepository
      * @param   array        $extraArgs         Allow the user to pass extra args eg array('-i')
      * @param   string|null  $author            The author
      */
-    public function commit($commitMsg, array $file = null, $author = null, $extraArgs = array())
+    public function commit($commitMsg, array $file = null, $author = null, array $extraArgs = array())
     {
         $author = $author ?: $this->getAuthor();
         $args   = array(
