@@ -83,8 +83,34 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
         $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
 
-        //$commit = $c->showCommit($revision);
-        //$this->assertContains('+++ b/test.txt', $commit);
+        $commit = $c->showCommit($revision);
+        $this->assertContains('+++ test.txt', $commit);
+    }
+
+    public function testAddFileInSubdirectory()
+    {
+        $c          = $this->getRepository();
+        $revision   = $c->writeFile('/directory/test.txt', 'Test');
+        $this->assertEquals(2, $revision);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/directory/test.txt');
+        $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/directory/test.txt'));
+
+        $commit = $c->showCommit($revision);
+        $this->assertContains('+++ directory/test.txt', $commit);
+    }
+
+    public function testAddFileInSecondLevelSubdirectory()
+    {
+        $c          = $this->getRepository();
+        $revision   = $c->writeFile('/dirA/dirB/test.txt', 'Test');
+        $this->assertEquals(2, $revision);
+
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/dirA/dirB/test.txt');
+        $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/dirA/dirB/test.txt'));
+
+        $commit = $c->showCommit($revision);
+        $this->assertContains('+++ dirA/dirB/test.txt', $commit);
     }
 }
 

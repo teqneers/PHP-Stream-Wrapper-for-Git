@@ -131,7 +131,26 @@ class Repository extends AbstractRepository
      */
     public function getCurrentCommit()
     {
-        return '';
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'update'}($this->getRepositoryPath(), array());
+        $result->assertSuccess(sprintf('Cannot update "%s"', $this->getRepositoryPath()));
+
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'info'}($this->getRepositoryPath(), array('--xml'));
+        $result->assertSuccess(sprintf('Cannot get info for "%s"', $this->getRepositoryPath()));
+
+        $xml    = simplexml_load_string($result->getStdOut());
+        if (!$xml) {
+            $result->assertSuccess(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
+        }
+
+        $commit = $xml->xpath('/info/entry/commit[@revision]');
+        if (empty($commit)) {
+            $result->assertSuccess(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
+        }
+
+        $commit = reset($commit);
+        return (string)($commit['revision']);
     }
 
     /**
@@ -158,27 +177,6 @@ class Repository extends AbstractRepository
         /** @var $result CallResult */
         $result = $this->getBinary()->{'commit'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
-
-        /** @var $result CallResult */
-        $result = $this->getBinary()->{'update'}($this->getRepositoryPath(), array());
-        $result->assertSuccess(sprintf('Cannot update "%s"', $this->getRepositoryPath()));
-
-        /** @var $result CallResult */
-        $result = $this->getBinary()->{'info'}($this->getRepositoryPath(), array('--xml'));
-        $result->assertSuccess(sprintf('Cannot get info for "%s"', $this->getRepositoryPath()));
-
-        $xml    = simplexml_load_string($result->getStdOut());
-        if (!$xml) {
-            $result->assertSuccess(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
-        }
-
-        $commit = $xml->xpath('/info/entry/commit[@revision]');
-        if (empty($commit)) {
-            $result->assertSuccess(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
-        }
-
-        $commit = reset($commit);
-        return (string)($commit['revision']);
     }
 
     /**
@@ -201,10 +199,13 @@ class Repository extends AbstractRepository
             $args[]  = '--force';
         }
         if ($file !== null) {
+            $args[] = '--parents';
             $args[] = '--';
             $args   = array_merge($args, $this->resolveLocalPath($file));
         } else {
             $args['--depth'] = 'infinity';
+            $args[] = '--';
+            $args[] = '*';
         }
 
         /** @var $result CallResult */
@@ -281,7 +282,7 @@ class Repository extends AbstractRepository
             $commitMsg  = sprintf('%s created or changed file "%s"', __CLASS__, $path);
         }
 
-        $this->commit($commitMsg, array($file), $author);
+        $this->commit($commitMsg, null, $author);
 
         return $this->getCurrentCommit();
     }
@@ -336,7 +337,17 @@ class Repository extends AbstractRepository
      */
     public function showCommit($hash)
     {
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'log'}($this->getRepositoryPath(), array(
+            '-v',
+            '--diff',
+            '-r' => $hash
+        ));
+        $result->assertSuccess(sprintf('Cannot retrieve commit "%s" from "%s"',
+            $hash, $this->getRepositoryPath()
+        ));
 
+        return $result->getStdOut();
     }
 
     /**
