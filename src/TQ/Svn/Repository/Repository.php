@@ -224,7 +224,18 @@ class Repository extends AbstractRepository
      */
     public function remove(array $file, $recursive = false, $force = false)
     {
+        $args   = array();
+        if ($force) {
+            $args[] = '--force';
+        }
+        $args[] = '--';
+        $args   = array_merge($args, $this->resolveLocalPath($file));
 
+        /** @var $result CallResult */
+        $result = $this->getBinary()->{'delete'}($this->getRepositoryPath(), $args);
+        $result->assertSuccess(sprintf('Cannot remove "%s" from "%s"',
+            implode(', ', $file), $this->getRepositoryPath()
+        ));
     }
 
     /**
@@ -299,7 +310,15 @@ class Repository extends AbstractRepository
      */
     public function removeFile($path, $commitMsg = null, $recursive = false, $force = false, $author = null)
     {
+        $this->remove(array($path), $recursive, $force);
 
+        if ($commitMsg === null) {
+            $commitMsg  = sprintf('%s deleted file "%s"', __CLASS__, $path);
+        }
+
+        $this->commit($commitMsg, array($path), $author);
+
+        return $this->getCurrentCommit();
     }
 
     /**

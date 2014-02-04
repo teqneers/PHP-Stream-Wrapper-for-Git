@@ -84,6 +84,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
 
         $commit = $c->showCommit($revision);
+        $this->assertContains('A /test.txt', $commit);
         $this->assertContains('+++ test.txt', $commit);
     }
 
@@ -97,6 +98,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/directory/test.txt'));
 
         $commit = $c->showCommit($revision);
+        $this->assertContains('A /directory/test.txt', $commit);
         $this->assertContains('+++ directory/test.txt', $commit);
     }
 
@@ -110,7 +112,52 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/dirA/dirB/test.txt'));
 
         $commit = $c->showCommit($revision);
+        $this->assertContains('A /dirA/dirB/test.txt', $commit);
         $this->assertContains('+++ dirA/dirB/test.txt', $commit);
+    }
+
+    public function testAddMultipleFiles()
+    {
+        $c  = $this->getRepository();
+        for ($i = 0; $i < 5; $i++) {
+            $revision   = $c->writeFile(sprintf('test_%s.txt', $i), $i);
+            $this->assertEquals($i + 2, $revision);
+            $commit = $c->showCommit($revision);
+            $this->assertContains(sprintf('A /test_%d.txt', $i), $commit);
+            $this->assertContains(sprintf('+++ test_%d.txt', $i), $commit);
+        }
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->assertFileExists(TESTS_REPO_PATH_1.sprintf('/test_%s.txt', $i));
+            $this->assertEquals($i, file_get_contents(TESTS_REPO_PATH_1.sprintf('/test_%s.txt', $i)));
+        }
+    }
+
+    public function testRemoveFile()
+    {
+        $c          = $this->getRepository();
+        $revision   = $c->removeFile('file_0.txt');
+        $this->assertEquals(2, $revision);
+
+        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+
+        $commit = $c->showCommit($revision);
+        $this->assertContains('D /file_0.txt', $commit);
+    }
+
+    public function testRemoveMultipleFiles()
+    {
+        $c  = $this->getRepository();
+        for ($i = 0; $i < 5; $i++) {
+            $revision   = $c->removeFile(sprintf('file_%s.txt', $i), $i);
+            $this->assertEquals($i + 2, $revision);
+            $commit = $c->showCommit($revision);
+            $this->assertContains(sprintf('D /file_%d.txt', $i), $commit);
+        }
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
+        }
     }
 }
 
