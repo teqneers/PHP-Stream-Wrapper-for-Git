@@ -360,7 +360,6 @@ class Repository extends AbstractRepository
         /** @var $result CallResult */
         $result = $this->getBinary()->{'log'}($this->getRepositoryPath(), array(
             '-v',
-            '--diff',
             '-r' => $hash
         ));
         $result->assertSuccess(sprintf('Cannot retrieve commit "%s" from "%s"',

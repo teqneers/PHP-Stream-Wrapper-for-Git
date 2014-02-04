@@ -85,7 +85,6 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
 
         $commit = $c->showCommit($revision);
         $this->assertContains('A /test.txt', $commit);
-        $this->assertContains('+++ test.txt', $commit);
     }
 
     public function testAddFileInSubdirectory()
@@ -99,7 +98,6 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
 
         $commit = $c->showCommit($revision);
         $this->assertContains('A /directory/test.txt', $commit);
-        $this->assertContains('+++ directory/test.txt', $commit);
     }
 
     public function testAddFileInSecondLevelSubdirectory()
@@ -113,7 +111,6 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
 
         $commit = $c->showCommit($revision);
         $this->assertContains('A /dirA/dirB/test.txt', $commit);
-        $this->assertContains('+++ dirA/dirB/test.txt', $commit);
     }
 
     public function testAddMultipleFiles()
@@ -124,7 +121,6 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals($i + 2, $revision);
             $commit = $c->showCommit($revision);
             $this->assertContains(sprintf('A /test_%d.txt', $i), $commit);
-            $this->assertContains(sprintf('+++ test_%d.txt', $i), $commit);
         }
 
         for ($i = 0; $i < 5; $i++) {
