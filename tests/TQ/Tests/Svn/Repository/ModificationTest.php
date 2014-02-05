@@ -173,5 +173,19 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('D /file_3.txt', $commit);
         $this->assertContains('D /file_4.txt', $commit);
     }
+
+    public function testRemoveSubdirectory()
+    {
+        $c      = $this->getRepository();
+        $c->writeFile('subdirectory/test.txt', 'Test');
+
+        $revision   = $c->removeFile('subdirectory', null, true);
+        $this->assertEquals(3, $revision);
+
+        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/subdirectory');
+
+        $commit = $c->showCommit($revision);
+        $this->assertContains('deleted file', $commit);
+    }
 }
 
