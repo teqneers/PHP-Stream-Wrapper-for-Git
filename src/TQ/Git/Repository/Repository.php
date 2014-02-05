@@ -208,7 +208,7 @@ class Repository extends AbstractRepository
         }
         if ($file !== null) {
             $args[] = '--';
-            $args   = array_merge($args, array($this->resolveLocalPath($file)));
+            $args   = array_merge($args, $this->resolveLocalPath($file));
         }
 
         /** @var $result CallResult */
@@ -255,7 +255,7 @@ class Repository extends AbstractRepository
         }
         if ($file !== null) {
             $args[] = '--';
-            $args   = array_merge($args, array($this->resolveLocalPath($file)));
+            $args   = array_merge($args, $this->resolveLocalPath($file));
         } else {
             $args[] = '--all';
         }
@@ -284,7 +284,7 @@ class Repository extends AbstractRepository
             $args[] = '--force';
         }
         $args[] = '--';
-        $args   = array_merge($args, array($this->resolveLocalPath($file)));
+        $args   = array_merge($args, $this->resolveLocalPath($file));
 
         /** @var $result CallResult */
         $result = $this->getBinary()->{'rm'}($this->getRepositoryPath(), $args);
