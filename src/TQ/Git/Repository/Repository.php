@@ -64,13 +64,13 @@ class Repository extends AbstractRepository
      *
      * @var Binary
      */
-    protected $binary;
+    protected $git;
 
     /**
      * Opens a Git repository on the file system, optionally creates and initializes a new repository
      *
      * @param   string               $repositoryPath        The full path to the repository
-     * @param   Binary|string|null   $binary                The Git binary
+     * @param   Binary|string|null   $git                   The Git binary
      * @param   boolean|integer      $createIfNotExists     False to fail on non-existing repositories, directory
      *                                                      creation mode, such as 0755  if the command
      *                                                      should create the directory and init the repository instead
@@ -78,9 +78,9 @@ class Repository extends AbstractRepository
      * @throws  \RuntimeException                       If the path cannot be created
      * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid Git repository
      */
-    public static function open($repositoryPath, $binary = null, $createIfNotExists = false)
+    public static function open($repositoryPath, $git = null, $createIfNotExists = false)
     {
-        $binary = Binary::ensure($binary);
+        $git = Binary::ensure($git);
 
         if (!is_string($repositoryPath)) {
             throw new \InvalidArgumentException(sprintf(
@@ -105,7 +105,7 @@ class Repository extends AbstractRepository
                         '"%s" is not a valid path', $repositoryPath
                     ));
                 }
-                self::initRepository($binary, $repositoryPath);
+                self::initRepository($git, $repositoryPath);
                 $repositoryRoot = $repositoryPath;
             }
         }
@@ -116,19 +116,19 @@ class Repository extends AbstractRepository
             ));
         }
 
-        return new static($repositoryRoot, $binary);
+        return new static($repositoryRoot, $git);
     }
 
     /**
      * Inits a path to be used as a Git repository
      *
-     * @param   Binary   $binary        The Git binary
+     * @param   Binary   $git           The Git binary
      * @param   string   $path          The repository path
      */
-    protected static function initRepository(Binary $binary, $path)
+    protected static function initRepository(Binary $git, $path)
     {
         /** @var $result CallResult */
-        $result = $binary->{'init'}($path);
+        $result = $git->{'init'}($path);
         $result->assertSuccess(sprintf('Cannot initialize a Git repository in "%s"', $path));
     }
 
@@ -150,11 +150,11 @@ class Repository extends AbstractRepository
      * Creates a new repository instance - use {@see open()} instead
      *
      * @param   string     $repositoryPath
-     * @param   Binary     $binary
+     * @param   Binary     $git
      */
-    protected function __construct($repositoryPath, Binary $binary)
+    protected function __construct($repositoryPath, Binary $git)
     {
-        $this->binary   = $binary;
+        $this->git   = $git;
         parent::__construct($repositoryPath);
     }
 
@@ -163,9 +163,9 @@ class Repository extends AbstractRepository
      *
      * @return  Binary
      */
-    public function getBinary()
+    public function getGit()
     {
-        return $this->binary;
+        return $this->git;
     }
 
     /**
@@ -176,7 +176,7 @@ class Repository extends AbstractRepository
     public function getCurrentCommit()
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'rev-parse'}($this->getRepositoryPath(), array(
+        $result = $this->getGit()->{'rev-parse'}($this->getRepositoryPath(), array(
              '--verify',
             'HEAD'
         ));
@@ -212,7 +212,7 @@ class Repository extends AbstractRepository
         }
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'commit'}($this->getRepositoryPath(), $args);
+        $result = $this->getGit()->{'commit'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
     }
 
@@ -226,13 +226,13 @@ class Repository extends AbstractRepository
         $what   = (int)$what;
         if (($what & self::RESET_STAGED) == self::RESET_STAGED) {
             /** @var $result CallResult */
-            $result = $this->getBinary()->{'reset'}($this->getRepositoryPath(), array('--hard'));
+            $result = $this->getGit()->{'reset'}($this->getRepositoryPath(), array('--hard'));
             $result->assertSuccess(sprintf('Cannot reset "%s"', $this->getRepositoryPath()));
         }
 
         if (($what & self::RESET_WORKING) == self::RESET_WORKING) {
             /** @var $result CallResult */
-            $result = $this->getBinary()->{'clean'}($this->getRepositoryPath(), array(
+            $result = $this->getGit()->{'clean'}($this->getRepositoryPath(), array(
                 '--force',
                 '-x',
                 '-d'
@@ -261,7 +261,7 @@ class Repository extends AbstractRepository
         }
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'add'}($this->getRepositoryPath(), $args);
+        $result = $this->getGit()->{'add'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot add "%s" to "%s"',
             ($file !== null) ? implode(', ', $file) : '*', $this->getRepositoryPath()
         ));
@@ -287,7 +287,7 @@ class Repository extends AbstractRepository
         $args   = array_merge($args, $this->resolveLocalPath($file));
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'rm'}($this->getRepositoryPath(), $args);
+        $result = $this->getGit()->{'rm'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot remove "%s" from "%s"',
             implode(', ', $file), $this->getRepositoryPath()
         ));
@@ -310,7 +310,7 @@ class Repository extends AbstractRepository
         $args[] = $this->resolveLocalPath($toPath);
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'mv'}($this->getRepositoryPath(), $args);
+        $result = $this->getGit()->{'mv'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot move "%s" to "%s" in "%s"',
             $fromPath, $toPath, $this->getRepositoryPath()
         ));
@@ -433,7 +433,7 @@ class Repository extends AbstractRepository
         }
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'log'}($this->getRepositoryPath(), $arguments);
+        $result = $this->getGit()->{'log'}($this->getRepositoryPath(), $arguments);
         $result->assertSuccess(sprintf('Cannot retrieve log from "%s"',
             $this->getRepositoryPath()
         ));
@@ -455,7 +455,7 @@ class Repository extends AbstractRepository
     public function showCommit($hash)
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'show'}($this->getRepositoryPath(), array(
+        $result = $this->getGit()->{'show'}($this->getRepositoryPath(), array(
             '--format' => 'fuller',
             $hash
         ));
@@ -476,7 +476,7 @@ class Repository extends AbstractRepository
     public function showFile($file, $ref = 'HEAD')
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'show'}($this->getRepositoryPath(), array(
+        $result = $this->getGit()->{'show'}($this->getRepositoryPath(), array(
             sprintf('%s:%s', $ref, $file)
         ));
         $result->assertSuccess(sprintf('Cannot show "%s" at "%s" from "%s"',
@@ -510,7 +510,7 @@ class Repository extends AbstractRepository
         );
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'cat-file'}($this->getRepositoryPath(), array(
+        $result = $this->getGit()->{'cat-file'}($this->getRepositoryPath(), array(
             '--batch-check'
         ), sprintf('%s:%s', $ref, $path));
         $result->assertSuccess(sprintf('Cannot cat-file "%s" at "%s" from "%s"',
@@ -551,7 +551,7 @@ class Repository extends AbstractRepository
         $path       = $this->getRepositoryPath().'/'.$this->resolveLocalPath($directory);
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'ls-tree'}($path, array(
+        $result = $this->getGit()->{'ls-tree'}($path, array(
             '--name-only',
             '-z',
             $ref
@@ -583,7 +583,7 @@ class Repository extends AbstractRepository
     public function getStatus()
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'status'}($this->getRepositoryPath(), array(
+        $result = $this->getGit()->{'status'}($this->getRepositoryPath(), array(
             '--short'
         ));
         $result->assertSuccess(
@@ -630,7 +630,7 @@ class Repository extends AbstractRepository
     public function getCurrentBranch()
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'name-rev'}($this->getRepositoryPath(), array(
+        $result = $this->getGit()->{'name-rev'}($this->getRepositoryPath(), array(
             '--name-only',
             'HEAD'
         ));
@@ -664,7 +664,7 @@ class Repository extends AbstractRepository
         }
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'branch'}($this->getRepositoryPath(), $arguments);
+        $result = $this->getGit()->{'branch'}($this->getRepositoryPath(), $arguments);
         $result->assertSuccess(
             sprintf('Cannot retrieve branch from "%s"', $this->getRepositoryPath())
         );
@@ -692,7 +692,7 @@ class Repository extends AbstractRepository
     public function getCurrentRemote()
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'remote'}($this->getRepositoryPath(), array(
+        $result = $this->getGit()->{'remote'}($this->getRepositoryPath(), array(
              '-v'
         ));
         $result->assertSuccess(sprintf('Cannot remote "%s"', $this->getRepositoryPath()));
