@@ -166,7 +166,7 @@ abstract class AbstractRepository implements Repository
      * Resolves an absolute path into a path relative to the repository path
      *
      * @param   string|array  $path         A file system path (or an array of paths)
-     * @return  string
+     * @return  string|array                Either a single path or an array of paths is returned
      */
     public function resolveLocalPath($path)
     {
@@ -189,7 +189,7 @@ abstract class AbstractRepository implements Repository
      * Resolves a path relative to the repository into an absolute path
      *
      * @param   string|array  $path     A local path (or an array of paths)
-     * @return  string
+     * @return  string|array            Either a single path or an array of paths is returned
      */
     public function resolveFullPath($path)
     {
