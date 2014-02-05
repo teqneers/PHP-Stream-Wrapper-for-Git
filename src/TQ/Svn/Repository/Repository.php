@@ -172,7 +172,7 @@ class Repository extends AbstractRepository
         }
         if ($file !== null) {
             $args[] = '--';
-            $args   = array_merge($args, $this->resolveLocalPath($file));
+            $args   = array_merge($args, array($this->resolveLocalPath($file)));
         }
 
         /** @var $result CallResult */
@@ -202,7 +202,7 @@ class Repository extends AbstractRepository
         if ($file !== null) {
             $args[] = '--parents';
             $args[] = '--';
-            $args   = array_merge($args, $this->resolveLocalPath($file));
+            $args   = array_merge($args, array($this->resolveLocalPath($file)));
         } else {
             $args['--depth'] = 'infinity';
             $args[] = '--';
@@ -230,7 +230,7 @@ class Repository extends AbstractRepository
             $args[] = '--force';
         }
         $args[] = '--';
-        $args   = array_merge($args, $this->resolveLocalPath($file));
+        $args   = array_merge($args, array($this->resolveLocalPath($file)));
 
         /** @var $result CallResult */
         $result = $this->getBinary()->{'delete'}($this->getRepositoryPath(), $args);
