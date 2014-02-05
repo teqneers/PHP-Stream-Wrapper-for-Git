@@ -155,5 +155,23 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
             $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
         }
     }
+
+    public function testRemoveWildcardFile()
+    {
+        $c          = $this->getRepository();
+        $revision   = $c->removeFile('file_*');
+        $this->assertEquals(2, $revision);
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
+        }
+
+        $commit = $c->showCommit($revision);
+        $this->assertContains('D /file_0.txt', $commit);
+        $this->assertContains('D /file_1.txt', $commit);
+        $this->assertContains('D /file_2.txt', $commit);
+        $this->assertContains('D /file_3.txt', $commit);
+        $this->assertContains('D /file_4.txt', $commit);
+    }
 }
 

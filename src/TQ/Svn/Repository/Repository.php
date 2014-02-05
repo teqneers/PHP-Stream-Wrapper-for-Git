@@ -172,7 +172,7 @@ class Repository extends AbstractRepository
         }
         if ($file !== null) {
             $args[] = '--';
-            $args   = array_merge($args, array($this->resolveLocalPath($file)));
+            $args   = array_merge($args, $this->resolveLocalGlobPath($file));
         }
 
         /** @var $result CallResult */
@@ -202,7 +202,7 @@ class Repository extends AbstractRepository
         if ($file !== null) {
             $args[] = '--parents';
             $args[] = '--';
-            $args   = array_merge($args, array($this->resolveLocalPath($file)));
+            $args   = array_merge($args, $this->resolveLocalGlobPath($file));
         } else {
             $args['--depth'] = 'infinity';
             $args[] = '--';
@@ -230,7 +230,7 @@ class Repository extends AbstractRepository
             $args[] = '--force';
         }
         $args[] = '--';
-        $args   = array_merge($args, array($this->resolveLocalPath($file)));
+        $args   = array_merge($args, $this->resolveLocalGlobPath($file));
 
         /** @var $result CallResult */
         $result = $this->getBinary()->{'delete'}($this->getRepositoryPath(), $args);
@@ -439,6 +439,22 @@ class Repository extends AbstractRepository
     {
         $status = $this->getStatus();
         return !empty($status);
+    }
+
+    /**
+     * Resolves an absolute path containing glob wildcards into a path relative to the repository path
+     *
+     * @param   array       $files      The list of files
+     * @return  array
+     */
+    protected function resolveLocalGlobPath(array $files)
+    {
+        $absoluteFiles  = $this->resolveFullPath($files);
+        $expandedFiles  = array();
+        foreach ($absoluteFiles as $absoluteFile) {
+            $expandedFiles  = array_merge($expandedFiles, glob($absoluteFile));
+        }
+        return $this->resolveLocalPath($expandedFiles);
     }
 }
 
