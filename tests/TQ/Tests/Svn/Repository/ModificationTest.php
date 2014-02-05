@@ -187,5 +187,18 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $commit = $c->showCommit($revision);
         $this->assertContains('deleted file', $commit);
     }
+
+    public function testMoveFile()
+    {
+        $c          = $this->getRepository();
+        $revision   = $c->renameFile('file_0.txt', 'test.txt');
+        $this->assertEquals(2, $revision);
+
+        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
+
+        $commit = $c->showCommit($revision);
+        $this->assertContains('A /test.txt (from /file_0.txt', $commit);
+    }
 }
 

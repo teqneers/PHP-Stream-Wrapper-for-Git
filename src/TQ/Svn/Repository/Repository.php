@@ -248,7 +248,18 @@ class Repository extends AbstractRepository
      */
     public function move($fromPath, $toPath, $force = false)
     {
+        $args   = array();
+        if ($force) {
+            $args[] = '--force';
+        }
+        $args[] = $this->resolveLocalPath($fromPath);
+        $args[] = $this->resolveLocalPath($toPath);
 
+        /** @var $result CallResult */
+        $result = $this->getSvn()->{'move'}($this->getRepositoryPath(), $args);
+        $result->assertSuccess(sprintf('Cannot move "%s" to "%s" in "%s"',
+            $fromPath, $toPath, $this->getRepositoryPath()
+        ));
     }
 
     /**
@@ -334,7 +345,15 @@ class Repository extends AbstractRepository
      */
     public function renameFile($fromPath, $toPath, $commitMsg = null, $force = false, $author = null)
     {
+        $this->move($fromPath, $toPath, $force);
 
+        if ($commitMsg === null) {
+            $commitMsg  = sprintf('%s renamed/moved file "%s" to "%s"', __CLASS__, $fromPath, $toPath);
+        }
+
+        $this->commit($commitMsg, array($fromPath, $toPath), $author);
+
+        return $this->getCurrentCommit();
     }
 
     /**
