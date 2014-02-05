@@ -56,20 +56,20 @@ class Repository extends AbstractRepository
      *
      * @var Binary
      */
-    protected $binary;
+    protected $svn;
 
     /**
      * Opens a SVN repository on the file system
      *
      * @param   string               $repositoryPath        The full path to the repository
-     * @param   Binary|string|null   $binary                The SVN binary
+     * @param   Binary|string|null   $svn                   The SVN binary
      * @return  Repository
      * @throws  \RuntimeException                       If the path cannot be created
      * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid SVN repository
      */
-    public static function open($repositoryPath, $binary = null)
+    public static function open($repositoryPath, $svn = null)
     {
-        $binary = Binary::ensure($binary);
+        $svn = Binary::ensure($svn);
 
         if (!is_string($repositoryPath)) {
             throw new \InvalidArgumentException(sprintf(
@@ -85,7 +85,7 @@ class Repository extends AbstractRepository
             ));
         }
 
-        return new static($repositoryRoot, $binary);
+        return new static($repositoryRoot, $svn);
     }
 
     /**
@@ -106,11 +106,11 @@ class Repository extends AbstractRepository
      * Creates a new repository instance - use {@see open()} instead
      *
      * @param   string     $repositoryPath
-     * @param   Binary     $binary
+     * @param   Binary     $svn
      */
-    protected function __construct($repositoryPath, Binary $binary)
+    protected function __construct($repositoryPath, Binary $svn)
     {
-        $this->binary   = $binary;
+        $this->svn   = $svn;
         parent::__construct($repositoryPath);
     }
 
@@ -119,9 +119,9 @@ class Repository extends AbstractRepository
      *
      * @return  Binary
      */
-    public function getBinary()
+    public function getSvn()
     {
-        return $this->binary;
+        return $this->svn;
     }
 
     /**
@@ -132,11 +132,11 @@ class Repository extends AbstractRepository
     public function getCurrentCommit()
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'update'}($this->getRepositoryPath(), array());
+        $result = $this->getSvn()->{'update'}($this->getRepositoryPath(), array());
         $result->assertSuccess(sprintf('Cannot update "%s"', $this->getRepositoryPath()));
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'info'}($this->getRepositoryPath(), array('--xml'));
+        $result = $this->getSvn()->{'info'}($this->getRepositoryPath(), array('--xml'));
         $result->assertSuccess(sprintf('Cannot get info for "%s"', $this->getRepositoryPath()));
 
         $xml    = simplexml_load_string($result->getStdOut());
@@ -176,7 +176,7 @@ class Repository extends AbstractRepository
         }
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'commit'}($this->getRepositoryPath(), $args);
+        $result = $this->getSvn()->{'commit'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot commit to "%s"', $this->getRepositoryPath()));
     }
 
@@ -210,7 +210,7 @@ class Repository extends AbstractRepository
         }
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'add'}($this->getRepositoryPath(), $args);
+        $result = $this->getSvn()->{'add'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot add "%s" to "%s"',
             ($file !== null) ? implode(', ', $file) : '*', $this->getRepositoryPath()
         ));
@@ -233,7 +233,7 @@ class Repository extends AbstractRepository
         $args   = array_merge($args, $this->resolveLocalGlobPath($file));
 
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'delete'}($this->getRepositoryPath(), $args);
+        $result = $this->getSvn()->{'delete'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot remove "%s" from "%s"',
             implode(', ', $file), $this->getRepositoryPath()
         ));
@@ -358,7 +358,7 @@ class Repository extends AbstractRepository
     public function showCommit($hash)
     {
         /** @var $result CallResult */
-        $result = $this->getBinary()->{'log'}($this->getRepositoryPath(), array(
+        $result = $this->getSvn()->{'log'}($this->getRepositoryPath(), array(
             '-v',
             '-r' => $hash
         ));
