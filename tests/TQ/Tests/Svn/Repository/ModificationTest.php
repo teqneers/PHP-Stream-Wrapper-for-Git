@@ -200,5 +200,24 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $commit = $c->showCommit($revision);
         $this->assertContains('A /test.txt (from /file_0.txt', $commit);
     }
+
+    public function testReset()
+    {
+        $c  = $this->getRepository();
+        $this->assertFalse($c->isDirty());
+
+        $file   = TESTS_REPO_PATH_1.'/test.txt';
+        file_put_contents($file, 'Test');
+        $this->assertTrue($c->isDirty());
+        $c->reset();
+        $this->assertFalse($c->isDirty());
+        $this->assertFileNotExists($file);
+
+        file_put_contents($file, 'Test');
+        $c->add(array('test.txt'));
+        $c->reset();
+        $this->assertFalse($c->isDirty());
+        $this->assertFileNotExists($file);
+    }
 }
 

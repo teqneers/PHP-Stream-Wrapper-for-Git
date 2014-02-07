@@ -185,6 +185,21 @@ class Repository extends AbstractRepository
      */
     public function reset()
     {
+        /** @var $result CallResult */
+        $result = $this->getSvn()->{'revert'}($this->getRepositoryPath(), array(
+            '--recursive',
+            '--',
+            '.'
+        ));
+        $result->assertSuccess(sprintf('Cannot reset "%s"', $this->getRepositoryPath()));
+
+        $status = $this->getStatus();
+        foreach ($status as $item) {
+            $file   = $this->resolveFullPath($item['file']);
+            if (@unlink($file) !== true || $item['status'] !== 'unversioned') {
+                throw new \RuntimeException('Cannot delete file "'.$item['file'].'"');
+            }
+        }
     }
 
     /**
@@ -432,21 +447,40 @@ class Repository extends AbstractRepository
     }
 
     /**
-     * Returns the current status of the working directory and the staging area
+     * Returns the current status of the working directory
      *
      * The returned array structure is
      *      array(
      *          'file'      => '...',
-     *          'x'         => '.',
-     *          'y'         => '.',
-     *          'renamed'   => null/'...'
+     *          'status'    => '...'
      *      )
      *
      * @return  array
      */
     public function getStatus()
     {
+        /** @var $result CallResult */
+        $result = $this->getSvn()->{'status'}($this->getRepositoryPath(), array(
+            '--xml'
+        ));
+        $result->assertSuccess(
+            sprintf('Cannot retrieve status from "%s"', $this->getRepositoryPath())
+        );
 
+        $output = rtrim($result->getStdOut());
+        $xml    = simplexml_load_string($output);
+        if (!$xml) {
+            $result->assertSuccess(sprintf('Cannot read status XML for "%s"', $this->getRepositoryPath()));
+        }
+
+        $status = array();
+        foreach ($xml->xpath('/status/target/entry') as $entry) {
+            $status[]   = array(
+                'file'      => (string)$entry['path'],
+                'status'    => (string)$entry->{'wc-status'}['item']
+            );
+        }
+        return $status;
     }
 
     /**
