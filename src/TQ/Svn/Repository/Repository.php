@@ -210,15 +210,35 @@ class Repository extends AbstractRepository
      */
     public function add(array $file = null, $force = false)
     {
-        $args   = array('--force');
+        $args   = array();
+        if ($force) {
+            $args[]  = '--force';
+        }
         if ($file !== null) {
             $args[] = '--parents';
             $args[] = '--';
             $args   = array_merge($args, $this->resolveLocalGlobPath($file));
         } else {
-            $args['--depth'] = 'infinity';
-            $args[] = '--';
-            $args   = array_merge($args, $this->resolveLocalGlobPath(array('*')));
+            $toAdd      = array();
+            $toRemove   = array();
+            foreach ($this->getStatus() as $status) {
+                if ($status['status'] == 'missing') {
+                    $toRemove[] = $this->resolveLocalPath($status['file']);
+                } else if ($status['status'] == 'unversioned') {
+                    $toAdd[] = $this->resolveLocalPath($status['file']);
+                }
+            }
+
+            if (!empty($toRemove)) {
+                $this->remove($toRemove, false, $force);
+            }
+            if (empty($toAdd)) {
+                return;
+            }
+
+            $args['--depth']    = 'infinity';
+            $args[]             = '--';
+            $args               = array_merge($args, $toAdd);
         }
 
         /** @var $result CallResult */
@@ -527,7 +547,15 @@ class Repository extends AbstractRepository
         $absoluteFiles  = $this->resolveFullPath($files);
         $expandedFiles  = array();
         foreach ($absoluteFiles as $absoluteFile) {
-            $expandedFiles  = array_merge($expandedFiles, glob($absoluteFile));
+            $globResult     = glob($absoluteFile);
+            if (   empty($globResult)
+                && stripos($absoluteFile, '*') === false
+                && !file_exists($absoluteFile)
+            ) {
+                $expandedFiles[]    = $absoluteFile;
+            } else {
+                $expandedFiles  = array_merge($expandedFiles, $globResult);
+            }
         }
         return $this->resolveLocalPath($expandedFiles);
     }
