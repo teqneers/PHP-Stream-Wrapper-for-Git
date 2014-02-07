@@ -397,7 +397,43 @@ class Repository extends AbstractRepository
      */
     public function getLog($limit = null, $skip = null)
     {
+        $arguments  = array(
+            '--xml',
+            '--revision'    => 'HEAD:0'
+        );
 
+
+        $skip   = ($skip === null) ? 0 : (int)$skip;
+        if ($limit !== null) {
+            $arguments['--limit']    = (int)($limit + $skip);
+        }
+
+        /** @var $result CallResult */
+        $result = $this->getSvn()->{'log'}($this->getRepositoryPath(), $arguments);
+        $result->assertSuccess(sprintf('Cannot retrieve log from "%s"',
+            $this->getRepositoryPath()
+        ));
+
+        $xml    = simplexml_load_string($result->getStdOut());
+        if (!$xml) {
+            $result->assertSuccess(sprintf('Cannot read log XML for "%s"', $this->getRepositoryPath()));
+        }
+        $logEntries = new \ArrayIterator($xml->xpath('/log/logentry'));
+
+        if ($limit !== null) {
+            $logEntries = new \LimitIterator($logEntries, $skip, $limit);
+        }
+
+        $log = array();
+        foreach ($logEntries as $item) {
+            $log[]   = array(
+                (string)$item['revision'],
+                (string)$item->author,
+                (string)$item->date,
+                (string)$item->msg
+            );
+        }
+        return $log;
     }
 
     /**
@@ -462,17 +498,15 @@ class Repository extends AbstractRepository
     {
         $directory  = FileSystem::normalizeDirectorySeparator($directory);
         $directory  = rtrim($directory, '/').'/';
-        $path       = $this->getRepositoryPath().'/'.$this->resolveLocalPath($directory);
 
         $args   = array(
             '--xml',
             '--revision' => $ref,
-            '--',
+            $this->resolveLocalPath($directory)
         );
-        $args   = array_merge($args, $this->resolveLocalGlobPath(array('*')));
 
         /** @var $result CallResult */
-        $result = $this->getSvn()->{'list'}($path, $args);
+        $result = $this->getSvn()->{'list'}($this->getRepositoryPath(), $args);
         $result->assertSuccess(sprintf('Cannot list directory "%s" at "%s" from "%s"',
             $directory, $ref, $this->getRepositoryPath()
         ));
@@ -483,8 +517,8 @@ class Repository extends AbstractRepository
         }
 
         $list = array();
-        foreach ($xml->xpath('/lists/list') as $item) {
-            $list[]   = (string)$item['path'];
+        foreach ($xml->xpath('/lists/list/entry') as $item) {
+            $list[]   = (string)$item->name;
         }
         return $list;
     }
