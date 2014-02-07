@@ -26,6 +26,7 @@ namespace TQ\Tests\Svn\Repository;
 use TQ\Svn\Cli\Binary;
 use TQ\Svn\Repository\Repository;
 use TQ\Tests\Helper;
+use TQ\Vcs\Repository\Transaction;
 
 class ModificationTest extends \PHPUnit_Framework_TestCase
 {
@@ -218,6 +219,79 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $c->reset();
         $this->assertFalse($c->isDirty());
         $this->assertFileNotExists($file);
+    }
+
+    public function testTransactionalChangesNoException()
+    {
+        $c  = $this->getRepository();
+
+        $result = $c->transactional(function(Transaction $t) {
+            for ($i = 0; $i < 5; $i++) {
+                $file   = $t->getRepositoryPath().'/'.sprintf('test_%s.txt', $i);
+                file_put_contents($file, 'Test');
+            }
+            $t->setCommitMsg('Hello World');
+            return 'This is the return value';
+        });
+
+        $this->assertEquals('This is the return value', $result->getResult());
+
+        $this->assertFalse($c->isDirty());
+
+        $list   = $c->listDirectory();
+        $this->assertContains('file_0.txt', $list);
+        $this->assertContains('file_1.txt', $list);
+        $this->assertContains('file_2.txt', $list);
+        $this->assertContains('file_3.txt', $list);
+        $this->assertContains('file_4.txt', $list);
+        $this->assertContains('test_0.txt', $list);
+        $this->assertContains('test_1.txt', $list);
+        $this->assertContains('test_2.txt', $list);
+        $this->assertContains('test_3.txt', $list);
+        $this->assertContains('test_4.txt', $list);
+
+        $commit = $c->showCommit($result->getCommitHash());
+        $this->assertContains($result->getCommitMsg(), $commit);
+        $this->assertContains('A /test_0.txt', $commit);
+        $this->assertContains('A /test_1.txt', $commit);
+        $this->assertContains('A /test_2.txt', $commit);
+        $this->assertContains('A /test_3.txt', $commit);
+        $this->assertContains('A /test_4.txt', $commit);
+    }
+
+    public function testTransactionalChangesException()
+    {
+        $c  = $this->getRepository();
+
+
+        try {
+            $c->transactional(function(Transaction $t) {
+                for ($i = 0; $i < 5; $i++) {
+                    $file   = $t->getRepositoryPath().'/'.sprintf('test_%s.txt', $i);
+                    file_put_contents($file, 'Test');
+                }
+                throw new \Exception('Test');
+            });
+            $this->fail('Exception not thrown');
+        } catch (\Exception $e) {
+            $this->assertEquals('Test', $e->getMessage());
+            $this->assertFalse($c->isDirty());
+        }
+    }
+
+    public function testTransactionalNoChanges()
+    {
+        $c              = $this->getRepository();
+        $currentCommit  = $c->getCurrentCommit();
+
+        $result = $c->transactional(function(Transaction $t) {
+            $t->setCommitMsg('Hello World');
+            return 'This is the return value';
+        });
+
+        $this->assertEquals('This is the return value', $result->getResult());
+        $this->assertEquals($currentCommit, $result->getCommitHash());
+        $this->assertEquals($currentCommit, $c->getCurrentCommit());
     }
 }
 

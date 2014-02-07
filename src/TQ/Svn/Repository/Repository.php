@@ -210,10 +210,7 @@ class Repository extends AbstractRepository
      */
     public function add(array $file = null, $force = false)
     {
-        $args   = array();
-        if ($force) {
-            $args[]  = '--force';
-        }
+        $args   = array('--force');
         if ($file !== null) {
             $args[] = '--parents';
             $args[] = '--';
@@ -221,7 +218,7 @@ class Repository extends AbstractRepository
         } else {
             $args['--depth'] = 'infinity';
             $args[] = '--';
-            $args[] = '*';
+            $args   = array_merge($args, $this->resolveLocalGlobPath(array('*')));
         }
 
         /** @var $result CallResult */
@@ -443,7 +440,33 @@ class Repository extends AbstractRepository
      */
     public function listDirectory($directory = '.', $ref = 'HEAD')
     {
+        $directory  = FileSystem::normalizeDirectorySeparator($directory);
+        $directory  = rtrim($directory, '/').'/';
+        $path       = $this->getRepositoryPath().'/'.$this->resolveLocalPath($directory);
 
+        $args   = array(
+            '--xml',
+            '--revision' => $ref,
+            '--',
+        );
+        $args   = array_merge($args, $this->resolveLocalGlobPath(array('*')));
+
+        /** @var $result CallResult */
+        $result = $this->getSvn()->{'list'}($path, $args);
+        $result->assertSuccess(sprintf('Cannot list directory "%s" at "%s" from "%s"',
+            $directory, $ref, $this->getRepositoryPath()
+        ));
+
+        $xml    = simplexml_load_string($result->getStdOut());
+        if (!$xml) {
+            $result->assertSuccess(sprintf('Cannot read list XML for "%s"', $this->getRepositoryPath()));
+        }
+
+        $list = array();
+        foreach ($xml->xpath('/lists/list') as $item) {
+            $list[]   = (string)$item['path'];
+        }
+        return $list;
     }
 
     /**
@@ -467,8 +490,7 @@ class Repository extends AbstractRepository
             sprintf('Cannot retrieve status from "%s"', $this->getRepositoryPath())
         );
 
-        $output = rtrim($result->getStdOut());
-        $xml    = simplexml_load_string($output);
+        $xml    = simplexml_load_string($result->getStdOut());
         if (!$xml) {
             $result->assertSuccess(sprintf('Cannot read status XML for "%s"', $this->getRepositoryPath()));
         }
