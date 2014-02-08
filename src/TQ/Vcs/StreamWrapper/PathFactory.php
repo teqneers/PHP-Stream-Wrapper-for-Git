@@ -66,6 +66,7 @@ interface PathFactory
      *
      * @param   string      $streamUrl      The URL given to the stream function
      * @return  array                       An array containing information about the path
+     * @throws \InvalidArgumentException    If the URL is invalid
      */
     public function parsePath($streamUrl);
 }

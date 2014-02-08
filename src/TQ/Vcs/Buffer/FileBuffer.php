@@ -51,14 +51,14 @@ interface FileBuffer
      *
      * @return  string
      */
-    function getBuffer();
+    public function getBuffer();
 
     /**
      * Returns true if the pointer is at the end of the buffer
      *
      * @return  boolean
      */
-    function isEof();
+    public function isEof();
 
     /**
      * Reads $count bytes from the buffer
@@ -66,7 +66,7 @@ interface FileBuffer
      * @param   integer     $count      The number of bytes to read
      * @return  string|null
      */
-    function read($count);
+    public function read($count);
 
     /**
      * Writes the given date into the buffer at the current pointer position
@@ -74,14 +74,14 @@ interface FileBuffer
      * @param   string  $data       The data to write
      * @return  integer             The number of bytes written
      */
-    function write($data);
+    public function write($data);
 
     /**
      * Returns the current pointer position
      *
      * @return integer
      */
-    function getPosition();
+    public function getPosition();
 
     /**
      * Sets the pointer position
@@ -90,24 +90,24 @@ interface FileBuffer
      * @param   integer     $whence     The reference from where to measure $position (SEEK_SET, SEEK_CUR or SEEK_END)
      * @return  boolean                 True if the position could be set
      */
-    function setPosition($position, $whence);
+    public function setPosition($position, $whence);
 
     /**
      * Returns the stat information for the buffer
      *
      * @return array
      */
-    function getStat();
+    public function getStat();
 
     /**
      * Flushes the buffer to the storage media
      *
      * @return  boolean
      */
-    function flush();
+    public function flush();
 
     /**
      * Closes the buffer
      */
-    function close();
+    public function close();
 }

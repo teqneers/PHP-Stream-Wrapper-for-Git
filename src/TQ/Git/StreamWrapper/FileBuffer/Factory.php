@@ -129,7 +129,7 @@ class Factory implements FactoryInterface
      * @param   string              $mode   The mode used to open the file
      * @return  boolean                     True if this factory can handle the path
      */
-    function canHandle(PathInformation $path, $mode)
+    public function canHandle(PathInformation $path, $mode)
     {
         try {
             $this->findFactory($path, $mode);
@@ -146,7 +146,7 @@ class Factory implements FactoryInterface
      * @param   string              $mode   The mode used to open the path
      * @return  FileBuffer                  The file buffer to handle the path
      */
-    function createFileBuffer(PathInformation $path, $mode)
+    public function createFileBuffer(PathInformation $path, $mode)
     {
         $factory    = $this->findFactory($path, $mode);
         return $factory->createFileBuffer($path, $mode);

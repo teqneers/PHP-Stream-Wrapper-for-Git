@@ -140,6 +140,7 @@ class PathFactory implements PathFactoryInterface
      *
      * @param   string      $streamUrl      The URL given to the stream function
      * @return  array                       An array containing information about the path
+     * @throws \InvalidArgumentException    If the URL is invalid
      */
     public function parsePath($streamUrl)
     {
@@ -155,6 +156,9 @@ class PathFactory implements PathFactoryInterface
         }
 
         $info   = parse_url($path);
+        if (!$info) {
+            throw new \InvalidArgumentException('Url "'.$streamUrl.'" is not a valid path');
+        }
         if (isset($info['path']) && preg_match('~^/\w:.+~', $info['path'])) {
             $info['path']   = ltrim($info['path'], '/');
         } else if (!isset( $info['path'])) {

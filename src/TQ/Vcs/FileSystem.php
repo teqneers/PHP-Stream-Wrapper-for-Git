@@ -65,7 +65,7 @@ class FileSystem
     public static function bubble($path, \Closure $comparator)
     {
         $found   = null;
-        $path    = FileSystem::normalizeDirectorySeparator($path);
+        $path    = self::normalizeDirectorySeparator($path);
 
         $drive  = null;
         if (preg_match('~^(\w:)(.+)~', $path, $parts)) {
