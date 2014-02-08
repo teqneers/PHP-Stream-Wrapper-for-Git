@@ -120,7 +120,7 @@ class Repository extends AbstractRepository
     }
 
     /**
-     * Inits a path to be used as a Git repository
+     * Initializes a path to be used as a Git repository
      *
      * @param   Binary   $git           The Git binary
      * @param   string   $path          The repository path
@@ -201,11 +201,11 @@ class Repository extends AbstractRepository
         if ($author !== null) {
             $args['--author']  = $author;
         }
-        if (count($extraArgs)) {
-           foreach($extraArgs as $value) {
-               $arts[] = $value;
-           }
+
+        foreach($extraArgs as $value) {
+           $args[] = $value;
         }
+
         if ($file !== null) {
             $args[] = '--';
             $args   = array_merge($args, $this->resolveLocalPath($file));
@@ -708,4 +708,3 @@ class Repository extends AbstractRepository
         return $retVar;
     }
 }
-
