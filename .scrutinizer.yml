@@ -9,6 +9,8 @@ tools:
   php_mess_detector: true
   php_code_sniffer:
     enabled: true
+    config:
+      standard: psr1
   sensiolabs_security_checker: true
   php_code_coverage: true
   php_pdepend: true
