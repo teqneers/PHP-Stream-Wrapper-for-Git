@@ -215,9 +215,22 @@ class Repository extends AbstractRepository
             $args[]  = '--force';
         }
         if ($file !== null) {
+            $files  = $this->resolveLocalGlobPath($file);
+            foreach ($this->getStatus() as $status) {
+                if (   $status['status'] != 'unversioned'
+                    && in_array($status['file'], $files)
+                ) {
+                    array_splice($files, array_search($status['file'], $files), 1);
+                }
+            }
+
+            if (empty($files)) {
+                return;
+            }
+
             $args[] = '--parents';
             $args[] = '--';
-            $args   = array_merge($args, $this->resolveLocalGlobPath($file));
+            $args   = array_merge($args, $files);
         } else {
             $toAdd      = array();
             $toRemove   = array();
@@ -465,7 +478,16 @@ class Repository extends AbstractRepository
      */
     public function showFile($file, $ref = 'HEAD')
     {
+        /** @var $result CallResult */
+        $result = $this->getSvn()->{'cat'}($this->getRepositoryPath(), array(
+            '--revision'    => $ref,
+            $file
+        ));
+        $result->assertSuccess(sprintf('Cannot show "%s" at "%s" from "%s"',
+            $file, $ref, $this->getRepositoryPath()
+        ));
 
+        return $result->getStdOut();
     }
 
     /**

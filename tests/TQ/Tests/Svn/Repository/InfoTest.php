@@ -189,5 +189,24 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $list   = $c->listDirectory('directory', 'HEAD');
         $this->assertContains('test.txt', $list);
     }
+
+    public function testShowFile()
+    {
+        $c      = $this->getRepository();
+
+        $this->assertEquals('File 0', $c->showFile('file_0.txt'));
+
+        $c->writeFile('test.txt', 'Test 1');
+        $this->assertEquals('Test 1', $c->showFile('test.txt'));
+
+        $c->writeFile('test.txt', 'Test 2');
+        $this->assertEquals('Test 2', $c->showFile('test.txt'));
+        $this->assertEquals('Test 1', $c->showFile('test.txt', '2'));
+
+        $c->writeFile('test.txt', 'Test 3');
+        $this->assertEquals('Test 3', $c->showFile('test.txt'));
+        $this->assertEquals('Test 2', $c->showFile('test.txt', '3'));
+        $this->assertEquals('Test 1', $c->showFile('test.txt', '2'));
+    }
 }
 
