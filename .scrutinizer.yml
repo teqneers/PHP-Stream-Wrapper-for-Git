@@ -1,8 +1,10 @@
 imports:
   - php
+
 filter:
   paths: [src/*]
   excluded_paths: [tests/*]
+
 tools:
   external_code_coverage:
     timeout: 600
@@ -20,3 +22,6 @@ tools:
   php_cpd:
     enabled: true
     excluded_dirs: [tests]
+
+before_commands:
+  - composer install
