@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ * Copyright (C) 2014 by TEQneers GmbH & Co. KG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_Vcs
  * @subpackage Vcs
- * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Vcs\Cli;
@@ -39,7 +39,7 @@ namespace TQ\Vcs\Cli;
  * @category   TQ
  * @package    TQ_Vcs
  * @subpackage Vcs
- * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 abstract class Binary
 {
