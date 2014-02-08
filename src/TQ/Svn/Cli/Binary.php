@@ -25,14 +25,11 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Git
- * @subpackage Cli
+ * @package    TQ_Vcs
+ * @subpackage Svn
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
-/**
- * @namespace
- */
 namespace TQ\Svn\Cli;
 use TQ\Vcs\Cli\Binary as VcsBinary;
 use TQ\Vcs\Cli\Call;
@@ -42,8 +39,8 @@ use TQ\Vcs\Cli\Call;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Git
- * @subpackage Cli
+ * @package    TQ_Vcs
+ * @subpackage Svn
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 class Binary extends VcsBinary

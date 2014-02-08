@@ -25,14 +25,11 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Git
- * @subpackage StreamWrapper
+ * @package    TQ_Vcs
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
-/**
- * @namespace
- */
 namespace TQ\Vcs\Buffer;
 use TQ\Vcs\Exception;
 
@@ -41,8 +38,8 @@ use TQ\Vcs\Exception;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Git
- * @subpackage StreamWrapper
+ * @package    TQ_Vcs
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 class StreamBufferException extends \RuntimeException implements Exception

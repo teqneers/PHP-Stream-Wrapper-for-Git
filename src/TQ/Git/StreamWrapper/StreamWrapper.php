@@ -25,14 +25,11 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Git
- * @subpackage StreamWrapper
+ * @package    TQ_Vcs
+ * @subpackage Git
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
-/**
- * @namespace
- */
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
 use TQ\Vcs\Buffer\FileBuffer;
@@ -46,8 +43,8 @@ use TQ\Vcs\StreamWrapper\RepositoryRegistry;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Git
- * @subpackage StreamWrapper
+ * @package    TQ_Vcs
+ * @subpackage Git
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 class StreamWrapper extends AbstractStreamWrapper

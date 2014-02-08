@@ -24,15 +24,12 @@
 /**
  * Git Stream Wrapper for PHP
  *
- * @category   TQ
- * @package    TQ_Git
+ * @package    TQ_Vcs
+ * @subpackage Git
  * @subpackage StreamWrapper
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
-/**
- * @namespace
- */
 namespace TQ\Git\StreamWrapper;
 use TQ\Vcs\Repository\Repository;
 use TQ\Vcs\StreamWrapper\PathInformation as PathInformationInterface;
@@ -42,8 +39,8 @@ use TQ\Vcs\StreamWrapper\PathInformation as PathInformationInterface;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Git
- * @subpackage StreamWrapper
+ * @package    TQ_Vcs
+ * @subpackage Git
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 class PathInformation implements PathInformationInterface

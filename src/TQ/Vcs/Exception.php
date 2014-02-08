@@ -25,13 +25,11 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Git
+ * @package    TQ_Vcs
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
-/**
- * @namespace
- */
 namespace TQ\Vcs;
 
 /**
@@ -39,7 +37,8 @@ namespace TQ\Vcs;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Git
+ * @package    TQ_Vcs
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 interface Exception

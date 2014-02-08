@@ -25,14 +25,11 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Git
- * @subpackage Cli
+ * @package    TQ_Vcs
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 
-/**
- * @namespace
- */
 namespace TQ\Vcs\Cli;
 use TQ\Vcs\Exception;
 
@@ -41,8 +38,8 @@ use TQ\Vcs\Exception;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Git
- * @subpackage Cli
+ * @package    TQ_Vcs
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2011 by TEQneers GmbH & Co. KG
  */
 class CallException extends \RuntimeException implements Exception
