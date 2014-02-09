@@ -42,7 +42,7 @@ use TQ\Vcs\Repository\RepositoryInterface;
  * @subpackage VCS
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class RepositoryRegistry
+class RepositoryRegistry implements \Countable
 {
     /**
      * The repository map
