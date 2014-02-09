@@ -129,11 +129,10 @@ class Repository extends AbstractRepository
     public function getCurrentCommit()
     {
         /** @var $result CallResult */
-        $result = $this->getSvn()->{'update'}($this->getRepositoryPath(), array());
-        $result->assertSuccess(sprintf('Cannot update "%s"', $this->getRepositoryPath()));
-
-        /** @var $result CallResult */
-        $result = $this->getSvn()->{'info'}($this->getRepositoryPath(), array('--xml'));
+        $result = $this->getSvn()->{'info'}($this->getRepositoryPath(), array(
+            '--xml',
+            '--revision' => 'HEAD'
+        ));
         $result->assertSuccess(sprintf('Cannot get info for "%s"', $this->getRepositoryPath()));
 
         $xml    = simplexml_load_string($result->getStdOut());
@@ -508,7 +507,44 @@ class Repository extends AbstractRepository
      */
     public function getObjectInfo($path, $ref = 'HEAD')
     {
-        return array();
+        /** @var $result CallResult */
+        $result = $this->getSvn()->{'info'}($this->getRepositoryPath(), array(
+            '--xml',
+            '--revision' => $ref,
+            $this->resolveLocalPath($path)
+        ));
+        $result->assertSuccess(sprintf('Cannot get info for "%s" at "%s" from "%s"',
+            $path, $ref, $this->getRepositoryPath()
+        ));
+
+        $xml    = simplexml_load_string($result->getStdOut());
+        if (!$xml) {
+            $result->assertSuccess(sprintf('Cannot read info XML for "%s" at "%s" from "%s"',
+                $path, $ref, $this->getRepositoryPath()
+            ));
+        }
+
+        $entry = $xml->xpath('/info/entry');
+        if (count($entry) !== 1) {
+            $result->assertSuccess(sprintf('Cannot read info XML for "%s" at "%s" from "%s"',
+                $path, $ref, $this->getRepositoryPath()
+            ));
+        }
+        $entry  = reset($entry);
+        $mode   = 0;
+        switch ((string)$entry['kind']) {
+            case 'dir':
+                $mode   |= 0040000;
+                break;
+            case 'file':
+                $mode   |= 0100000;
+                break;
+        }
+        return array(
+            'type'  => (string)$entry['kind'],
+            'mode'  => (int)$mode,
+            'size'  => 0
+        );
     }
 
     /**
@@ -537,7 +573,9 @@ class Repository extends AbstractRepository
 
         $xml    = simplexml_load_string($result->getStdOut());
         if (!$xml) {
-            $result->assertSuccess(sprintf('Cannot read list XML for "%s"', $this->getRepositoryPath()));
+            $result->assertSuccess(sprintf('Cannot read list XML for "%s" at "%s" from "%s"',
+                $directory, $ref, $this->getRepositoryPath()
+            ));
         }
 
         $list = array();
