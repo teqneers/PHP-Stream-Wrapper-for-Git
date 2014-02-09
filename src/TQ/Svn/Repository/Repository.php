@@ -122,6 +122,8 @@ class Repository extends AbstractRepository
             $realPath   = realpath($pathWithSvnDir);
             if ($realPath == $wcPath) {
                 return $pathWithSvnDir;
+            } else {
+                return $wcPath;
             }
 
         } catch (\Exception $e) {
