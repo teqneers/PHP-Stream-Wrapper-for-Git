@@ -119,11 +119,10 @@ class Repository extends AbstractRepository
             $wcInfo = reset($wcInfo);
             $wcPath = (string)$wcInfo->{'wcroot-abspath'};
 
-            $testPath   = $pathWithSvnDir;
-            while ($testPath !== '.' || realpath($testPath) !== $wcPath) {
-                $testPath   = dirname($testPath);
+            $realPath   = realpath($pathWithSvnDir);
+            if ($realPath == $wcPath) {
+                return $pathWithSvnDir;
             }
-            return $testPath;
 
         } catch (\Exception $e) {
             return null;
