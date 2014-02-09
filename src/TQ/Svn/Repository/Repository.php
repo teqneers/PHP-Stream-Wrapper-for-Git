@@ -94,42 +94,20 @@ class Repository extends AbstractRepository
      */
     public static function findRepositoryRoot(Binary $svn, $path)
     {
-        $pathWithSvnDir   = FileSystem::bubble($path, function($p) {
-            $svnDir = $p.'/'.'.svn';
+        $hasSvnDir  = function($path) {
+            $svnDir = $path.'/'.'.svn';
             return file_exists($svnDir) && is_dir($svnDir);
-        });
-        return $pathWithSvnDir;
-        if (!$pathWithSvnDir) {
-            return null;
+        };
+
+        $pathWithSvnDir = FileSystem::bubble($path, $hasSvnDir);
+
+        $root       = $pathWithSvnDir;
+        $parentDir  = dirname($pathWithSvnDir);
+        while ($hasSvnDir($parentDir) && strlen($root) > 1) {
+            $root      = dirname($root);
+            $parentDir = dirname($parentDir);
         }
-
-        try {
-            /** @var $result CallResult */
-            $result = $svn->{'info'}($pathWithSvnDir, array('--xml'));
-            $result->assertSuccess(sprintf('Cannot get info for "%s"', $pathWithSvnDir));
-
-            $xml    = simplexml_load_string($result->getStdOut());
-            if (!$xml) {
-                throw new \RuntimeException(sprintf('Cannot read info XML for "%s"', $pathWithSvnDir));
-            }
-
-            $wcInfo = $xml->xpath('/info/entry/wc-info');
-            if (count($wcInfo) !== 1) {
-                throw new \RuntimeException(sprintf('Cannot read info XML for "%s"', $pathWithSvnDir));
-            }
-            $wcInfo = reset($wcInfo);
-            $wcPath = (string)$wcInfo->{'wcroot-abspath'};
-
-            $realPath   = realpath($pathWithSvnDir);
-            if ($realPath == $wcPath) {
-                return $pathWithSvnDir;
-            } else {
-                return $wcPath;
-            }
-
-        } catch (\Exception $e) {
-            return null;
-        }
+        return $root;
     }
 
     /**
