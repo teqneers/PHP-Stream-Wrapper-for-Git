@@ -50,9 +50,10 @@ class Helper
         }
 
         $dirIt  = new \RecursiveDirectoryIterator($path,
-              \RecursiveDirectoryIterator::SKIP_DOTS
-            | \RecursiveDirectoryIterator::KEY_AS_PATHNAME
-            | \RecursiveDirectoryIterator::CURRENT_AS_FILEINFO
+              \FilesystemIterator::SKIP_DOTS
+            | \FilesystemIterator::KEY_AS_PATHNAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it = new \RecursiveIteratorIterator($dirIt,
             \RecursiveIteratorIterator::CHILD_FIRST

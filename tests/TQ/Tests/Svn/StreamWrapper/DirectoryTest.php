@@ -203,9 +203,10 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
 
     public function testListDirectoryWithRecursiveIterator()
     {
-        $dir    = new \RecursiveDirectoryIterator(
-            'svn://'.TESTS_REPO_PATH_1,
-            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        $dir    = new \RecursiveDirectoryIterator('svn://'.TESTS_REPO_PATH_1,
+              \FilesystemIterator::KEY_AS_FILENAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it     = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
         $i      = 0;
@@ -234,9 +235,10 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         $c->writeFile('test.txt', 'Test');
 
-        $dir    = new \RecursiveDirectoryIterator(
-            'svn://'.TESTS_REPO_PATH_1,
-            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        $dir    = new \RecursiveDirectoryIterator('svn://'.TESTS_REPO_PATH_1,
+              \FilesystemIterator::KEY_AS_FILENAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
         $i  = 0;
@@ -269,9 +271,10 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(count($ex), $i);
 
-        $dir    = new \RecursiveDirectoryIterator(
-            'svn://'.TESTS_REPO_PATH_1.'#6',
-            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        $dir    = new \RecursiveDirectoryIterator('svn://'.TESTS_REPO_PATH_1.'#6',
+              \FilesystemIterator::KEY_AS_FILENAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
         $i  = 0;
@@ -303,9 +306,10 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(count($ex), $i);
 
-        $dir    = new \RecursiveDirectoryIterator(
-            'svn://'.TESTS_REPO_PATH_1.'#5',
-            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        $dir    = new \RecursiveDirectoryIterator('svn://'.TESTS_REPO_PATH_1.'#5',
+              \FilesystemIterator::KEY_AS_FILENAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
         $i  = 0;
@@ -336,9 +340,10 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(count($ex), $i);
 
-        $dir    = new \RecursiveDirectoryIterator(
-            'svn://'.TESTS_REPO_PATH_1.'#4',
-            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        $dir    = new \RecursiveDirectoryIterator('svn://'.TESTS_REPO_PATH_1.'#4',
+              \FilesystemIterator::KEY_AS_FILENAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
         $i  = 0;
@@ -368,9 +373,10 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(count($ex), $i);
 
-        $dir    = new \RecursiveDirectoryIterator(
-            'svn://'.TESTS_REPO_PATH_1.'#3',
-            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        $dir    = new \RecursiveDirectoryIterator('svn://'.TESTS_REPO_PATH_1.'#3',
+              \FilesystemIterator::KEY_AS_FILENAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
         $i  = 0;
@@ -399,9 +405,10 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(count($ex), $i);
 
-        $dir    = new \RecursiveDirectoryIterator(
-            'svn://'.TESTS_REPO_PATH_1.'#2',
-            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        $dir    = new \RecursiveDirectoryIterator('svn://'.TESTS_REPO_PATH_1.'#2',
+              \FilesystemIterator::KEY_AS_FILENAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
         $i  = 0;
@@ -429,9 +436,10 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
         }
         $this->assertEquals(count($ex), $i);
 
-        $dir    = new \RecursiveDirectoryIterator(
-            'svn://'.TESTS_REPO_PATH_1.'#1',
-            \FilesystemIterator::KEY_AS_FILENAME | \FilesystemIterator::CURRENT_AS_FILEINFO
+        $dir    = new \RecursiveDirectoryIterator('svn://'.TESTS_REPO_PATH_1.'#1',
+              \FilesystemIterator::KEY_AS_FILENAME
+            | \FilesystemIterator::CURRENT_AS_FILEINFO
+            | \FilesystemIterator::UNIX_PATHS
         );
         $it = new \RecursiveIteratorIterator($dir, \RecursiveIteratorIterator::SELF_FIRST);
         $i  = 0;
