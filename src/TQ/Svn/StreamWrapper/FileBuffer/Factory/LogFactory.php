@@ -59,7 +59,7 @@ class LogFactory extends AbstractLogFactory
             str_repeat(PHP_EOL, 3),
             array_map(
                 function(array $log) {
-                    return sprintf('%d: %s [%s]:'.PHP_EOL.'%s', $log[0], $log[2], $log[1], $log[3]);
+                    return sprintf('r%d | %s | %s:'.PHP_EOL.'%s', $log[0], $log[2], $log[1], $log[3]);
                 },
                 $repository->getLog($limit, $skip)
             )
