@@ -130,7 +130,7 @@ class Adapter implements AdapterInterface, StreamFactory, ChecksumCalculator
         $keys = array();
         foreach ($iterator as $file) {
             $path   = $this->repository->resolveLocalPath($file);
-            if (strpos($path, '.') === 0) {
+            if (preg_match('~\.(?:svn|git)~i', $path)) {
                 continue;
             }
             $keys[] = $key = $path;
