@@ -85,6 +85,14 @@ class PathFactoryTest extends \PHPUnit_Framework_TestCase
                     'path'   => 'C:/path/to/file'
                 )
             ),
+            array(
+                'protocol://repo1/path/to/file',
+                array(
+                    'scheme' => 'protocol',
+                    'host'   => 'repo1',
+                    'path'   => '/path/to/file'
+                )
+            ),
         );
     }
 }
