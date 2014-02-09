@@ -31,6 +31,9 @@
  */
 
 namespace TQ\Vcs\StreamWrapper;
+use TQ\Vcs\Buffer\ArrayBuffer;
+use TQ\Vcs\Buffer\FileBufferInterface;
+use TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface;
 
 /**
  * A basic abstract stream wrapper that hooks into PHP's stream infrastructure
@@ -49,6 +52,41 @@ abstract class AbstractStreamWrapper
      * @var string
      */
     protected static $protocol;
+
+    /**
+     * The path factory
+     *
+     * @var PathFactoryInterface
+     */
+    protected static $pathFactory;
+
+    /**
+     * The buffer factory
+     *
+     * @var FactoryInterface
+     */
+    protected static $bufferFactory;
+
+    /**
+     * The directory buffer if used on a directory
+     *
+     * @var ArrayBuffer
+     */
+    protected $dirBuffer;
+
+    /**
+     * The file buffer if used on a file
+     *
+     * @var FileBufferInterface
+     */
+    protected $fileBuffer;
+
+    /**
+     * The opened path
+     *
+     * @var PathInformationInterface
+     */
+    protected $path;
 
     /**
      * The stream context if set
@@ -70,6 +108,71 @@ abstract class AbstractStreamWrapper
      * @var array
      */
     protected $contextParameters;
+
+    /**
+     * Registers the stream wrapper with the given protocol
+     *
+     * @param   string                $protocol         The protocol (such as "vcs")
+     * @param   PathFactoryInterface  $pathFactory      The path factory
+     * @param   FactoryInterface      $bufferFactory    The buffer factory
+     * @throws  \RuntimeException                       If $protocol is already registered
+     */
+    protected static function doRegister($protocol, PathFactoryInterface $pathFactory, FactoryInterface $bufferFactory)
+    {
+        static::$protocol       = $protocol;
+        static::$pathFactory    = $pathFactory;
+        static::$bufferFactory  = $bufferFactory;
+
+        if (!stream_wrapper_register($protocol, get_called_class())) {
+            throw new \RuntimeException(sprintf('The protocol "%s" is already registered with the
+                runtime or it cannot be registered', $protocol));
+        }
+    }
+
+    /**
+     * Unregisters the stream wrapper
+     */
+    public static function unregister()
+    {
+        if (!stream_wrapper_unregister(static::$protocol)) {
+            throw new \RuntimeException(sprintf('The protocol "%s" cannot be unregistered
+                from the runtime', static::$protocol));
+        }
+        static::$protocol       = null;
+        static::$pathFactory    = null;
+        static::$bufferFactory  = null;
+    }
+
+    /**
+     * Returns the repository registry
+     *
+     * @return  RepositoryRegistry
+     */
+    public static function getRepositoryRegistry()
+    {
+        return static::$pathFactory->getRegistry();
+    }
+
+    /**
+     * Returns the path information for a given stream URL
+     *
+     * @param   string  $streamUrl          The URL given to the stream function
+     * @return  PathInformationInterface    The path information representing the stream URL
+     */
+    protected function getPath($streamUrl)
+    {
+        return self::$pathFactory->createPathInformation($streamUrl);
+    }
+
+    /**
+     * Creates the buffer factory
+     *
+     * @return  FactoryInterface
+     */
+    protected function getBufferFactory()
+    {
+        return self::$bufferFactory;
+    }
 
     /**
      * Parses the passed stream context and returns the context options
@@ -145,7 +248,12 @@ abstract class AbstractStreamWrapper
      *
      * @return  boolean     Returns TRUE on success or FALSE on failure.
      */
-    abstract public function dir_closedir();
+    public function dir_closedir()
+    {
+        $this->dirBuffer    = null;
+        $this->path         = null;
+        return true;
+    }
 
     /**
      * streamWrapper::dir_opendir — Open directory handle
@@ -154,21 +262,43 @@ abstract class AbstractStreamWrapper
      * @param   integer  $options   Whether or not to enforce safe_mode (0x04).
      * @return  boolean             Returns TRUE on success or FALSE on failure.
      */
-    abstract public function dir_opendir($path, $options);
+    public function dir_opendir($path, $options)
+    {
+        try {
+            $path               = $this->getPath($path);
+            $repo               = $path->getRepository();
+            $listing            = $repo->listDirectory($path->getLocalPath(), $path->getRef());
+            $this->dirBuffer    = new ArrayBuffer($listing);
+            $this->path         = $path;
+            return true;
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
+    }
 
     /**
      * streamWrapper::dir_readdir — Read entry from directory handle
      *
      * @return  string|false    Should return string representing the next filename, or FALSE if there is no next file.
      */
-    abstract public function dir_readdir();
+    public function dir_readdir()
+    {
+        $file   = $this->dirBuffer->current();
+        $this->dirBuffer->next();
+        return $file;
+    }
 
     /**
      * streamWrapper::dir_rewinddir — Rewind directory handle
      *
      * @return  boolean     Returns TRUE on success or FALSE on failure.
      */
-    abstract public function dir_rewinddir();
+    public function dir_rewinddir()
+    {
+        $this->dirBuffer->rewind();
+        return true;
+    }
 
     /**
      * streamWrapper::mkdir — Create a directory
@@ -212,7 +342,21 @@ abstract class AbstractStreamWrapper
     /**
      * streamWrapper::stream_close — Close an resource
      */
-    abstract public function stream_close();
+    public function stream_close()
+    {
+        $this->fileBuffer->close();
+        $this->fileBuffer   = null;
+
+        $repo   = $this->path->getRepository();
+        $repo->add(array($this->path->getFullPath()));
+        if ($repo->isDirty()) {
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+            $repo->commit($commitMsg, array($this->path->getFullPath()), $author);
+        }
+
+        $this->path         = null;
+    }
 
     /**
      * streamWrapper::stream_eof — Tests for end-of-file on a file pointer
@@ -220,7 +364,10 @@ abstract class AbstractStreamWrapper
      * @return  boolean     Should return TRUE if the read/write position is at the end of the stream
      *                      and if no more data is available to be read, or FALSE otherwise.
      */
-    abstract public function stream_eof();
+    public function stream_eof()
+    {
+        return $this->fileBuffer->isEof();
+    }
 
     /**
      * streamWrapper::stream_flush — Flushes the output
@@ -228,7 +375,10 @@ abstract class AbstractStreamWrapper
      * @return  boolean     Should return TRUE if the cached data was successfully stored
      *                      (or if there was no data to store), or FALSE if the data could not be stored.
      */
-    abstract public function stream_flush();
+    public function stream_flush()
+    {
+        return $this->fileBuffer->flush();
+    }
 
     /**
      * streamWrapper::stream_lock — Advisory file locking
@@ -285,7 +435,27 @@ abstract class AbstractStreamWrapper
      *                                  should be set to the full path of the file/resource that was actually opened.
      * @return  boolean                 Returns TRUE on success or FALSE on failure.
      */
-    abstract public function stream_open($path, $mode, $options, &$opened_path);
+    public function stream_open($path, $mode, $options, &$opened_path)
+    {
+        try {
+            $path   = $this->getPath($path);
+
+            $factory            = $this->getBufferFactory();
+            $this->fileBuffer   = $factory->createFileBuffer($path, $mode);
+            $this->path         = $path;
+
+            if (self::maskHasFlag($options, STREAM_USE_PATH)) {
+                $opened_path    = $this->path->getUrl();
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            if (self::maskHasFlag($options, STREAM_REPORT_ERRORS)) {
+                trigger_error($e->getMessage(), E_USER_WARNING);
+            }
+            return false;
+        }
+    }
 
     /**
      * streamWrapper::stream_read — Read from stream
@@ -294,7 +464,14 @@ abstract class AbstractStreamWrapper
      * @return  string              If there are less than count bytes available, return as many as are available.
      *                              If no more data is available, return either FALSE or an empty string.
      */
-    abstract public function stream_read($count);
+    public function stream_read($count)
+    {
+        $buffer = $this->fileBuffer->read($count);
+        if ($buffer === null) {
+            return false;
+        }
+        return $buffer;
+    }
 
     /**
      * streamWrapper::stream_seek — Seeks to specific location in a stream
@@ -306,7 +483,10 @@ abstract class AbstractStreamWrapper
      *                                  SEEK_END - Set position to end-of-file plus offset.
      * @return  boolean             Return TRUE if the position was updated, FALSE otherwise.
      */
-    abstract public function stream_seek($offset, $whence = SEEK_SET);
+    public function stream_seek($offset, $whence = SEEK_SET)
+    {
+        return $this->fileBuffer->setPosition($offset, $whence);
+    }
 
     /**
      * streamWrapper::stream_set_option
@@ -351,14 +531,20 @@ abstract class AbstractStreamWrapper
      *                      * On Windows this will always be 0.
      *                      ** Only valid on systems supporting the st_blksize type - other systems (e.g. Windows) return -1.
      */
-    abstract public function stream_stat();
+    public function stream_stat()
+    {
+        return $this->fileBuffer->getStat();
+    }
 
     /**
      * streamWrapper::stream_tell — Retrieve the current position of a stream
      *
      * @return  integer     Should return the current position of the stream.
      */
-    abstract public function stream_tell();
+    public function stream_tell()
+    {
+        return $this->fileBuffer->getPosition();
+    }
 
     /**
      * streamWrapper::stream_write — Write to stream
@@ -366,7 +552,10 @@ abstract class AbstractStreamWrapper
      * @param   string  $data   Should be stored into the underlying stream.
      * @return  integer         Should return the number of bytes that were successfully stored, or 0 if none could be stored.
      */
-    abstract public function stream_write($data);
+    public function stream_write($data)
+    {
+        return $this->fileBuffer->write($data);
+    }
 
     /**
      * streamWrapper::unlink — Delete a file
@@ -419,7 +608,39 @@ abstract class AbstractStreamWrapper
      * @return  array           Should return as many elements as stat() does. Unknown or unavailable values should be set to a
      *                          rational value (usually 0).
      */
-    abstract public function url_stat($path, $flags);
+    public function url_stat($path, $flags)
+    {
+        try {
+            $path   = $this->getPath($path);
+            if ($path->getRef() == 'HEAD' && file_exists($path->getFullPath())) {
+                return stat($path->getFullPath());
+            } else {
+                $repo   = $path->getRepository();
+                $info   = $repo->getObjectInfo($path->getLocalPath(), $path->getRef());
+
+                $stat   = array(
+                    'ino'       => 0,
+                    'mode'      => $info['mode'],
+                    'nlink'     => 0,
+                    'uid'       => 0,
+                    'gid'       => 0,
+                    'rdev'      => 0,
+                    'size'      => $info['size'],
+                    'atime'     => 0,
+                    'mtime'     => 0,
+                    'ctime'     => 0,
+                    'blksize'   => -1,
+                    'blocks'    => -1,
+                );
+                return array_merge($stat, array_values($stat));
+            }
+        } catch (\Exception $e) {
+            if (!self::maskHasFlag($flags, STREAM_URL_STAT_QUIET)) {
+                trigger_error($e->getMessage(), E_USER_WARNING);
+            }
+            return false;
+        }
+    }
 
     /**
      * Checks if a bitmask has a specific flag set

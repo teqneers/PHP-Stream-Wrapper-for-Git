@@ -32,7 +32,7 @@
 
 namespace TQ\Vcs\StreamWrapper\FileBuffer;
 use TQ\Vcs\Buffer\FileBufferInterface;
-use TQ\Vcs\StreamWrapper\PathInformation;
+use TQ\Vcs\StreamWrapper\PathInformationInterface;
 
 /**
  * Interface to which file stream factories must adhere
@@ -48,19 +48,19 @@ interface FactoryInterface
     /**
      * Returns true if this factory can handle the requested path
      *
-     * @param   PathInformation     $path   The path information
-     * @param   string              $mode   The mode used to open the file
-     * @return  boolean                     True if this factory can handle the path
+     * @param   PathInformationInterface     $path   The path information
+     * @param   string                       $mode   The mode used to open the file
+     * @return  boolean                              True if this factory can handle the path
      */
-    public function canHandle(PathInformation $path, $mode);
+    public function canHandle(PathInformationInterface $path, $mode);
 
     /**
      * Returns the file stream to handle the requested path
      *
-     * @param   PathInformation     $path   The path information
-     * @param   string              $mode   The mode used to open the path
+     * @param   PathInformationInterface     $path   The path information
+     * @param   string                       $mode   The mode used to open the path
      * @return  FileBufferInterface                  The file buffer to handle the path
      */
-    public function createFileBuffer(PathInformation $path, $mode);
+    public function createFileBuffer(PathInformationInterface $path, $mode);
 
 }

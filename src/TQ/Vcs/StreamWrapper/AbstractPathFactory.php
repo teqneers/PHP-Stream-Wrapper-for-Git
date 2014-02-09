@@ -88,7 +88,7 @@ abstract class AbstractPathFactory implements PathFactoryInterface
      */
     protected function getRepository(array $pathInfo)
     {
-        if ($pathInfo['host'] === PathInformation::GLOBAL_PATH_HOST) {
+        if ($pathInfo['host'] === PathInformationInterface::GLOBAL_PATH_HOST) {
             return $this->createRepositoryForPath($pathInfo['path']);
         } else {
             return $this->map->getRepository($pathInfo['host']);
@@ -145,11 +145,11 @@ abstract class AbstractPathFactory implements PathFactoryInterface
         /// fix /// paths to __global__ "host"
         $protocol   = $this->protocol;
         if (strpos($path, $protocol.':///') === 0) {
-            $path   = str_replace($protocol.':///', $protocol.'://'.PathInformation::GLOBAL_PATH_HOST.'/', $path);
+            $path   = str_replace($protocol.':///', $protocol.'://'.PathInformationInterface::GLOBAL_PATH_HOST.'/', $path);
         }
 
         $info   = parse_url($path);
-        if (!$info) {
+        if ($info === false) {
             throw new \InvalidArgumentException('Url "'.$streamUrl.'" is not a valid path');
         }
         if (isset($info['path']) && preg_match('~^/\w:.+~', $info['path'])) {

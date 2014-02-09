@@ -32,9 +32,6 @@
 
 namespace TQ\Git\StreamWrapper\FileBuffer;
 use TQ\Vcs\StreamWrapper\FileBuffer\Factory as VcsFactory;
-use TQ\Vcs\StreamWrapper\FileBuffer\Factory\CommitFactory;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;
-use TQ\Vcs\StreamWrapper\FileBuffer\Factory\HeadFileFactory;
 use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
 
 /**
@@ -61,11 +58,8 @@ class Factory extends VcsFactory
      */
     public static function getDefault()
     {
-        $factory    = new self();
-        $factory->addFactory(new CommitFactory(), 100)
-                ->addFactory(new LogFactory(), 90)
-                ->addFactory(new HeadFileFactory(), 80)
-                ->addFactory(new DefaultFactory(), -100);
+        $factory    = parent::getDefault()
+                            ->addFactory(new LogFactory(), 90);
         return $factory;
     }
 }

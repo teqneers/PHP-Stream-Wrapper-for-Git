@@ -32,12 +32,13 @@
 
 namespace TQ\Vcs\StreamWrapper\FileBuffer\Factory;
 use TQ\Vcs\Buffer\FileBufferInterface;
+use TQ\Vcs\Repository\RepositoryInterface;
 use TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface;
 use TQ\Vcs\Buffer\StringBuffer;
 use TQ\Vcs\StreamWrapper\PathInformationInterface;
 
 /**
- * Factory to create a commit buffer
+ * Factory to create a log buffer
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -45,7 +46,7 @@ use TQ\Vcs\StreamWrapper\PathInformationInterface;
  * @subpackage VCS
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class CommitFactory implements FactoryInterface
+abstract class AbstractLogFactory implements FactoryInterface
 {
     /**
      * Returns true if this factory can handle the requested path
@@ -56,7 +57,7 @@ class CommitFactory implements FactoryInterface
      */
     public function canHandle(PathInformationInterface $path, $mode)
     {
-        return $path->hasArgument('commit');
+        return $path->hasArgument('log');
     }
 
     /**
@@ -68,9 +69,24 @@ class CommitFactory implements FactoryInterface
      */
     public function createFileBuffer(PathInformationInterface $path, $mode)
     {
-        $repo   = $path->getRepository();
-        $buffer = $repo->showCommit($path->getArgument('ref'));
-        return new StringBuffer($buffer, array(), 'r');
+        return new StringBuffer(
+            $this->createLogString(
+                $path->getRepository(),
+                $path->getArgument('limit'),
+                $path->getArgument('skip')
+            ),
+            array(),
+            'r'
+        );
     }
 
+    /**
+     * Creates the log string to be fed into the string buffer
+     *
+     * @param   RepositoryInterface     $repository The repository
+     * @param   integer|null            $limit      The maximum number of log entries returned
+     * @param   integer|null            $skip       Number of log entries that are skipped from the beginning
+     * @return  string
+     */
+    abstract protected function createLogString(RepositoryInterface $repository, $limit, $skip);
 }
