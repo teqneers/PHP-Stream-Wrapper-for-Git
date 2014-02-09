@@ -212,6 +212,11 @@ class Repository extends AbstractRepository
             $args[]  = '--force';
         }
         if ($file !== null) {
+            $status = $this->getStatus();
+            if (empty($status)) {
+                return;
+            }
+
             $files  = $this->resolveLocalGlobPath($file);
             foreach ($this->getStatus() as $status) {
                 if (   $status['status'] != 'unversioned'
@@ -503,7 +508,7 @@ class Repository extends AbstractRepository
      */
     public function getObjectInfo($path, $ref = 'HEAD')
     {
-
+        return array();
     }
 
     /**
