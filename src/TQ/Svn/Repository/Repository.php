@@ -129,10 +129,11 @@ class Repository extends AbstractRepository
     public function getCurrentCommit()
     {
         /** @var $result CallResult */
-        $result = $this->getSvn()->{'info'}($this->getRepositoryPath(), array(
-            '--xml',
-            '--revision' => 'HEAD'
-        ));
+        $result = $this->getSvn()->{'update'}($this->getRepositoryPath(), array());
+        $result->assertSuccess(sprintf('Cannot update "%s"', $this->getRepositoryPath()));
+
+        /** @var $result CallResult */
+        $result = $this->getSvn()->{'info'}($this->getRepositoryPath(), array('--xml'));
         $result->assertSuccess(sprintf('Cannot get info for "%s"', $this->getRepositoryPath()));
 
         $xml    = simplexml_load_string($result->getStdOut());
