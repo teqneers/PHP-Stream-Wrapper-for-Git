@@ -46,7 +46,7 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
             $file   = sprintf('file_%d.txt', $i);
             $path   = TESTS_REPO_PATH_1.'/'.$file;
             file_put_contents($path, sprintf('File %d', $i));
-             Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('add %s',
+            Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('add %s',
                 escapeshellarg($file)
             ));
         }
@@ -56,7 +56,7 @@ class DirectoryTest extends \PHPUnit_Framework_TestCase
             $path  = TESTS_REPO_PATH_1.'/'.$dir;
             Helper::createDirectory($path);
             file_put_contents($path.'/file.txt', sprintf('Directory %d File', $i));
-             Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('add %s',
+            Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('add %s',
                 escapeshellarg($path)
             ));
         }
