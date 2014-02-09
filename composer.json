@@ -19,5 +19,8 @@
         "psr-0": {
             "TQ": "src"
         }
+    },
+    "require-dev": {
+        "knplabs/gaufrette": "*"
     }
 }
