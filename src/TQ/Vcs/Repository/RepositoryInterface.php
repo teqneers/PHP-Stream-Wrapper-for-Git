@@ -114,6 +114,19 @@ interface RepositoryInterface
     );
 
     /**
+     * Writes data to a file and commit the changes immediately
+     *
+     * @param   string          $path           The directory path
+     * @param   string|null     $commitMsg      The commit message used when committing the changes
+     * @param   integer|null    $dirMode        The mode for creating the intermediate directories
+     * @param   boolean         $recursive      Create intermediate directories recursively if required
+     * @param   string|null     $author         The author
+     * @return  string                          The current commit hash
+     * @throws  \RuntimeException               If the directory could not be created
+     */
+    public function createDirectory($path, $commitMsg = null, $dirMode = null, $recursive = true, $author = null);
+
+    /**
      * Removes a file and commit the changes immediately
      *
      * @param   string          $path           The file path

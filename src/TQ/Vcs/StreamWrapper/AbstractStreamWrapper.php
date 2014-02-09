@@ -134,6 +134,9 @@ abstract class AbstractStreamWrapper
      */
     public static function unregister()
     {
+        if (!static::$protocol) {
+            return;
+        }
         if (!stream_wrapper_unregister(static::$protocol)) {
             throw new \RuntimeException(sprintf('The protocol "%s" cannot be unregistered
                 from the runtime', static::$protocol));
@@ -308,7 +311,33 @@ abstract class AbstractStreamWrapper
      * @param   integer  $options   A bitwise mask of values, such as STREAM_MKDIR_RECURSIVE.
      * @return  boolean             Returns TRUE on success or FALSE on failure.
      */
-    abstract public function mkdir($path, $mode, $options);
+    public function mkdir($path, $mode, $options)
+    {
+        try {
+            $path   = $this->getPath($path);
+            if ($path->getRef() != 'HEAD') {
+                throw new \Exception(sprintf(
+                    'Cannot create a non-HEAD directory [%s#%s]', $path->getFullPath(), $path->getRef()
+                ));
+            }
+            if (file_exists($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s already exists', $path->getFullPath()));
+            }
+
+            $recursive  = self::maskHasFlag($options, STREAM_MKDIR_RECURSIVE);
+
+            $repo   = $path->getRepository();
+
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+
+            $repo->createDirectory($path->getLocalPath(), $commitMsg, $mode, $recursive, $author);
+            return true;
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
+    }
 
     /**
      * streamWrapper::rename — Renames a file or directory
@@ -317,7 +346,43 @@ abstract class AbstractStreamWrapper
      * @param   string   $path_to       The URL which the $path_from should be renamed to.
      * @return  boolean                 Returns TRUE on success or FALSE on failure.
      */
-    abstract public function rename($path_from, $path_to);
+    public function rename($path_from, $path_to)
+    {
+        try {
+            $pathFrom   = $this->getPath($path_from);
+            if ($pathFrom->getRef() != 'HEAD') {
+                throw new \Exception(sprintf(
+                    'Cannot rename a non-HEAD file [%s#%s]', $pathFrom->getFullPath(), $pathFrom->getRef()
+                ));
+            }
+            if (!file_exists($pathFrom->getFullPath())) {
+                throw new \Exception(sprintf('Path %s not found', $pathFrom->getFullPath()));
+            }
+
+            if (!is_file($pathFrom->getFullPath())) {
+                throw new \Exception(sprintf('Path %s is not a file', $pathFrom->getFullPath()));
+            }
+
+            $pathTo = self::$pathFactory->parsePath($path_to);
+            $pathTo = $pathTo['path'];
+
+            if (strpos($pathTo, $pathFrom->getRepositoryPath()) !== 0) {
+                throw new \Exception(sprintf('Cannot rename across repositories [%s -> %s]',
+                    $pathFrom->getFullPath(), $pathTo));
+            }
+
+            $repo   = $pathFrom->getRepository();
+
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+
+            $repo->renameFile($pathFrom->getLocalPath(), $pathTo, $commitMsg, false, $author);
+            return true;
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
+    }
 
     /**
      * streamWrapper::rmdir — Removes a directory
@@ -326,7 +391,37 @@ abstract class AbstractStreamWrapper
      * @param   integer  $options   A bitwise mask of values, such as STREAM_MKDIR_RECURSIVE.
      * @return  boolean             Returns TRUE on success or FALSE on failure.
      */
-    abstract public function rmdir($path, $options);
+    public function rmdir($path, $options)
+    {
+        try {
+            $path   = $this->getPath($path);
+            if ($path->getRef() != 'HEAD') {
+                throw new \Exception(sprintf(
+                    'Cannot remove a non-HEAD directory [%s#%s]', $path->getFullPath(), $path->getRef()
+                ));
+            }
+            if (!file_exists($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s not found', $path->getFullPath()));
+            }
+            if (!is_dir($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s is not a directory', $path->getFullPath()));
+            }
+
+            $options    |= STREAM_MKDIR_RECURSIVE;
+            $recursive  = self::maskHasFlag($options, STREAM_MKDIR_RECURSIVE);
+
+            $repo   = $path->getRepository();
+
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+
+            $repo->removeFile($path->getLocalPath(), $commitMsg, $recursive, false, $author);
+            return true;
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
+    }
 
     /**
      * streamWrapper::stream_cast — Retrieve the underlaying resource
@@ -563,7 +658,34 @@ abstract class AbstractStreamWrapper
      * @param   string   $path  The file URL which should be deleted.
      * @return  boolean         Returns TRUE on success or FALSE on failure.
      */
-    abstract public function unlink($path);
+    public function unlink($path)
+    {
+        try {
+            $path   = $this->getPath($path);
+            if ($path->getRef() != 'HEAD') {
+                throw new \Exception(sprintf(
+                    'Cannot unlink a non-HEAD file [%s#%s]', $path->getFullPath(), $path->getRef()
+                ));
+            }
+            if (!file_exists($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s not found', $path->getFullPath()));
+            }
+            if (!is_file($path->getFullPath())) {
+                throw new \Exception(sprintf('Path %s is not a file', $path->getFullPath()));
+            }
+
+            $repo   = $path->getRepository();
+
+            $commitMsg      = $this->getContextOption('commitMsg', null);
+            $author         = $this->getContextOption('author', null);
+
+            $repo->removeFile($path->getLocalPath(), $commitMsg, false, false, $author);
+            return true;
+        } catch (\Exception $e) {
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return false;
+        }
+    }
 
     /**
      * streamWrapper::url_stat — Retrieve information about a file

@@ -357,6 +357,36 @@ class Repository extends AbstractRepository
     }
 
     /**
+     * Writes data to a file and commit the changes immediately
+     *
+     * @param   string          $path           The directory path
+     * @param   string|null     $commitMsg      The commit message used when committing the changes
+     * @param   integer|null    $dirMode        The mode for creating the intermediate directories
+     * @param   boolean         $recursive      Create intermediate directories recursively if required
+     * @param   string|null     $author         The author
+     * @return  string                          The current commit hash
+     * @throws  \RuntimeException               If the directory could not be created
+     */
+    public function createDirectory($path, $commitMsg = null, $dirMode = null, $recursive = true, $author = null) {
+        $directory  = $this->resolveFullPath($path);
+        $dirMode    = $dirMode ?: $this->getDirectoryCreationMode();
+
+        if (file_exists($directory) || !mkdir($directory, (int)$dirMode, $recursive)) {
+            throw new \RuntimeException(sprintf('Cannot create "%s"', $directory));
+        }
+
+        $this->add(array($this->resolveLocalPath($directory)));
+
+        if ($commitMsg === null) {
+            $commitMsg  = sprintf('%s created directory "%s"', __CLASS__, $path);
+        }
+
+        $this->commit($commitMsg, null, $author);
+
+        return $this->getCurrentCommit();
+    }
+
+    /**
      * Removes a file and commit the changes immediately
      *
      * @param   string          $path           The file path
