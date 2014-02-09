@@ -15,12 +15,15 @@
     "require":     {
         "php": ">=5.3.0"
     },
+    "require-dev": {
+        "knplabs/gaufrette": "*"
+    },
+    "suggest": {
+        "knplabs/gaufrette": "to use the Gaufrette adapter"
+    },
     "autoload":    {
         "psr-0": {
             "TQ": "src"
         }
-    },
-    "require-dev": {
-        "knplabs/gaufrette": "*"
     }
 }
