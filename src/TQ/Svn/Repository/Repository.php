@@ -98,6 +98,7 @@ class Repository extends AbstractRepository
             $svnDir = $p.'/'.'.svn';
             return file_exists($svnDir) && is_dir($svnDir);
         });
+        return $pathWithSvnDir;
         if (!$pathWithSvnDir) {
             return null;
         }
