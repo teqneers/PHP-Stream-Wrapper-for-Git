@@ -6,6 +6,9 @@ php:
   - hhvm
 
 before_script:
+  - which git
+  - git --version
+  - which svn
   - svn --version
   - composer install
 
