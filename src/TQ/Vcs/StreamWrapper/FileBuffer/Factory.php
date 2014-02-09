@@ -26,27 +26,73 @@
  *
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
-namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Vcs\Buffer\FileBufferInterface;
-use TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface;
+namespace TQ\Vcs\StreamWrapper\FileBuffer;
 use TQ\Vcs\StreamWrapper\PathInformation;
-use TQ\Vcs\Buffer\StringBuffer;
+use TQ\Vcs\Buffer\FileBufferInterface;
 
 /**
- * Factory to create a default buffer
+ * Resolves the file stream factory to use on a stream_open call
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class DefaultFactory implements FactoryInterface
+class Factory implements FactoryInterface
 {
+    /**
+     * The list containing the possible factories
+     *
+     * @var \SplPriorityQueue
+     */
+    protected $factoryList;
+
+    /**
+     * Creates a new factory resolver
+     */
+    public function __construct()
+    {
+        $this->factoryList  = new \SplPriorityQueue();
+    }
+
+    /**
+     * Adds a factory to the list of possible factories
+     *
+     * @param   FactoryInterface    $factory    The factory to add
+     * @param   integer             $priority   The priority
+     * @return  Factory                         The factory
+     */
+    public function addFactory(FactoryInterface $factory, $priority = 10)
+    {
+        $this->factoryList->insert($factory, $priority);
+        return $this;
+    }
+
+    /**
+     * Returns the file stream factory to handle the requested path
+     *
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the path
+     * @return  Factory                     The file buffer factory to handle the path
+     * @throws  \RuntimeException           If no factory is found to handle to the path
+     */
+    public function findFactory(PathInformation $path, $mode)
+    {
+        $factoryList    = clone $this->factoryList;
+        foreach ($factoryList as $factory) {
+            /** @var $factory Factory */
+            if ($factory->canHandle($path, $mode)) {
+                return $factory;
+            }
+        }
+        throw new \RuntimeException('No factory found to handle the requested path');
+    }
+
     /**
      * Returns true if this factory can handle the requested path
      *
@@ -56,7 +102,12 @@ class DefaultFactory implements FactoryInterface
      */
     public function canHandle(PathInformation $path, $mode)
     {
-        return true;
+        try {
+            $this->findFactory($path, $mode);
+            return true;
+        } catch (\RuntimeException $e) {
+            return false;
+        }
     }
 
     /**
@@ -68,10 +119,7 @@ class DefaultFactory implements FactoryInterface
      */
     public function createFileBuffer(PathInformation $path, $mode)
     {
-        $repo       = $path->getRepository();
-        $buffer     = $repo->showFile($path->getLocalPath(), $path->getRef());
-        $objectInfo = $repo->getObjectInfo($path->getLocalPath(), $path->getRef());
-        return new StringBuffer($buffer, $objectInfo, 'r');
+        $factory    = $this->findFactory($path, $mode);
+        return $factory->createFileBuffer($path, $mode);
     }
-
 }

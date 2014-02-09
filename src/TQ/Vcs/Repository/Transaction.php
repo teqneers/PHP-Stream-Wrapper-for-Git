@@ -46,7 +46,7 @@ class Transaction
     /**
      * The Vcs repository
      *
-     * @var Repository
+     * @var RepositoryInterface
      */
     protected $repository;
 
@@ -81,9 +81,9 @@ class Transaction
     /**
      * Creates a new transactional parameter
      *
-     * @param   Repository  $repository     The Vcs repository
+     * @param   RepositoryInterface  $repository     The Vcs repository
      */
-    public function __construct(Repository $repository)
+    public function __construct(RepositoryInterface $repository)
     {
         $this->repository   = $repository;
     }
@@ -91,7 +91,7 @@ class Transaction
     /**
      * Returns the Vcs repository
      *
-     * @return  Repository
+     * @return  RepositoryInterface
      */
     public function getRepository()
     {

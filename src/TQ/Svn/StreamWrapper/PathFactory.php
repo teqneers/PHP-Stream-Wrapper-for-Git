@@ -26,50 +26,56 @@
  *
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Svn
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
-namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Vcs\Buffer\FileBuffer;
-use TQ\Git\StreamWrapper\PathInformation;
-use TQ\Vcs\Buffer\StringBuffer;
+namespace TQ\Svn\StreamWrapper;
+use TQ\Svn\Cli\Binary;
+use TQ\Svn\Repository\Repository;
+use TQ\Vcs\Repository\RepositoryInterface;
+use TQ\Vcs\StreamWrapper\AbstractPathFactory;
+use TQ\Vcs\StreamWrapper\RepositoryRegistry;
 
 /**
- * Factory to create a commit buffer
+ * Creates path information for a given stream URL
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Svn
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class CommitFactory implements Factory
+class PathFactory extends AbstractPathFactory
 {
     /**
-     * Returns true if this factory can handle the requested path
+     * The SVN binary
      *
-     * @param   PathInformation     $path   The path information
-     * @param   string              $mode   The mode used to open the file
-     * @return  boolean                     True if this factory can handle the path
+     * @var Binary
      */
-    public function canHandle(PathInformation $path, $mode)
+    protected $svn;
+
+    /**
+     * Creates a path factory
+     *
+     * @param   string              $protocol    The protocol (such as "svn")
+     * @param   Binary|string|null  $svn         The SVN binary
+     * @param   RepositoryRegistry  $map         The repository registry
+     */
+    public function __construct($protocol, $svn = null, RepositoryRegistry $map = null)
     {
-        return $path->hasArgument('commit');
+        parent::__construct($protocol, $map);
+        $this->svn   = Binary::ensure($svn);
     }
 
     /**
-     * Returns the file stream to handle the requested path
+     * Creates a new Repository instance for the given path
      *
-     * @param   PathInformation     $path   The path information
-     * @param   string              $mode   The mode used to open the path
-     * @return  FileBuffer                  The file buffer to handle the path
+     * @param   string      $path       The path
+     * @return  RepositoryInterface
      */
-    public function createFileBuffer(PathInformation $path, $mode)
+    protected function createRepositoryForPath($path)
     {
-        $repo   = $path->getRepository();
-        $buffer = $repo->showCommit($path->getArgument('ref'));
-        return new StringBuffer($buffer, array(), 'r');
+        return Repository::open($path, $this->svn);
     }
-
 }

@@ -26,46 +26,41 @@
  *
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
-namespace TQ\Git\StreamWrapper\FileBuffer;
-use TQ\Vcs\StreamWrapper\FileBuffer\Factory as VcsFactory;
-use TQ\Vcs\StreamWrapper\FileBuffer\Factory\CommitFactory;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\DefaultFactory;
-use TQ\Vcs\StreamWrapper\FileBuffer\Factory\HeadFileFactory;
-use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
+namespace TQ\Vcs\StreamWrapper\FileBuffer;
+use TQ\Vcs\Buffer\FileBufferInterface;
+use TQ\Vcs\StreamWrapper\PathInformation;
 
 /**
- * Resolves the file stream factory to use on a stream_open call
+ * Interface to which file stream factories must adhere
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class Factory extends VcsFactory
+interface FactoryInterface
 {
     /**
-     * Returns a default factory
+     * Returns true if this factory can handle the requested path
      *
-     * includes:
-     * - CommitFactory
-     * - LogFactory
-     * - HeadFileFactory
-     * - DefaultFactory
-     *
-     * @return  Factory
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the file
+     * @return  boolean                     True if this factory can handle the path
      */
-    public static function getDefault()
-    {
-        $factory    = new self();
-        $factory->addFactory(new CommitFactory(), 100)
-                ->addFactory(new LogFactory(), 90)
-                ->addFactory(new HeadFileFactory(), 80)
-                ->addFactory(new DefaultFactory(), -100);
-        return $factory;
-    }
+    public function canHandle(PathInformation $path, $mode);
+
+    /**
+     * Returns the file stream to handle the requested path
+     *
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the path
+     * @return  FileBufferInterface                  The file buffer to handle the path
+     */
+    public function createFileBuffer(PathInformation $path, $mode);
+
 }

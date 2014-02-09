@@ -33,8 +33,9 @@
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
+use TQ\Vcs\Repository\RepositoryInterface;
+use TQ\Vcs\StreamWrapper\AbstractPathFactory;
 use TQ\Vcs\StreamWrapper\RepositoryRegistry;
-use TQ\Vcs\StreamWrapper\PathFactory as PathFactoryInterface;
 
 /**
  * Creates path information for a given stream URL
@@ -45,122 +46,36 @@ use TQ\Vcs\StreamWrapper\PathFactory as PathFactoryInterface;
  * @subpackage Git
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class PathFactory implements PathFactoryInterface
+class PathFactory extends AbstractPathFactory
 {
-    /**
-     * The repository registry
-     *
-     * @var RepositoryRegistry
-     */
-    protected $map;
-
     /**
      * The Git binary
      *
      * @var Binary
      */
-    protected $binary;
+    protected $git;
 
     /**
-     * The registered protocol
-     *
-     * @var string
-     */
-    protected $protocol;
-
-    /**
-     * Registers the stream wrapper with the given protocol
+     * Creates a path factory
      *
      * @param   string              $protocol    The protocol (such as "git")
-     * @param   Binary|string|null  $binary      The Git binary
+     * @param   Binary|string|null  $git         The Git binary
      * @param   RepositoryRegistry  $map         The repository registry
      */
-    public function __construct($protocol, $binary = null, RepositoryRegistry $map = null)
+    public function __construct($protocol, $git = null, RepositoryRegistry $map = null)
     {
-        $this->protocol = $protocol;
-        $this->binary   = Binary::ensure($binary);
-        $this->map      = $map ?: new RepositoryRegistry();
+        parent::__construct($protocol, $map);
+        $this->git   = Binary::ensure($git);
     }
 
     /**
-     * Returns the repository registry
+     * Creates a new Repository instance for the given path
      *
-     * @return  RepositoryRegistry
+     * @param   string      $path       The path
+     * @return  RepositoryInterface
      */
-    public function getRegistry()
+    protected function createRepositoryForPath($path)
     {
-        return $this->map;
-    }
-
-    /**
-     * Returns the repository for the given path information
-     *
-     * @param   array       $pathInfo       An array containing information about the path
-     * @return  Repository
-     */
-    protected function getRepository(array $pathInfo)
-    {
-        if ($pathInfo['host'] === PathInformation::GLOBAL_PATH_HOST) {
-            return Repository::open($pathInfo['path'], $this->binary, false);
-        } else {
-            return $this->map->getRepository($pathInfo['host']);
-        }
-    }
-
-    /**
-     * Returns the path information for a given stream URL
-     *
-     * @param   string  $streamUrl      The URL given to the stream function
-     * @return  PathInformation         The path information representing the stream URL
-     */
-    public function createPathInformation($streamUrl)
-    {
-        $pathInfo     = $this->parsePath($streamUrl);
-        $repository   = $this->getRepository($pathInfo);
-        $ref          = isset($pathInfo['fragment']) ? $pathInfo['fragment'] : 'HEAD';
-
-        $arguments  = array();
-        if (isset($pathInfo['query'])) {
-            parse_str($pathInfo['query'], $arguments);
-        }
-
-        $fullPath   = $repository->resolveFullPath($pathInfo['path']);
-        $url        =  $this->protocol.'://'.$fullPath
-                      .'#'.$ref
-                      .'?'.http_build_query($arguments);
-
-        return new PathInformation($repository, $url, $fullPath, $ref, $arguments);
-    }
-
-    /**
-     * Returns path information for a given stream path
-     *
-     * @param   string      $streamUrl      The URL given to the stream function
-     * @return  array                       An array containing information about the path
-     * @throws \InvalidArgumentException    If the URL is invalid
-     */
-    public function parsePath($streamUrl)
-    {
-        // normalize directory separators
-        $path   = str_replace(array('\\', '/'), '/', $streamUrl);
-        //fix path if fragment has been munged into the path (e.g. when using the RecursiveIterator)
-        $path   = preg_replace('~^(.+?)(#[^/]+)(.*)$~', '$1$3$2', $path);
-
-        /// fix /// paths to __global__ "host"
-        $protocol   = $this->protocol;
-        if (strpos($path, $protocol.':///') === 0) {
-            $path   = str_replace($protocol.':///', $protocol.'://'.PathInformation::GLOBAL_PATH_HOST.'/', $path);
-        }
-
-        $info   = parse_url($path);
-        if (!$info) {
-            throw new \InvalidArgumentException('Url "'.$streamUrl.'" is not a valid path');
-        }
-        if (isset($info['path']) && preg_match('~^/\w:.+~', $info['path'])) {
-            $info['path']   = ltrim($info['path'], '/');
-        } else if (!isset( $info['path'])) {
-             $info['path']  = '/';
-        }
-        return $info;
+        return Repository::open($path, $this->git, false);
     }
 }

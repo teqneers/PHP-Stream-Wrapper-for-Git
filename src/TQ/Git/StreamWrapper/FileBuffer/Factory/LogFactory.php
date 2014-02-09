@@ -31,8 +31,9 @@
  */
 
 namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Vcs\Buffer\FileBuffer;
-use TQ\Git\StreamWrapper\PathInformation;
+use TQ\Vcs\Buffer\FileBufferInterface;
+use TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface;
+use TQ\Vcs\StreamWrapper\PathInformation;
 use TQ\Vcs\Buffer\StringBuffer;
 
 /**
@@ -44,7 +45,7 @@ use TQ\Vcs\Buffer\StringBuffer;
  * @subpackage Git
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class LogFactory implements Factory
+class LogFactory implements FactoryInterface
 {
     /**
      * Returns true if this factory can handle the requested path
@@ -63,7 +64,7 @@ class LogFactory implements Factory
      *
      * @param   PathInformation     $path   The path information
      * @param   string              $mode   The mode used to open the path
-     * @return  FileBuffer                  The file buffer to handle the path
+     * @return  FileBufferInterface                  The file buffer to handle the path
      */
     public function createFileBuffer(PathInformation $path, $mode)
     {

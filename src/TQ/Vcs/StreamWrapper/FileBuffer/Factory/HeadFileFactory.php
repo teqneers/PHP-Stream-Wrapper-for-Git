@@ -26,24 +26,26 @@
  *
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
-namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Vcs\Buffer\FileBuffer;
-use TQ\Git\StreamWrapper\PathInformation;
+namespace TQ\Vcs\StreamWrapper\FileBuffer\Factory;
+use TQ\Vcs\Buffer\FileBufferInterface;
+use TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface;
+use TQ\Vcs\StreamWrapper\PathInformation;
+use TQ\Vcs\Buffer\StreamBuffer;
 
 /**
- * Interface to which file stream factories must adhere
+ * Factory to create a HEAD file buffer
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-interface Factory
+class HeadFileFactory implements FactoryInterface
 {
     /**
      * Returns true if this factory can handle the requested path
@@ -52,15 +54,21 @@ interface Factory
      * @param   string              $mode   The mode used to open the file
      * @return  boolean                     True if this factory can handle the path
      */
-    public function canHandle(PathInformation $path, $mode);
+    public function canHandle(PathInformation $path, $mode)
+    {
+        return $path->getRef() == 'HEAD' && !is_dir($path->getFullPath());
+    }
 
     /**
      * Returns the file stream to handle the requested path
      *
      * @param   PathInformation     $path   The path information
      * @param   string              $mode   The mode used to open the path
-     * @return  FileBuffer                  The file buffer to handle the path
+     * @return  FileBufferInterface                  The file buffer to handle the path
      */
-    public function createFileBuffer(PathInformation $path, $mode);
+    public function createFileBuffer(PathInformation $path, $mode)
+    {
+        return new StreamBuffer($path->getFullPath(), $mode);
+    }
 
 }

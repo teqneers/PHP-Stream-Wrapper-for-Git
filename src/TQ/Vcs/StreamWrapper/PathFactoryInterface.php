@@ -26,48 +26,44 @@
  *
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
-namespace TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Vcs\Buffer\FileBuffer;
-use TQ\Git\StreamWrapper\PathInformation;
-use TQ\Vcs\Buffer\StreamBuffer;
+namespace TQ\Vcs\StreamWrapper;
 
 /**
- * Factory to create a HEAD file buffer
+ * Creates path information for a given stream URL
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Vcs
- * @subpackage Git
+ * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class HeadFileFactory implements Factory
+interface PathFactoryInterface
 {
     /**
-     * Returns true if this factory can handle the requested path
+     * Returns the repository registry
      *
-     * @param   PathInformation     $path   The path information
-     * @param   string              $mode   The mode used to open the file
-     * @return  boolean                     True if this factory can handle the path
+     * @return  RepositoryRegistry
      */
-    public function canHandle(PathInformation $path, $mode)
-    {
-        return $path->getRef() == 'HEAD' && !is_dir($path->getFullPath());
-    }
+    public function getRegistry();
 
     /**
-     * Returns the file stream to handle the requested path
+     * Returns the path information for a given stream URL
      *
-     * @param   PathInformation     $path   The path information
-     * @param   string              $mode   The mode used to open the path
-     * @return  FileBuffer                  The file buffer to handle the path
+     * @param   string  $streamUrl              The URL given to the stream function
+     * @return  PathInformationInterface        The path information representing the stream URL
      */
-    public function createFileBuffer(PathInformation $path, $mode)
-    {
-        return new StreamBuffer($path->getFullPath(), $mode);
-    }
+    public function createPathInformation($streamUrl);
 
+    /**
+     * Returns path information for a given stream path
+     *
+     * @param   string      $streamUrl      The URL given to the stream function
+     * @return  array                       An array containing information about the path
+     * @throws \InvalidArgumentException    If the URL is invalid
+     */
+    public function parsePath($streamUrl);
 }

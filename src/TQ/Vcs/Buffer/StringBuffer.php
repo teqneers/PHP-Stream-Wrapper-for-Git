@@ -41,7 +41,7 @@ namespace TQ\Vcs\Buffer;
  * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class StringBuffer implements FileBuffer
+class StringBuffer implements FileBufferInterface
 {
     /**
      * The buffer contents

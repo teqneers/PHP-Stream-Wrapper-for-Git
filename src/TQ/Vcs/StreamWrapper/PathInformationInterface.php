@@ -30,10 +30,11 @@
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
-namespace TQ\Vcs\Buffer;
+namespace TQ\Vcs\StreamWrapper;
+use TQ\Vcs\Repository\RepositoryInterface;
 
 /**
- * Interface for file buffers used in the stream wrapper
+ * Represents a given stream wrapper path
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -41,70 +42,75 @@ namespace TQ\Vcs\Buffer;
  * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-interface FileBuffer
+interface PathInformationInterface
 {
     /**
-     * Returns the complete contents of the buffer
+     * The host name used for global paths
+     */
+    const GLOBAL_PATH_HOST  = '__global__';
+
+    /**
+     * Returns the URL
      *
      * @return  string
      */
-    public function getBuffer();
+    public function getUrl();
 
     /**
-     * Returns true if the pointer is at the end of the buffer
+     * Returns the repository instance
      *
+     * @return  RepositoryInterface
+     */
+    public function getRepository();
+
+    /**
+     * Returns the absolute repository path
+     *
+     * @return  string
+     */
+    public function getRepositoryPath();
+
+    /**
+     * Returns the absolute path to the resource
+     *
+     * @return  string
+     */
+    public function getFullPath();
+
+    /**
+     * Returns the relative path to the resource based on the repository path
+     *
+     * @return  string
+     */
+    public function getLocalPath();
+
+    /**
+     * Returns the version ref
+     *
+     * @return  string
+     */
+    public function getRef();
+
+    /**
+     * Returns the additional arguments given
+     *
+     * @return  array
+     */
+    public function getArguments();
+
+    /**
+     * Checks if the given argument exists
+     *
+     * @param   string  $argument   The argument name
      * @return  boolean
      */
-    public function isEof();
+    public function hasArgument($argument);
 
     /**
-     * Reads $count bytes from the buffer
+     * Returns the given argument from the argument collection
      *
-     * @param   integer     $count      The number of bytes to read
-     * @return  string|null
+     * @param   string  $argument   The argument name
+     * @return  string|null         The argument value or NULL if the argument does not exist
      */
-    public function read($count);
-
-    /**
-     * Writes the given date into the buffer at the current pointer position
-     *
-     * @param   string  $data       The data to write
-     * @return  integer             The number of bytes written
-     */
-    public function write($data);
-
-    /**
-     * Returns the current pointer position
-     *
-     * @return integer
-     */
-    public function getPosition();
-
-    /**
-     * Sets the pointer position
-     *
-     * @param   integer     $position   The position in bytes
-     * @param   integer     $whence     The reference from where to measure $position (SEEK_SET, SEEK_CUR or SEEK_END)
-     * @return  boolean                 True if the position could be set
-     */
-    public function setPosition($position, $whence);
-
-    /**
-     * Returns the stat information for the buffer
-     *
-     * @return array
-     */
-    public function getStat();
-
-    /**
-     * Flushes the buffer to the storage media
-     *
-     * @return  boolean
-     */
-    public function flush();
-
-    /**
-     * Closes the buffer
-     */
-    public function close();
+    public function getArgument($argument);
 }

@@ -33,16 +33,15 @@
 namespace TQ\Vcs\Repository;
 
 /**
- * Provides access to a Git repository
+ * Provides access to a VCS repository
  *
- * @uses       TQ\Git\Cli\Binary
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Vcs
  * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-interface Repository
+interface RepositoryInterface
 {
     /**
      * Returns the full file system path to the repository
@@ -120,7 +119,7 @@ interface Repository
      * @param   string          $path           The file path
      * @param   string|null     $commitMsg      The commit message used when committing the changes
      * @param   boolean         $recursive      True to recursively remove subdirectories
-     * @param   boolean         $force          True to continue even though Git reports a possible conflict
+     * @param   boolean         $force          True to continue even though VCS reports a possible conflict
      * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */
@@ -132,7 +131,7 @@ interface Repository
      * @param   string          $fromPath       The source path
      * @param   string          $toPath         The destination path
      * @param   string|null     $commitMsg      The commit message used when committing the changes
-     * @param   boolean         $force          True to continue even though Git reports a possible conflict
+     * @param   boolean         $force          True to continue even though VCS reports a possible conflict
      * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */

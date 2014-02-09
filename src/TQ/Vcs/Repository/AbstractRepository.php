@@ -36,14 +36,13 @@ use TQ\Vcs\FileSystem;
 /**
  * Base class for Vcs repositories
  *
- * @uses       TQ\Git\Cli\Binary
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_Vcs
  * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-abstract class AbstractRepository implements Repository
+abstract class AbstractRepository implements RepositoryInterface
 {
     /**
      * The repository path
@@ -107,7 +106,7 @@ abstract class AbstractRepository implements Repository
      * Sets the mode used to create files when requested
      *
      * @param   integer     $fileCreationMode   The mode, e.g. 644
-     * @return  Repository
+     * @return  RepositoryInterface
      */
     public function setFileCreationMode($fileCreationMode)
     {
@@ -129,7 +128,7 @@ abstract class AbstractRepository implements Repository
      * Sets the mode used to create directories when requested
      *
      * @param   integer     $directoryCreationMode   The mode, e.g. 755
-     * @return  Repository
+     * @return  RepositoryInterface
      */
     public function setDirectoryCreationMode($directoryCreationMode)
     {
@@ -151,7 +150,7 @@ abstract class AbstractRepository implements Repository
      * Sets the author used when committing changes
      *
      * @param   string     $author      The author used when committing changes
-     * @return  Repository
+     * @return  RepositoryInterface
      */
     public function setAuthor($author)
     {

@@ -21,10 +21,11 @@
  * THE SOFTWARE.
  */
 
-namespace TQ\Tests\Git\StreamWrapper\FileBuffer\Factory;
+namespace TQ\Tests\Vcs\StreamWrapper\FileBuffer\Factory;
 
-use TQ\Git\StreamWrapper\FileBuffer\Factory;
-use TQ\Git\StreamWrapper\PathInformation;
+use TQ\Vcs\StreamWrapper\FileBuffer\Factory;
+use TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface;
+use TQ\Vcs\StreamWrapper\PathInformation;
 
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +35,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     protected function createPathMock()
     {
         return $this->getMock(
-            'TQ\Git\StreamWrapper\PathInformation',
+            'TQ\Vcs\StreamWrapper\PathInformation',
             array(),
             array(),
             '',
@@ -43,12 +44,12 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return  \TQ\Git\StreamWrapper\FileBuffer\Factory\Factory
+     * @return  FactoryInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createFactoryMock()
     {
         return $this->getMock(
-            'TQ\Git\StreamWrapper\FileBuffer\Factory\Factory',
+            'TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface',
             array('canHandle', 'createFileBuffer')
         );
     }

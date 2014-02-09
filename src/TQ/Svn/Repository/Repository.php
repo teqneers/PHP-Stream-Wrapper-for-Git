@@ -263,7 +263,7 @@ class Repository extends AbstractRepository
      *
      * @param   array   $file           The file(s) to be removed
      * @param   boolean $recursive      True to recursively remove subdirectories
-     * @param   boolean $force          True to continue even though Git reports a possible conflict
+     * @param   boolean $force          True to continue even though SVN reports a possible conflict
      */
     public function remove(array $file, $recursive = false, $force = false)
     {
@@ -286,7 +286,7 @@ class Repository extends AbstractRepository
      *
      * @param   string  $fromPath   The source path
      * @param   string  $toPath     The destination path
-     * @param   boolean $force      True to continue even though Git reports a possible conflict
+     * @param   boolean $force      True to continue even though SVN reports a possible conflict
      */
     public function move($fromPath, $toPath, $force = false)
     {
@@ -358,7 +358,7 @@ class Repository extends AbstractRepository
      * @param   string          $path           The file path
      * @param   string|null     $commitMsg      The commit message used when committing the changes
      * @param   boolean         $recursive      True to recursively remove subdirectories
-     * @param   boolean         $force          True to continue even though Git reports a possible conflict
+     * @param   boolean         $force          True to continue even though SVN reports a possible conflict
      * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */
@@ -381,7 +381,7 @@ class Repository extends AbstractRepository
      * @param   string          $fromPath       The source path
      * @param   string          $toPath         The destination path
      * @param   string|null     $commitMsg      The commit message used when committing the changes
-     * @param   boolean         $force          True to continue even though Git reports a possible conflict
+     * @param   boolean         $force          True to continue even though SVN reports a possible conflict
      * @param   string|null     $author         The author
      * @return  string                          The current commit hash
      */

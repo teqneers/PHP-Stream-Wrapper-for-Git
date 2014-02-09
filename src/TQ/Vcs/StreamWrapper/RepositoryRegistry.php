@@ -31,7 +31,7 @@
  */
 
 namespace TQ\Vcs\StreamWrapper;
-use TQ\Vcs\Repository\Repository;
+use TQ\Vcs\Repository\RepositoryInterface;
 
 /**
  * Manages multiples repositories by keys
@@ -55,10 +55,10 @@ class RepositoryRegistry
      * Adds a single repository
      *
      * @param   string               $key        The key
-     * @param   Repository           $repository The repository
+     * @param   RepositoryInterface           $repository The repository
      * @return  RepositoryRegistry
      */
-    public function addRepository($key, Repository $repository)
+    public function addRepository($key, RepositoryInterface $repository)
     {
         $this->map[$key]    = $repository;
         return $this;
@@ -93,7 +93,7 @@ class RepositoryRegistry
      * Returns the repository if it is registered in the map, throws exception otherwise
      *
      * @param   string      $key        The key
-     * @return  Repository
+     * @return  RepositoryInterface
      * @throws  \OutOfBoundsException   If the key does not exist
      */
     public function getRepository($key)
@@ -109,7 +109,7 @@ class RepositoryRegistry
      * Returns the repository if it is registered in the map, NULL otherwise
      *
      * @param   string      $key        The key
-     * @return  Repository|null
+     * @return  RepositoryInterface|null
      */
     public function tryGetRepository($key)
     {

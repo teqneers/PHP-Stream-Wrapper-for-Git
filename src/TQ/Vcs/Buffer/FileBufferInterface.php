@@ -33,7 +33,7 @@
 namespace TQ\Vcs\Buffer;
 
 /**
- * Encapsulates a file stream buffer to be used in the stream wrapper
+ * Interface for file buffers used in the stream wrapper
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -41,61 +41,21 @@ namespace TQ\Vcs\Buffer;
  * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-class StreamBuffer implements FileBufferInterface
+interface FileBufferInterface
 {
-    /**
-     * The file resource
-     *
-     * @var resource
-     */
-    protected $stream;
-
-    /**
-     * Creates a new file buffer with the given path
-     *
-     * @param   string  $path    The path
-     * @param   string  $mode    The file mode
-     * @throws  StreamBufferException  If the stream cannot be opened in the given mode
-     */
-    public function __construct($path, $mode = 'r+')
-    {
-        $this->stream   = @fopen($path, $mode);
-        if ($this->stream === false) {
-            throw new StreamBufferException(sprintf('Cannot access "%s" in mode "%s"', $path, $mode));
-        }
-    }
-
-    /**
-     * Destructor closes file stream handle
-     */
-    public function __destruct()
-    {
-        $this->close();
-    }
-
     /**
      * Returns the complete contents of the buffer
      *
      * @return  string
      */
-    public function getBuffer()
-    {
-        $currentPos = $this->getPosition();
-        $this->setPosition(0, SEEK_SET);
-        $buffer = stream_get_contents($this->stream);
-        $this->setPosition($currentPos, SEEK_SET);
-        return $buffer;
-    }
+    public function getBuffer();
 
     /**
      * Returns true if the pointer is at the end of the buffer
      *
      * @return  boolean
      */
-    public function isEof()
-    {
-        return feof($this->stream);
-    }
+    public function isEof();
 
     /**
      * Reads $count bytes from the buffer
@@ -103,10 +63,7 @@ class StreamBuffer implements FileBufferInterface
      * @param   integer     $count      The number of bytes to read
      * @return  string|null
      */
-    public function read($count)
-    {
-        return fread($this->stream, $count);
-    }
+    public function read($count);
 
     /**
      * Writes the given date into the buffer at the current pointer position
@@ -114,20 +71,14 @@ class StreamBuffer implements FileBufferInterface
      * @param   string  $data       The data to write
      * @return  integer             The number of bytes written
      */
-    public function write($data)
-    {
-        return fwrite($this->stream, $data);
-    }
+    public function write($data);
 
     /**
      * Returns the current pointer position
      *
      * @return integer
      */
-    public function getPosition()
-    {
-        return ftell($this->stream);
-    }
+    public function getPosition();
 
     /**
      * Sets the pointer position
@@ -136,39 +87,24 @@ class StreamBuffer implements FileBufferInterface
      * @param   integer     $whence     The reference from where to measure $position (SEEK_SET, SEEK_CUR or SEEK_END)
      * @return  boolean                 True if the position could be set
      */
-    public function setPosition($position, $whence)
-    {
-        return (fseek($this->stream, $position, $whence) == 0);
-    }
+    public function setPosition($position, $whence);
 
     /**
      * Returns the stat information for the buffer
      *
      * @return array
      */
-    public function getStat()
-    {
-        return fstat($this->stream);
-    }
+    public function getStat();
 
     /**
      * Flushes the buffer to the storage media
      *
      * @return  boolean
      */
-    public function flush()
-    {
-        return fflush($this->stream);
-    }
+    public function flush();
 
     /**
      * Closes the buffer
      */
-    public function close()
-    {
-        if ($this->stream !== null) {
-            fclose($this->stream);
-            $this->stream   = null;
-        }
-    }
+    public function close();
 }

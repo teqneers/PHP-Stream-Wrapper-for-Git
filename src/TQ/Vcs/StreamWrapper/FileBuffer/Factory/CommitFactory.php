@@ -30,10 +30,14 @@
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
-namespace TQ\Vcs\StreamWrapper;
+namespace TQ\Vcs\StreamWrapper\FileBuffer\Factory;
+use TQ\Vcs\Buffer\FileBufferInterface;
+use TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface;
+use TQ\Vcs\StreamWrapper\PathInformation;
+use TQ\Vcs\Buffer\StringBuffer;
 
 /**
- * Creates path information for a given stream URL
+ * Factory to create a commit buffer
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
@@ -41,29 +45,32 @@ namespace TQ\Vcs\StreamWrapper;
  * @subpackage Vcs
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
-interface PathFactory
+class CommitFactory implements FactoryInterface
 {
     /**
-     * Returns the repository registry
+     * Returns true if this factory can handle the requested path
      *
-     * @return  RepositoryRegistry
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the file
+     * @return  boolean                     True if this factory can handle the path
      */
-    public function getRegistry();
+    public function canHandle(PathInformation $path, $mode)
+    {
+        return $path->hasArgument('commit');
+    }
 
     /**
-     * Returns the path information for a given stream URL
+     * Returns the file stream to handle the requested path
      *
-     * @param   string  $streamUrl      The URL given to the stream function
-     * @return  PathInformation         The path information representing the stream URL
+     * @param   PathInformation     $path   The path information
+     * @param   string              $mode   The mode used to open the path
+     * @return  FileBufferInterface                  The file buffer to handle the path
      */
-    public function createPathInformation($streamUrl);
+    public function createFileBuffer(PathInformation $path, $mode)
+    {
+        $repo   = $path->getRepository();
+        $buffer = $repo->showCommit($path->getArgument('ref'));
+        return new StringBuffer($buffer, array(), 'r');
+    }
 
-    /**
-     * Returns path information for a given stream path
-     *
-     * @param   string      $streamUrl      The URL given to the stream function
-     * @return  array                       An array containing information about the path
-     * @throws \InvalidArgumentException    If the URL is invalid
-     */
-    public function parsePath($streamUrl);
 }

@@ -32,10 +32,12 @@
 
 namespace TQ\Git\StreamWrapper;
 use TQ\Git\Cli\Binary;
-use TQ\Vcs\Buffer\FileBuffer;
+use TQ\Vcs\Buffer\FileBufferInterface;
 use TQ\Vcs\Buffer\ArrayBuffer;
 use TQ\Git\StreamWrapper\FileBuffer\Factory;
 use TQ\Vcs\StreamWrapper\AbstractStreamWrapper;
+use TQ\Vcs\StreamWrapper\PathFactoryInterface;
+use TQ\Vcs\StreamWrapper\PathInformation;
 use TQ\Vcs\StreamWrapper\RepositoryRegistry;
 
 /**
@@ -57,6 +59,13 @@ class StreamWrapper extends AbstractStreamWrapper
     protected static $pathFactory;
 
     /**
+     * The buffer factory
+     *
+     * @var Factory
+     */
+    protected static $bufferFactory;
+
+    /**
      * The directory buffer if used on a directory
      *
      * @var ArrayBuffer
@@ -66,7 +75,7 @@ class StreamWrapper extends AbstractStreamWrapper
     /**
      * The file buffer if used on a file
      *
-     * @var FileBuffer
+     * @var FileBufferInterface
      */
     protected $fileBuffer;
 
@@ -78,27 +87,21 @@ class StreamWrapper extends AbstractStreamWrapper
     protected $path;
 
     /**
-     * The buffer factory
-     *
-     * @var Factory
-     */
-    protected $bufferFactory;
-
-    /**
      * Registers the stream wrapper with the given protocol
      *
-     * @param   string                          $protocol    The protocol (such as "git")
-     * @param   Binary|string|null|PathFactory  $binary      The Git binary or a path factory
-     * @throws  \RuntimeException                            If $protocol is already registered
+     * @param   string                                   $protocol    The protocol (such as "git")
+     * @param   Binary|string|null|PathFactoryInterface  $binary      The Git binary or a path factory
+     * @throws  \RuntimeException                                     If $protocol is already registered
      */
     public static function register($protocol, $binary = null)
     {
-        static::$protocol = $protocol;
-        if ($binary instanceof PathFactory) {
+        static::$protocol       = $protocol;
+        static::$bufferFactory  = Factory::getDefault();
+        if ($binary instanceof PathFactoryInterface) {
             static::$pathFactory  = $binary;
         } else {
             $binary              = Binary::ensure($binary);
-            static::$pathFactory  = new PathFactory(static::$protocol, $binary, null);
+            static::$pathFactory = new PathFactory(static::$protocol, $binary, null);
         }
 
         if (!stream_wrapper_register($protocol, get_called_class())) {
@@ -146,10 +149,7 @@ class StreamWrapper extends AbstractStreamWrapper
      */
     protected function getBufferFactory()
     {
-        if ($this->bufferFactory === null) {
-            $this->bufferFactory   = Factory::getDefault();
-        }
-        return $this->bufferFactory;
+        return self::$bufferFactory;
     }
 
     /**
