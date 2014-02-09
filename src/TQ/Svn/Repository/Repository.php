@@ -74,7 +74,7 @@ class Repository extends AbstractRepository
             ));
         }
 
-        $repositoryRoot = self::findRepositoryRoot($repositoryPath);
+        $repositoryRoot = self::findRepositoryRoot($svn, $repositoryPath);
 
         if ($repositoryRoot === null) {
             throw new \InvalidArgumentException(sprintf(
@@ -88,15 +88,46 @@ class Repository extends AbstractRepository
     /**
      * Tries to find the root directory for a given repository path
      *
+     * @param   Binary      $svn        The SVN binary
      * @param   string      $path       The file system path
      * @return  string|null             NULL if the root cannot be found, the root path otherwise
      */
-    public static function findRepositoryRoot($path)
+    public static function findRepositoryRoot(Binary $svn, $path)
     {
-        return FileSystem::bubble($path, function($p) {
-            $gitDir = $p.'/'.'.svn';
-            return file_exists($gitDir) && is_dir($gitDir);
+        $pathWithSvnDir   = FileSystem::bubble($path, function($p) {
+            $svnDir = $p.'/'.'.svn';
+            return file_exists($svnDir) && is_dir($svnDir);
         });
+        if (!$pathWithSvnDir) {
+            return null;
+        }
+
+        try {
+            /** @var $result CallResult */
+            $result = $svn->{'info'}($pathWithSvnDir, array('--xml'));
+            $result->assertSuccess(sprintf('Cannot get info for "%s"', $pathWithSvnDir));
+
+            $xml    = simplexml_load_string($result->getStdOut());
+            if (!$xml) {
+                throw new \RuntimeException(sprintf('Cannot read info XML for "%s"', $pathWithSvnDir));
+            }
+
+            $wcInfo = $xml->xpath('/info/entry/wc-info');
+            if (count($wcInfo) !== 1) {
+                throw new \RuntimeException(sprintf('Cannot read info XML for "%s"', $pathWithSvnDir));
+            }
+            $wcInfo = reset($wcInfo);
+            $wcPath = (string)$wcInfo->{'wcroot-abspath'};
+
+            $testPath   = $pathWithSvnDir;
+            while ($testPath !== '.' && realpath($testPath) !== $wcPath) {
+                $testPath   = dirname($testPath);
+            }
+            return $testPath;
+
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -125,6 +156,7 @@ class Repository extends AbstractRepository
      * Returns the current commit hash
      *
      * @return  string
+     * @throws  \RuntimeException
      */
     public function getCurrentCommit()
     {
@@ -137,12 +169,12 @@ class Repository extends AbstractRepository
 
         $xml    = simplexml_load_string($result->getStdOut());
         if (!$xml) {
-            $result->assertSuccess(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
+            throw new \RuntimeException(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
         }
 
         $commit = $xml->xpath('/info/entry/commit[@revision]');
         if (empty($commit)) {
-            $result->assertSuccess(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
+            throw new \RuntimeException(sprintf('Cannot read info XML for "%s"', $this->getRepositoryPath()));
         }
 
         $commit = reset($commit);
@@ -178,6 +210,8 @@ class Repository extends AbstractRepository
 
     /**
      * Resets the working directory and/or the staging area and discards all changes
+     *
+     * @throws  \RuntimeException
      */
     public function reset()
     {
@@ -438,6 +472,7 @@ class Repository extends AbstractRepository
      * @param   integer|null    $limit      The maximum number of log entries returned
      * @param   integer|null    $skip       Number of log entries that are skipped from the beginning
      * @return  array
+     * @throws  \RuntimeException
      */
     public function getLog($limit = null, $skip = null)
     {
@@ -460,7 +495,7 @@ class Repository extends AbstractRepository
 
         $xml    = simplexml_load_string($result->getStdOut());
         if (!$xml) {
-            $result->assertSuccess(sprintf('Cannot read log XML for "%s"', $this->getRepositoryPath()));
+            throw new \RuntimeException(sprintf('Cannot read log XML for "%s"', $this->getRepositoryPath()));
         }
         $logEntries = new \ArrayIterator($xml->xpath('/log/logentry'));
 
@@ -534,6 +569,7 @@ class Repository extends AbstractRepository
      * @param   string  $path       The path to the object
      * @param   string  $ref        The version ref
      * @return  array               The object info
+     * @throws  \RuntimeException
      */
     public function getObjectInfo($path, $ref = 'HEAD')
     {
@@ -549,14 +585,14 @@ class Repository extends AbstractRepository
 
         $xml    = simplexml_load_string($result->getStdOut());
         if (!$xml) {
-            $result->assertSuccess(sprintf('Cannot read info XML for "%s" at "%s" from "%s"',
+            throw new \RuntimeException(sprintf('Cannot read info XML for "%s" at "%s" from "%s"',
                 $path, $ref, $this->getRepositoryPath()
             ));
         }
 
         $entry = $xml->xpath('/info/entry');
         if (count($entry) !== 1) {
-            $result->assertSuccess(sprintf('Cannot read info XML for "%s" at "%s" from "%s"',
+            throw new \RuntimeException(sprintf('Cannot read info XML for "%s" at "%s" from "%s"',
                 $path, $ref, $this->getRepositoryPath()
             ));
         }
@@ -583,6 +619,7 @@ class Repository extends AbstractRepository
      * @param   string  $directory      The path ot the directory
      * @param   string  $ref            The version ref
      * @return  array
+     * @throws  \RuntimeException
      */
     public function listDirectory($directory = '.', $ref = 'HEAD')
     {
@@ -603,7 +640,7 @@ class Repository extends AbstractRepository
 
         $xml    = simplexml_load_string($result->getStdOut());
         if (!$xml) {
-            $result->assertSuccess(sprintf('Cannot read list XML for "%s" at "%s" from "%s"',
+            throw new \RuntimeException(sprintf('Cannot read list XML for "%s" at "%s" from "%s"',
                 $directory, $ref, $this->getRepositoryPath()
             ));
         }
@@ -625,6 +662,7 @@ class Repository extends AbstractRepository
      *      )
      *
      * @return  array
+     * @throws  \RuntimeException
      */
     public function getStatus()
     {
@@ -638,7 +676,7 @@ class Repository extends AbstractRepository
 
         $xml    = simplexml_load_string($result->getStdOut());
         if (!$xml) {
-            $result->assertSuccess(sprintf('Cannot read status XML for "%s"', $this->getRepositoryPath()));
+            throw new \RuntimeException(sprintf('Cannot read status XML for "%s"', $this->getRepositoryPath()));
         }
 
         $status = array();

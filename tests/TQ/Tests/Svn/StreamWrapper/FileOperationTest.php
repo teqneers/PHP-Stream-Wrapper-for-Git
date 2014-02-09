@@ -206,8 +206,6 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
     public function testRmdirDirectory()
     {
-        $this->markTestSkipped('fails currently on travis-ci');
-
         $c  = $this->getRepository();
         $c->writeFile('directory/test.txt', 'Test');
         $this->assertFileExists(TESTS_REPO_PATH_1.'/directory');
@@ -256,8 +254,6 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
     public function testRmdirDirectoryWithContext()
     {
-        $this->markTestSkipped('fails currently on travis-ci');
-
         $c  = $this->getRepository();
         $c->writeFile('directory/test.txt', 'Test');
         $this->assertFileExists(TESTS_REPO_PATH_1.'/directory');
