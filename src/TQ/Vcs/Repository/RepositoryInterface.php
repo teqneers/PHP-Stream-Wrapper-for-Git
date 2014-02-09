@@ -142,7 +142,7 @@ interface RepositoryInterface
      *
      * @param   integer|null    $limit      The maximum number of log entries returned
      * @param   integer|null    $skip       Number of log entries that are skipped from the beginning
-     * @return  string
+     * @return  array
      */
     public function getLog($limit = null, $skip = null);
 
