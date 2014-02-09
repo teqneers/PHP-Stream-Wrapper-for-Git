@@ -25,8 +25,8 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Vcs
- * @subpackage Vcs
+ * @package    TQ_VCS
+ * @subpackage VCS
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
@@ -34,12 +34,12 @@ namespace TQ\Vcs\Repository;
 use TQ\Vcs\FileSystem;
 
 /**
- * Base class for Vcs repositories
+ * Base class for VCS repositories
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Vcs
- * @subpackage Vcs
+ * @package    TQ_VCS
+ * @subpackage VCS
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 abstract class AbstractRepository implements RepositoryInterface

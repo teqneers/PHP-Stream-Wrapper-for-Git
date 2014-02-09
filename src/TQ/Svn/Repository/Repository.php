@@ -25,8 +25,8 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Vcs
- * @subpackage Svn
+ * @package    TQ_VCS
+ * @subpackage SVN
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
@@ -42,8 +42,8 @@ use TQ\Vcs\Cli\CallResult;
  * @uses       TQ\Svn\Cli\Binary
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Vcs
- * @subpackage Svn
+ * @package    TQ_VCS
+ * @subpackage SVN
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 class Repository extends AbstractRepository

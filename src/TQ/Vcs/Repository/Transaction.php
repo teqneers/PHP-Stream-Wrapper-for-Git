@@ -25,8 +25,8 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Vcs
- * @subpackage Vcs
+ * @package    TQ_VCS
+ * @subpackage VCS
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
@@ -37,14 +37,14 @@ namespace TQ\Vcs\Repository;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Vcs
- * @subpackage Vcs
+ * @package    TQ_VCS
+ * @subpackage VCS
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 class Transaction
 {
     /**
-     * The Vcs repository
+     * The VCS repository
      *
      * @var RepositoryInterface
      */
@@ -81,7 +81,7 @@ class Transaction
     /**
      * Creates a new transactional parameter
      *
-     * @param   RepositoryInterface  $repository     The Vcs repository
+     * @param   RepositoryInterface  $repository     The VCS repository
      */
     public function __construct(RepositoryInterface $repository)
     {
@@ -89,7 +89,7 @@ class Transaction
     }
 
     /**
-     * Returns the Vcs repository
+     * Returns the VCS repository
      *
      * @return  RepositoryInterface
      */
@@ -99,7 +99,7 @@ class Transaction
     }
 
     /**
-     * Returns the full file system path to the Vcs repository
+     * Returns the full file system path to the VCS repository
      *
      * @return  string
      */

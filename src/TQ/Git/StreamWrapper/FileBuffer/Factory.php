@@ -25,7 +25,7 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Vcs
+ * @package    TQ_VCS
  * @subpackage Git
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
@@ -42,7 +42,7 @@ use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Vcs
+ * @package    TQ_VCS
  * @subpackage Git
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */

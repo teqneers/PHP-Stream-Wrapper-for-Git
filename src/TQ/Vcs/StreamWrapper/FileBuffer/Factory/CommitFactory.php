@@ -25,8 +25,8 @@
  * Git Stream Wrapper for PHP
  *
  * @category   TQ
- * @package    TQ_Vcs
- * @subpackage Vcs
+ * @package    TQ_VCS
+ * @subpackage VCS
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 
@@ -41,8 +41,8 @@ use TQ\Vcs\Buffer\StringBuffer;
  *
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
- * @package    TQ_Vcs
- * @subpackage Vcs
+ * @package    TQ_VCS
+ * @subpackage VCS
  * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
  */
 class CommitFactory implements FactoryInterface
