@@ -153,6 +153,10 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, count($log));
         $this->assertContains('Initial commit', $log[1]);
 
+        $log    = $c->getLog(null, null);
+        $this->assertEquals(2, count($log));
+        $this->assertContains('Initial commit', $log[1]);
+
         $hash2 = $c->writeFile('file7.txt', 'Test create file 7', 'Test create file 7');
         $hash3 = $c->writeFile('file8.txt', 'Test create file 8', 'Test create file 8');
 

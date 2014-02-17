@@ -447,6 +447,8 @@ class Repository extends AbstractRepository
                 $noValue = true;
             } elseif (is_bool($value)) {
                 $noValue = true;
+            } elseif (is_null($value)) {
+                continue;
             } else {
                 $noValue = false;
             }
