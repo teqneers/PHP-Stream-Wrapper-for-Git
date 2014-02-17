@@ -133,13 +133,70 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($log));
         $this->assertContains($hash, $log[0]);
 
+        $log    = $c->getLog(array('limit' => 1));
+        $this->assertEquals(1, count($log));
+        $this->assertContains($hash, $log[0]);
+
         $log    = $c->getLog(1, 1);
+        $this->assertEquals(1, count($log));
+        $this->assertContains('Initial commit', $log[0]);
+
+        $log    = $c->getLog(array('limit' => 1, 'skip' => 1));
         $this->assertEquals(1, count($log));
         $this->assertContains('Initial commit', $log[0]);
 
         $log    = $c->getLog(10,0);
         $this->assertEquals(2, count($log));
         $this->assertContains('Initial commit', $log[1]);
+
+        $log    = $c->getLog(array('limit' => 10, 'skip' => 0));
+        $this->assertEquals(2, count($log));
+        $this->assertContains('Initial commit', $log[1]);
+
+        $log    = $c->getLog(null, null);
+        $this->assertEquals(2, count($log));
+        $this->assertContains('Initial commit', $log[1]);
+
+        $hash2 = $c->writeFile('file7.txt', 'Test create file 7', 'Test create file 7');
+        $hash3 = $c->writeFile('file8.txt', 'Test create file 8', 'Test create file 8');
+
+        $log    = $c->getLog(array('color', '--', 'file_0.txt'));
+        $allLogs = implode("\n", $log);
+        $this->assertEquals(1, count($log));
+        $this->assertEquals(1, substr_count($allLogs, 'create mode'));
+        $this->assertContains('Initial commit', $log[0]);
+
+        $log    = $c->getLog(array('--', 'file7.txt'));
+        $allLogs = implode("\n", $log);
+        $this->assertEquals(1, count($log));
+        $this->assertEquals(1, substr_count($allLogs, 'create mode'));
+        $this->assertContains('Test create file 7', $log[0]);
+
+        $log    = $c->getLog(array('--', 'file8.txt'));
+        $allLogs = implode("\n", $log);
+        $this->assertEquals(1, count($log));
+        $this->assertEquals(1, substr_count($allLogs, 'create mode'));
+        $this->assertContains('Test create file 8', $log[0]);
+
+        $log = $c->getLog(array(
+            'limit' => 3,
+            'graph',
+            'all',
+            'pretty' => 'format:"%h -%d %s (%cr)"',  // Prettier in color, but phpunit sees that they're non-ascii strings and cracks under the pressure...
+            'abbrev-commit',
+            'date' => 'relative'
+        ));
+
+        $this->assertEquals(3, count($log));
+        $this->assertContains(substr($hash3, 0, 7) . ' - (HEAD, master) Test create file 8', $log[0]);
+        $this->assertContains(substr($hash2, 0, 7) . ' - Test create file 7', $log[1]);
+        $this->assertContains(substr($hash, 0, 7) . ' - TQ\Git\Repository\Repository created or changed file "/directory/test.txt"', $log[2]);
+
+        $log = $c->getLog(array(
+            'pretty' => 'format:"%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]%Creset"',
+            'decorate',
+            'numstat'
+        ));
     }
 
     public function testShowCommit()

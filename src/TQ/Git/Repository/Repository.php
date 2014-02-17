@@ -427,6 +427,125 @@ class Repository extends AbstractRepository
     }
 
     /**
+     * Prepares a list of named arguments for use as command-line arguments.
+     * Preserves ordering, while prepending - and -- to argument names, then leaves value alone.
+     *
+     * @param   array           $namedArguments    Named argument list to format
+     * @return  array
+     **/
+    protected function _prepareNamedArgumentsForCLI($namedArguments) {
+        $filteredArguments = array();
+        $doneParsing = false;
+
+        foreach ($namedArguments as $name => $value) {
+            if ($value === false) {
+                continue;
+            }
+
+            if (is_integer($name)) {
+                $name = $value;
+                $noValue = true;
+            } elseif (is_bool($value)) {
+                $noValue = true;
+            } elseif (is_null($value)) {
+                continue;
+            } else {
+                $noValue = false;
+            }
+
+            if ($name == '--') {
+                $doneParsing = true;
+            }
+
+            if (!$doneParsing) {
+                $name = preg_replace('{^(\w|\d+)$}', '-$0', $name);
+                $name = preg_replace('{^[^-]}', '--$0', $name);
+            }
+
+            if ($noValue) {
+                $filteredArguments[] = $name;
+                continue;
+            }
+
+            $filteredArguments[$name] = $value;
+        }
+
+        return $filteredArguments;
+    }
+
+    /**
+     * _parseNamedArguments
+     *
+     * Takes a set of regular arguments and a set of extended/named arguments, combines them, and returns the results.
+     *
+     * The merging method is far from foolproof, but should take care of the vast majority of situations.  Where it fails is function calls
+     * in which the an argument is regular-style, is an array, and only has keys which are present in the named arguments.
+     *
+     * The easy way to trigger it would be to pass an empty array in one of the arguments.
+     *
+     * There's a bunch of array_splices.  Those are in place so that if named arguments have orders that they should be called in,
+     * they're not disturbed.  So... calling with 
+     *      getLog(5, ['reverse', 'diff' => 'git', 'path/to/repo/file.txt']
+     * will keep things in the order for the git call:
+     *      git-log --limit=5 --skip=10 --reverse --diff=git path/to/to/repo/file.txt
+     * and will put defaults at the beginning of the call, as well.
+     *
+     * @param   array $regularStyleArguments     An ordered list of the names of regular-style arguments that should be accepted.
+     * @param   array $namedStyleArguments       An associative array of named arguments to their default value,
+     *                                                 or null where no default is desired.
+     * @param   array $arguments                 The result of func_get_args() in the original function call we're helping.
+     * @param   int   $skipNamedTo               Index to which array arguments should be assumed NOT to be named arguments.
+     * @return  array                            A filtered associative array of the resulting arguments.
+     */
+    protected function _parseNamedArguments($regularStyleArguments, $namedStyleArguments, $arguments, $skipNamedTo = 0) {
+        $namedArguments = array();
+
+        foreach ($regularStyleArguments as $name) {
+            if (!isset($namedStyleArguments[$name])) {
+                $namedStyleArguments[$name] = null;
+            }
+        }
+
+        // We'll just step through the arguments and depending on whether the keys and values look appropriate, decide if they
+        // are named arguments or regular arguments.
+        foreach ($arguments as $index => $argument) {
+            // If it's a named argument, we'll keep the whole thing.
+            // Also keeps extra numbered arguments inside the named argument structure since they probably have special significance.
+            if (is_array($argument) && $index >= $skipNamedTo) {
+                $diff = array_diff_key($argument, $namedStyleArguments);
+                $diffKeys = array_keys($diff);
+
+                $integerDiffKeys = array_filter($diffKeys, 'is_int');
+                $diffOnlyHasIntegerKeys = (count($diffKeys) === count($integerDiffKeys));
+
+                if (empty($diff) || $diffOnlyHasIntegerKeys) {
+                    $namedArguments = array_merge($namedArguments, $argument);
+                    continue;
+                }
+
+                throw new \InvalidArgumentException('Unexpected named argument key: ' . implode(', ', $diffKeys));
+            }
+
+            if (empty($regularStyleArguments[$index])) {
+                throw new \InvalidArgumentException("The argument parser received too many arguments!");
+            }
+
+            $name = $regularStyleArguments[$index];
+            $namedArguments[$name] = $argument;
+        }
+
+        $defaultArguments = array_filter($namedStyleArguments,
+            function($value) { return !is_null($value); } 
+        );
+
+        // Insert defaults (for arguments that have no value) at the beginning
+        $defaultArguments = array_diff_key($defaultArguments, $namedArguments);
+        $namedArguments = array_merge($defaultArguments, $namedArguments);
+
+        return $namedArguments;
+    }
+
+    /**
      * Returns the current repository log
      *
      * @param   integer|null    $limit      The maximum number of log entries returned
@@ -435,18 +554,162 @@ class Repository extends AbstractRepository
      */
     public function getLog($limit = null, $skip = null)
     {
-        $arguments  = array(
-            '--format'   => 'fuller',
-            '--summary',
-            '-z'
+        $regularStyleArguments = array(
+            'limit',
+            'skip'
         );
 
-        if ($limit !== null) {
-            $arguments[]    = sprintf('-%d', $limit);
+        $namedStyleArguments = array(
+            'abbrev' => null,
+            'abbrev-commit' => null,
+            'after' => null,
+            'all' => null,
+            'all-match' => null,
+            'ancestry-path' => null,
+            'author' => null,
+            'basic-regexp' => null,
+            'before' => null,
+            'binary' => null,
+            'bisect' => null,
+            'boundary' => null,
+            'branches' => null,
+            'break-rewrites' => null,
+            'cc' => null,
+            'check' => null,
+            'cherry' => null,
+            'cherry-mark' => null,
+            'cherry-pick' => null,
+            'children' => null,
+            'color' => null,
+            'color-words' => null,
+            'combined' => null,
+            'committer' => null,
+            'date' => null,
+            'date-order' => null,
+            'decorate' => null,
+            'dense' => null,
+            'diff-filter' => null,
+            'dirstat' => null,
+            'do-walk' => null,
+            'dst-prefix' => null,
+            'encoding' => null,
+            'exit-code' => null,
+            'ext-diff' => null,
+            'extended-regexp' => null,
+            'find-copies' => null,
+            'find-copies-harder' => null,
+            'find-renames' => null,
+            'first-parent' => null,
+            'fixed-strings' => null,
+            'follow' => null,
+            'format' => 'fuller',
+            'full-diff' => null,
+            'full-history' => null,
+            'full-index' => null,
+            'function-context' => null,
+            'glob' => null,
+            'graph' => null,
+            'grep' => null,
+            'grep-reflog' => null,
+            'histogram' => null,
+            'ignore-all-space' => null,
+            'ignore-missing' => null,
+            'ignore-space-at-eol' => null,
+            'ignore-space-change' => null,
+            'ignore-submodules' => null,
+            'inter-hunk-context' => null,
+            'irreversible-delete' => null,
+            'left-only' => null,
+            'left-right' => null,
+            'log-size' => null,
+            'max-count' => null,
+            'max-parents' => null,
+            'merge' => null,
+            'merges' => null,
+            'min-parents' => null,
+            'minimal' => null,
+            'name-only' => null,
+            'name-status' => null,
+            'no-abbrev' => null,
+            'no-abbrev-commit' => null,
+            'no-color' => null,
+            'no-decorate' => null,
+            'no-ext-diff' => null,
+            'no-max-parents' => null,
+            'no-merges' => null,
+            'no-min-parents' => null,
+            'no-notes' => null,
+            'no-prefix' => null,
+            'no-renames' => null,
+            'no-textconv' => null,
+            'no-walk' => null,
+            'not' => null,
+            'notes' => null,
+            'numstat' => null,
+            'objects' => null,
+            'objects-edge' => null,
+            'oneline' => null,
+            'parents' => null,
+            'patch' => null,
+            'patch-with-raw' => null,
+            'patch-with-stat' => null,
+            'patience' => null,
+            'perl-regexp' => null,
+            'pickaxe-all' => null,
+            'pickaxe-regex' => null,
+            'pretty' => null,
+            'raw' => null,
+            'regexp-ignore-case' => null,
+            'relative' => null,
+            'relative-date' => null,
+            'remotes' => null,
+            'remove-empty' => null,
+            'reverse' => null,
+            'right-only' => null,
+            'shortstat' => null,
+            'show-notes' => null,
+            'show-signature' => null,
+            'simplify-by-decoration' => null,
+            'simplify-merges' => null,
+            'since' => null,
+            'skip' => null,
+            'source' => null,
+            'sparse' => null,
+            'src-prefix' => null,
+            'stat' => null,
+            'stat-count' => null,
+            'stat-graph-width' => null,
+            'stat-name-width' => null,
+            'stat-width' => null,
+            'stdin' => null,
+            'submodule' => null,
+            'summary' => true,
+            'tags' => null,
+            'text' => null,
+            'textconv' => null,
+            'topo-order' => null,
+            'unified' => null,
+            'unpacked' => null,
+            'until' => null,
+            'verify' => null,
+            'walk-reflogs' => null,
+            'word-diff' => null,
+            'word-diff-regex' => null,
+            'z' => true
+        );
+
+        $arguments = func_get_args();
+
+        $arguments = $this->_parseNamedArguments($regularStyleArguments, $namedStyleArguments, $arguments);
+
+        if (!empty($arguments['limit'])) {
+            $limit = '' . (int) $arguments['limit'];
+
+            unset($arguments['limit']);
+            array_unshift($arguments, $limit);
         }
-        if ($skip !== null) {
-            $arguments['--skip']    = (int)$skip;
-        }
+
+        $arguments = $this->_prepareNamedArgumentsForCLI($arguments);
 
         /** @var $result CallResult */
         $result = $this->getGit()->{'log'}($this->getRepositoryPath(), $arguments);
