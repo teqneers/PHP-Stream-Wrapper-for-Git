@@ -513,7 +513,8 @@ class Repository extends AbstractRepository
                 $diff = array_diff_key($argument, $namedStyleArguments);
                 $diffKeys = array_keys($diff);
 
-                $diffOnlyHasIntegerKeys = !empty(array_filter($diffKeys, 'is_int'));
+                $integerDiffKeys = array_filter($diffKeys, 'is_int');
+                $diffOnlyHasIntegerKeys = (count($diffKeys) === count($integerDiffKeys));
 
                 if (empty($diff) || $diffOnlyHasIntegerKeys) {
                     $namedArguments = array_merge($namedArguments, $argument);
