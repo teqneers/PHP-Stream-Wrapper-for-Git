@@ -221,6 +221,9 @@ file_4.txt"), Helper::normalizeNewLines(file_get_contents($dir.'#HEAD^^')));
 
         $missingFileName = end($c->listDirectory());
         $missingFilePath = sprintf('git://%s/%s', TESTS_REPO_PATH_1, $missingFileName);
+
+        $this->assertNotEmpty(file_get_contents($missingFilePath.'#HEAD'));
+
         $c->removeFile($missingFileName, null, true);
 
         $this->assertFalse(@file_get_contents($missingFilePath.'#HEAD'));
