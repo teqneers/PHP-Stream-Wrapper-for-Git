@@ -219,7 +219,8 @@ file_4.txt"), Helper::normalizeNewLines(file_get_contents($dir.'#HEAD^^')));
     {
         $c = $this->getRepository();
 
-        $missingFileName = end($c->listDirectory());
+        $directoryContents = $c->listDirectory();
+        $missingFileName = end($directoryContents);
         $missingFilePath = sprintf('git://%s/%s', TESTS_REPO_PATH_1, $missingFileName);
         $missingFileContents = file_get_contents($missingFilePath.'#HEAD');
         $this->assertNotEmpty($missingFileContents);
