@@ -214,5 +214,22 @@ file_2.txt
 file_3.txt
 file_4.txt"), Helper::normalizeNewLines(file_get_contents($dir.'#HEAD^^')));
     }
+
+    public function testGetContentsOfFileNotOnFilesystem()
+    {
+        $c = $this->getRepository();
+
+        $directoryContents = $c->listDirectory();
+        $missingFileName = end($directoryContents);
+        $missingFilePath = sprintf('git://%s/%s', TESTS_REPO_PATH_1, $missingFileName);
+        $missingFileContents = file_get_contents($missingFilePath.'#HEAD');
+        $this->assertNotEmpty($missingFileContents);
+
+        $c->removeFile($missingFileName, null, true);
+
+        $this->assertFalse(@file_get_contents($missingFilePath.'#HEAD'));
+        $this->assertEquals(file_get_contents($missingFilePath.'#HEAD^'), $missingFileContents);
+    }
+
 }
 
