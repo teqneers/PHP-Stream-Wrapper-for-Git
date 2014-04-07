@@ -214,5 +214,18 @@ file_2.txt
 file_3.txt
 file_4.txt"), Helper::normalizeNewLines(file_get_contents($dir.'#HEAD^^')));
     }
+
+    public function testGetContentsOfFileNotOnFilesystem()
+    {
+        $c = $this->getRepository();
+
+        $missingFileName = end($c->listDirectory());
+        $missingFilePath = sprintf('git://%s/%s', TESTS_REPO_PATH_1, $missingFileName);
+        $c->removeFile($missingFileName, null, true);
+
+        $this->assertFalse(@file_get_contents($missingFilePath.'#HEAD'));
+        $this->assertTrue(file_get_contents($missingFilePath.'#HEAD^'));
+    }
+
 }
 
