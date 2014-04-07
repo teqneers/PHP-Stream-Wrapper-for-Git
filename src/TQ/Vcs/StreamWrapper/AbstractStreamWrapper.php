@@ -443,8 +443,8 @@ abstract class AbstractStreamWrapper
         $this->fileBuffer   = null;
 
         $repo   = $this->path->getRepository();
-        $repo->add(array($this->path->getFullPath()));
         if ($repo->isDirty()) {
+            $repo->add(array($this->path->getFullPath()));
             $commitMsg      = $this->getContextOption('commitMsg', null);
             $author         = $this->getContextOption('author', null);
             $repo->commit($commitMsg, array($this->path->getFullPath()), $author);
