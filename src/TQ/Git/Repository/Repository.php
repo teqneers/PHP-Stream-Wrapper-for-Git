@@ -826,22 +826,24 @@ class Repository extends AbstractRepository
     public function listDirectory($directory = '.', $ref = 'HEAD')
     {
         $directory  = FileSystem::normalizeDirectorySeparator($directory);
-        $directory  = rtrim($directory, '/').'/';
-        $path       = $this->getRepositoryPath().'/'.$this->resolveLocalPath($directory);
+        $directory  = $this->resolveLocalPath(rtrim($directory, '/') . '/');
+        $path       = $this->getRepositoryPath();
 
         /** @var $result CallResult */
         $result = $this->getGit()->{'ls-tree'}($path, array(
             '--name-only',
+            '--full-name',
             '-z',
-            $ref
+            $ref,
+            $directory
         ));
         $result->assertSuccess(sprintf('Cannot list directory "%s" at "%s" from "%s"',
             $directory, $ref, $this->getRepositoryPath()
         ));
 
         $output     = $result->getStdOut();
-        $listing    = array_map(function($f) {
-            return trim($f);
+        $listing    = array_map(function($f) use ($directory) {
+            return str_replace($directory, '', trim($f));
         }, explode("\x0", $output));
         return $listing;
     }
