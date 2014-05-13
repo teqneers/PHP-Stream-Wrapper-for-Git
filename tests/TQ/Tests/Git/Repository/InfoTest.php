@@ -52,6 +52,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         Helper::executeGit(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
             escapeshellarg('Initial commit')
         ));
+        Helper::executeGit(TESTS_REPO_PATH_1, 'branch x-feature');
 
         clearstatcache();
     }
@@ -83,7 +84,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     public function testGetBranches()
     {
         $c  = $this->getRepository();
-        $this->assertEquals(array('master'), $c->getBranches());
+        $this->assertEquals(array('master', 'x-feature'), $c->getBranches());
     }
 
     public function testGetStatus()
