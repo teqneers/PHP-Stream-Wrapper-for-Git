@@ -960,6 +960,7 @@ class Repository extends AbstractRepository
             if (strpos($line, '* ') === 0) {
                 $line   = substr($line, 2);
             }
+            $line   = ltrim($line);
             return $line;
         }, explode("\n", $output));
         return $branches;
