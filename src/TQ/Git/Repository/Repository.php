@@ -3,7 +3,7 @@
  * Copyright (C) 2014 by TEQneers GmbH & Co. KG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
+ * of this software and associated documentation files (the "Software"), to dealgetCurrentRemote
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
@@ -985,7 +985,7 @@ class Repository extends AbstractRepository
 
         $retVar = array();
         foreach($matches[0] as $key => $value)
-            $retVar[$matches[3][$key]] = array($matches[1][$key] => $matches[2][$key]);
+            $retVar[$matches[1][$key]][$matches[3][$key]] = $matches[2][$key];
 
         return $retVar;
     }
