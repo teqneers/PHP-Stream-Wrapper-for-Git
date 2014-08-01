@@ -985,7 +985,7 @@ class Repository extends AbstractRepository
 
         $retVar = array();
         foreach($matches[0] as $key => $value)
-            $retVar[$matches[3][$key]] = array($matches[1][$key] => $matches[2][$key]);
+            $retVar[$matches[1][$key]][$matches[3][$key]] = $matches[2][$key];
 
         return $retVar;
     }
