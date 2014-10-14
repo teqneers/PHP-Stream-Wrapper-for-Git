@@ -71,11 +71,13 @@ class Repository extends AbstractRepository
      * @param   boolean|integer      $createIfNotExists     False to fail on non-existing repositories, directory
      *                                                      creation mode, such as 0755  if the command
      *                                                      should create the directory and init the repository instead
+     * @param   array|null           $initArguments         Arguments to be passed to git-init if initializing a
+     *                                                      repository
      * @return  Repository
      * @throws  \RuntimeException                       If the path cannot be created
      * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid Git repository
      */
-    public static function open($repositoryPath, $git = null, $createIfNotExists = false)
+    public static function open($repositoryPath, $git = null, $createIfNotExists = false, $initArguments = null)
     {
         $git = Binary::ensure($git);
 
@@ -102,7 +104,7 @@ class Repository extends AbstractRepository
                         '"%s" is not a valid path', $repositoryPath
                     ));
                 }
-                self::initRepository($git, $repositoryPath);
+                self::initRepository($git, $repositoryPath, $initArguments);
                 $repositoryRoot = $repositoryPath;
             }
         }
@@ -121,11 +123,14 @@ class Repository extends AbstractRepository
      *
      * @param   Binary   $git           The Git binary
      * @param   string   $path          The repository path
+     * @param   array    $initArguments Arguments to pass to git-init when initializing the repository
      */
-    protected static function initRepository(Binary $git, $path)
+    protected static function initRepository(Binary $git, $path, $initArguments = null)
     {
+        $initArguments = $initArguments ?: [];
+
         /** @var $result CallResult */
-        $result = $git->{'init'}($path);
+        $result = $git->{'init'}($path, $initArguments);
         $result->assertSuccess(sprintf('Cannot initialize a Git repository in "%s"', $path));
     }
 
