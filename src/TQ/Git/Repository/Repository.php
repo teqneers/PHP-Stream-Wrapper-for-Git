@@ -127,7 +127,7 @@ class Repository extends AbstractRepository
      */
     protected static function initRepository(Binary $git, $path, $initArguments = null)
     {
-        $initArguments = $initArguments ?: [];
+        $initArguments = $initArguments ?: Array();
 
         /** @var $result CallResult */
         $result = $git->{'init'}($path, $initArguments);
@@ -489,7 +489,7 @@ class Repository extends AbstractRepository
      * The easy way to trigger it would be to pass an empty array in one of the arguments.
      *
      * There's a bunch of array_splices.  Those are in place so that if named arguments have orders that they should be called in,
-     * they're not disturbed.  So... calling with 
+     * they're not disturbed.  So... calling with
      *      getLog(5, ['reverse', 'diff' => 'git', 'path/to/repo/file.txt']
      * will keep things in the order for the git call:
      *      git-log --limit=5 --skip=10 --reverse --diff=git path/to/to/repo/file.txt
@@ -540,7 +540,7 @@ class Repository extends AbstractRepository
         }
 
         $defaultArguments = array_filter($namedStyleArguments,
-            function($value) { return !is_null($value); } 
+            function($value) { return !is_null($value); }
         );
 
         // Insert defaults (for arguments that have no value) at the beginning
