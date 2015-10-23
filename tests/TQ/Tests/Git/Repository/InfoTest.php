@@ -189,7 +189,8 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         ));
 
         $this->assertEquals(3, count($log));
-        $this->assertContains(substr($hash3, 0, 7) . ' - (HEAD, master) Test create file 8', $log[0]);
+        $this->assertContains(substr($hash3, 0, 7) . ' - ', $log[0]);
+        $this->assertContains('Test create file 8', $log[0]);
         $this->assertContains(substr($hash2, 0, 7) . ' - Test create file 7', $log[1]);
         $this->assertContains(substr($hash, 0, 7) . ' - TQ\Git\Repository\Repository created or changed file "/directory/test.txt"', $log[2]);
 
