@@ -63,7 +63,7 @@ class Repository extends AbstractRepository
      */
     protected $git;
 
-    /**
+        /**
      * Opens a Git repository on the file system, optionally creates and initializes a new repository
      *
      * @param   string               $repositoryPath        The full path to the repository
@@ -73,15 +73,16 @@ class Repository extends AbstractRepository
      *                                                      should create the directory and init the repository instead
      * @param   array|null           $initArguments         Arguments to be passed to git-init if initializing a
      *                                                      repository
-     * @param   string|null          $repositoryRoot        The full path of the repository root path to avoid bubbling 
-     *                                                      up the repository path looking for the .git directory.
+     * @param   boolean              $findRepositoryRoot    False to use the repository path as the root directory.
+     *
      * @return  Repository
      * @throws  \RuntimeException                       If the path cannot be created
      * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid Git repository
      */
-    public static function open($repositoryPath, $git = null, $createIfNotExists = false, $initArguments = null, $repositoryRoot = null)
+    public static function open($repositoryPath, $git = null, $createIfNotExists = false, $initArguments = null, $findRepositoryRoot = true)
     {
         $git = Binary::ensure($git);
+        $repositoryRoot = null;
 
         if (!is_string($repositoryPath)) {
             throw new \InvalidArgumentException(sprintf(
@@ -89,7 +90,7 @@ class Repository extends AbstractRepository
             ));
         }
 
-        if ($repositoryRoot === null) {
+        if ($findRepositoryRoot) {
             $repositoryRoot = self::findRepositoryRoot($repositoryPath);
         }
 
