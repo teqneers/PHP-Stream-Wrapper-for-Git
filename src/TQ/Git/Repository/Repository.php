@@ -71,14 +71,15 @@ class Repository extends AbstractRepository
      * @param   boolean|integer      $createIfNotExists     False to fail on non-existing repositories, directory
      *                                                      creation mode, such as 0755  if the command
      *                                                      should create the directory and init the repository instead
+     * @param   array|null           $initArguments         Arguments to be passed to git-init if initializing a
+     *                                                      repository
      * @param   string|null          $repositoryRoot        The full path of the repository root path to avoid bubbling 
      *                                                      up the repository path looking for the .git directory.
-     *
      * @return  Repository
      * @throws  \RuntimeException                       If the path cannot be created
      * @throws  \InvalidArgumentException               If the path is not valid or if it's not a valid Git repository
      */
-    public static function open($repositoryPath, $git = null, $createIfNotExists = false, $repositoryRoot = null)
+    public static function open($repositoryPath, $git = null, $createIfNotExists = false, $initArguments = null, $repositoryRoot = null)
     {
         $git = Binary::ensure($git);
 
@@ -107,7 +108,7 @@ class Repository extends AbstractRepository
                         '"%s" is not a valid path', $repositoryPath
                     ));
                 }
-                self::initRepository($git, $repositoryPath);
+                self::initRepository($git, $repositoryPath, $initArguments);
                 $repositoryRoot = $repositoryPath;
             }
         }
