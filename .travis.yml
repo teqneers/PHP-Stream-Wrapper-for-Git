@@ -19,7 +19,6 @@ env:
   matrix:
     - COMPOSER_PARAM="update --prefer-source --prefer-lowest"
     - COMPOSER_PARAM="update --prefer-source"
-    - COMPOSER_PARAM="install --prefer-source"
 
 before_script:
   - which git

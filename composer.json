@@ -1,18 +1,22 @@
 {
-    "name":        "teqneers/php-stream-wrapper-for-git",
+    "name": "teqneers/php-stream-wrapper-for-git",
     "description": "Git Stream Wrapper for PHP",
-    "keywords":    ["git", "streamwrapper", "stream-wrapper"],
-    "homepage":    "https://github.com/teqneers/PHP-Stream-Wrapper-for-Git",
-    "type":        "library",
-    "license":     "MIT",
-    "authors":     [
+    "keywords": [
+        "git",
+        "streamwrapper",
+        "stream-wrapper"
+    ],
+    "homepage": "https://github.com/teqneers/PHP-Stream-Wrapper-for-Git",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
         {
-            "name":     "Stefan Gehrig",
-            "email":    "gehrig@teqneers.de",
+            "name": "Stefan Gehrig",
+            "email": "gehrig@teqneers.de",
             "homepage": "http://opensource.teqneers.de/"
         }
     ],
-    "require":     {
+    "require": {
         "php": ">=5.3.0"
     },
     "require-dev": {
@@ -23,14 +27,22 @@
     "suggest": {
         "knplabs/gaufrette": "to use the Gaufrette adapter"
     },
-    "autoload":    {
+    "autoload": {
         "psr-4": {
             "": "src/"
         }
     },
-    "autoload-dev":    {
+    "autoload-dev": {
         "psr-4": {
-            "": ["src/", "test/"]
+            "": [
+                "src/",
+                "test/"
+            ]
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.0.x-dev"
         }
     }
 }
