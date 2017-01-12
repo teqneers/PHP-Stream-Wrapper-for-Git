@@ -24,8 +24,13 @@
         "knplabs/gaufrette": "to use the Gaufrette adapter"
     },
     "autoload":    {
-        "psr-0": {
-            "TQ": "src"
+        "psr-4": {
+            "": "src/"
+        }
+    },
+    "autoload-dev":    {
+        "psr-4": {
+            "": ["src/", "test/"]
         }
     }
 }

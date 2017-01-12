@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (C) 2014 by TEQneers GmbH & Co. KG
+ * Copyright (C) 2017 by TEQneers GmbH & Co. KG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,11 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage Git
- * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Git\Cli;
+
 use TQ\Vcs\Cli\Binary as VcsBinary;
 use TQ\Vcs\Cli\Call;
 
@@ -41,17 +42,15 @@ use TQ\Vcs\Cli\Call;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage Git
- * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
  */
-class Binary extends VcsBinary
-{
+class Binary extends VcsBinary {
     /**
      * Try to find the Git binary on the system
      *
      * @return  string
      */
-    public static function locateBinary()
-    {
+    public static function locateBinary() {
         if (!self::isWindows()) {
             $result = Call::create('which git')->execute();
             return $result->getStdOut();
@@ -65,13 +64,12 @@ class Binary extends VcsBinary
      * If no path is given the class tries to find the correct
      * binary {@see locateBinary()}
      *
-     * @param   string|null $path           The path to the Git binary or NULL to auto-detect
+     * @param   string|null $path The path to the Git binary or NULL to auto-detect
      * @throws  \InvalidArgumentException   If no binary is found
      */
-    public function __construct($path = null)
-    {
+    public function __construct($path = null) {
         if (!$path) {
-            $path  = self::locateBinary();
+            $path = self::locateBinary();
         }
         parent::__construct($path);
     }
