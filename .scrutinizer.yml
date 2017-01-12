@@ -22,6 +22,3 @@ tools:
   php_cpd:
     enabled: true
     excluded_dirs: [tests]
-
-before_commands:
-  - composer install
