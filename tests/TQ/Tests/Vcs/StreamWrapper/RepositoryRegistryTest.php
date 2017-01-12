@@ -33,7 +33,8 @@ class RepositoryRegistryTest extends \PHPUnit_Framework_TestCase
      */
     protected function createRepositoryMock()
     {
-        return $this->getMock('TQ\Vcs\Repository\RepositoryInterface');
+        return $this->getMockBuilder('TQ\Vcs\Repository\RepositoryInterface')
+                    ->getMock();
     }
 
     public function testAddOneRepository()

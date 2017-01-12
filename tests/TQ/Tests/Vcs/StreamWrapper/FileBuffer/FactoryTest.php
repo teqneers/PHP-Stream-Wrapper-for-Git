@@ -34,13 +34,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function createPathMock()
     {
-        return $this->getMock(
-            'TQ\Vcs\StreamWrapper\PathInformation',
-            array(),
-            array(),
-            '',
-            false
-        );
+        return $this->getMockBuilder('TQ\Vcs\StreamWrapper\PathInformation')
+                    ->disableOriginalConstructor()
+                    ->getMock();
     }
 
     /**
@@ -48,10 +44,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function createFactoryMock()
     {
-        return $this->getMock(
-            'TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface',
-            array('canHandle', 'createFileBuffer')
-        );
+        return $this->getMockBuilder('TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface')
+                    ->setMethods(array('canHandle', 'createFileBuffer'))
+                    ->getMock();
     }
 
     public function testReturnsFactoryWhichIsResponsible()
