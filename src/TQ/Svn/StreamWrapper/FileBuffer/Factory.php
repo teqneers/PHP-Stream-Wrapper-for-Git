@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (C) 2014 by TEQneers GmbH & Co. KG
+ * Copyright (C) 2017 by TEQneers GmbH & Co. KG
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage SVN
- * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Svn\StreamWrapper\FileBuffer;
@@ -41,7 +41,7 @@ use TQ\Svn\StreamWrapper\FileBuffer\Factory\LogFactory;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage SVN
- * @copyright  Copyright (C) 2014 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
  */
 class Factory extends VcsFactory
 {
