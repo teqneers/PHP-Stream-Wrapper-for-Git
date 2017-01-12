@@ -282,5 +282,46 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test 2', $c->showFile('test.txt', 'HEAD^'));
         $this->assertEquals('Test 1', $c->showFile('test.txt', 'HEAD^^'));
     }
+
+    public function testGetDiff()
+    {
+        $c = $this->getRepository();
+
+        $file1   = TESTS_REPO_PATH_1.'/file_1.txt';
+        $file2   = TESTS_REPO_PATH_1.'/file_2.txt';
+
+        file_put_contents($file1, "\n", FILE_APPEND);
+        file_put_contents($file2, "\n", FILE_APPEND);
+        $c->commit('Prepare for diff', array($file1, $file2));
+
+        $this->assertFalse($c->isDirty());
+
+        file_put_contents($file1, "Staged1\n", FILE_APPEND);
+        file_put_contents($file2, "Staged2\n", FILE_APPEND);
+        $c->add(array($file1, $file2));
+
+        $this->assertTrue($c->isDirty());
+
+        file_put_contents($file1, "Unstaged1\n", FILE_APPEND);
+        file_put_contents($file2, "Unstaged2\n", FILE_APPEND);
+
+        $diff = $c->getDiff(array($file1), true);
+        $this->assertEquals(array('file_1.txt'), array_keys($diff));
+        $this->assertRegExp("/\\+Staged1$/", $diff['file_1.txt']);
+
+        $diff = $c->getDiff(array($file1), false);
+        $this->assertEquals(array('file_1.txt'), array_keys($diff));
+        $this->assertRegExp("/ Staged1\\n\\+Unstaged1$/", $diff['file_1.txt']);
+
+        $diff = $c->getDiff(null, true);
+        $this->assertEquals(array('file_1.txt', 'file_2.txt'), array_keys($diff));
+        $this->assertRegExp("/\\+Staged1$/", $diff['file_1.txt']);
+        $this->assertRegExp("/\\+Staged2$/", $diff['file_2.txt']);
+
+        $diff = $c->getDiff(null, false);
+        $this->assertEquals(array('file_1.txt', 'file_2.txt'), array_keys($diff));
+        $this->assertRegExp("/ Staged1\\n\\+Unstaged1$/", $diff['file_1.txt']);
+        $this->assertRegExp("/ Staged2\\n\\+Unstaged2$/", $diff['file_2.txt']);
+    }
 }
 

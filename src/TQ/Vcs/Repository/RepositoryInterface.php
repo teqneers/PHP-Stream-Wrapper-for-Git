@@ -202,6 +202,14 @@ interface RepositoryInterface
     public function listDirectory($directory = '.', $ref = 'HEAD');
 
     /**
+     * Returns the diff of a file
+     *
+     * @param   array  $file       The path to the file
+     * @return  string[]
+     */
+    public function getDiff(array $file);
+
+    /**
      * Returns true if there are uncommitted changes in the working directory and/or the staging area
      *
      * @return  boolean

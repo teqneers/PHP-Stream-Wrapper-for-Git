@@ -670,6 +670,44 @@ class Repository extends AbstractRepository
     }
 
     /**
+     * Returns the diff of a file
+     *
+     * @param   array  $files       The path to the file
+     * @return  string[]
+     */
+    public function getDiff(array $files = null)
+    {
+        $diffs  = array();
+
+        if (is_null($files)) {
+            $status = $this->getStatus();
+
+            foreach ($status as $entry) {
+                if ($entry['status'] !== 'modified') {
+			continue;
+		}
+
+                $files[] = $entry['file'];
+            }
+
+            asort($files);
+        }
+
+        $files = array_map(array($this, 'resolveLocalPath'), $files);
+
+        foreach ($files as $file) {
+            $result = $this->getSvn()->{'diff'}($this->getRepositoryPath(), $file);
+            $result->assertSuccess(sprintf('Cannot show diff for "%s" from "%s"',
+                $file, $this->getRepositoryPath()
+            ));
+
+            $diffs[$file] = $result->getStdOut();
+        }
+
+        return $diffs;
+    }
+
+    /**
      * Returns true if there are uncommitted changes in the working directory and/or the staging area
      *
      * @return  boolean
