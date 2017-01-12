@@ -150,8 +150,9 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('--- a/file_0.txt', $commit);
-        $this->assertContains('+++ b/test.txt', $commit);
+
+        $this->assertContains('file_0.txt', $commit);
+        $this->assertContains('test.txt', $commit);
     }
 
     /**

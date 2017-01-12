@@ -186,8 +186,8 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
 
         $commit = $c->showCommit($hash);
-        $this->assertContains('--- a/file_0.txt', $commit);
-        $this->assertContains('+++ b/test.txt', $commit);
+        $this->assertContains('file_0.txt', $commit);
+        $this->assertContains('test.txt', $commit);
     }
 
     public function testReset()
@@ -309,8 +309,8 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $commit = $c->showCommit($result->getCommitHash());
         $this->assertContains($result->getCommitMsg(), $commit);
         $this->assertContains('--- a/file_0.txt', $commit);
-        $this->assertContains('--- a/file_1.txt', $commit);
-        $this->assertContains('+++ b/test.txt', $commit);
+        $this->assertContains('file_1.txt', $commit);
+        $this->assertContains('test.txt', $commit);
     }
 
     public function testTransactionalNoChanges()
