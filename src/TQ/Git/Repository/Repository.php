@@ -903,6 +903,53 @@ class Repository extends AbstractRepository
     }
 
     /**
+     * Returns the diff of a file
+     *
+     * @param   string  $file       The path to the file
+     * @param   bool    $staged     Should the diff return for the staged file
+     * @return  string[]
+     */
+    public function getDiff(array $files = null, $staged = false)
+    {
+        $diffs = array();
+
+        if (is_null($files)) {
+            $files    = array();
+            $status   = $this->getStatus();
+            $modified = ($staged ? 'x' : 'y');
+
+            foreach ($status as $entry) {
+               if ($entry[$modified] !== 'M') {
+                        continue;
+                }
+
+                $files[] = $entry['file'];
+            }
+        }
+
+        $files = array_map(array($this, 'resolveLocalPath'), $files);
+
+        foreach ($files as $file) {
+            $args = array();
+
+            if ($staged) {
+                $args[] = '--staged';
+            }
+
+            $args[] = $file;
+
+            $result = $this->getGit()->{'diff'}($this->getRepositoryPath(), $args);
+            $result->assertSuccess(sprintf('Cannot show diff for %s from "%s"',
+                $file, $this->getRepositoryPath()
+            ));
+
+            $diffs[$file] = $result->getStdOut();
+        }
+
+        return $diffs;
+    }
+
+    /**
      * Returns true if there are uncommitted changes in the working directory and/or the staging area
      *
      * @return  boolean
