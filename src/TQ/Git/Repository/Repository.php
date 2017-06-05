@@ -968,8 +968,9 @@ class Repository extends AbstractRepository
     public function getCurrentBranch()
     {
         /** @var $result CallResult */
-        $result = $this->getGit()->{'name-rev'}($this->getRepositoryPath(), array(
-            '--name-only',
+        $result = $this->getGit()->{'rev-parse'}($this->getRepositoryPath(), array(
+            '--symbolic-full-name',
+            '--abbrev-ref',
             'HEAD'
         ));
         $result->assertSuccess(
