@@ -20,7 +20,7 @@
         "php": ">=7.0.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "~5.7",
+        "phpunit/phpunit": "~5.7 >=5.7.11",
         "knplabs/gaufrette": "~0.5",
         "symfony/yaml": "~3.4"
     },
