@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage VCS
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Vcs\Cli;
@@ -39,7 +39,7 @@ namespace TQ\Vcs\Cli;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage VCS
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 abstract class Binary
 {

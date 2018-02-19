@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage Git
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Git;
@@ -39,7 +39,7 @@ namespace TQ\Git;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage Git
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 interface Exception extends \TQ\Vcs\Exception
 {

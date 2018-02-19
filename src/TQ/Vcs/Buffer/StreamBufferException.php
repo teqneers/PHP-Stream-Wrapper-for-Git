@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage VCS
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Vcs\Buffer;
@@ -40,7 +40,7 @@ use TQ\Vcs\Exception;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage VCS
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 class StreamBufferException extends \RuntimeException implements Exception
 {

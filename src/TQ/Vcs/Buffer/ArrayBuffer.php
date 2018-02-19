@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage VCS
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Vcs\Buffer;
@@ -39,7 +39,7 @@ namespace TQ\Vcs\Buffer;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage VCS
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 class ArrayBuffer implements \Iterator
 {

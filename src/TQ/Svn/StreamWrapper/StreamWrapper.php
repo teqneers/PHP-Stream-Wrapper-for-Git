@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage SVN
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Svn\StreamWrapper;
@@ -43,7 +43,7 @@ use TQ\Vcs\StreamWrapper\PathFactoryInterface;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage SVN
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 class StreamWrapper extends AbstractStreamWrapper
 {

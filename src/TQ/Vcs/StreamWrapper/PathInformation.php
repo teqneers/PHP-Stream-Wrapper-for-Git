@@ -27,7 +27,7 @@
  * @package    TQ_VCS
  * @subpackage VCS
  * @subpackage StreamWrapper
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Vcs\StreamWrapper;
@@ -40,7 +40,7 @@ use TQ\Vcs\Repository\RepositoryInterface;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage VCS
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 class PathInformation implements PathInformationInterface
 {

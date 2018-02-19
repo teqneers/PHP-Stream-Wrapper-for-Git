@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage Git
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Git\StreamWrapper\FileBuffer;
@@ -41,7 +41,7 @@ use TQ\Git\StreamWrapper\FileBuffer\Factory\LogFactory;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage Git
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 class Factory extends VcsFactory
 {

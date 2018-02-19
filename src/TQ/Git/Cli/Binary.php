@@ -27,7 +27,7 @@
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage Git
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 
 namespace TQ\Git\Cli;
@@ -42,7 +42,7 @@ use TQ\Vcs\Cli\Call;
  * @category   TQ
  * @package    TQ_VCS
  * @subpackage Git
- * @copyright  Copyright (C) 2017 by TEQneers GmbH & Co. KG
+ * @copyright  Copyright (C) 2018 by TEQneers GmbH & Co. KG
  */
 class Binary extends VcsBinary {
     /**
