@@ -39,7 +39,7 @@ use TQ\Vcs\Cli\CallResult;
 /**
  * Provides access to a SVN repository
  *
- * @uses       TQ\Svn\Cli\Binary
+ * @uses       \TQ\Svn\Cli\Binary
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_VCS

@@ -39,7 +39,7 @@ use TQ\Vcs\Cli\CallResult;
 /**
  * Provides access to a Git repository
  *
- * @uses       TQ\Git\Cli\Binary
+ * @uses       \TQ\Git\Cli\Binary
  * @author     Stefan Gehrig <gehrigteqneers.de>
  * @category   TQ
  * @package    TQ_VCS
@@ -905,8 +905,8 @@ class Repository extends AbstractRepository
     /**
      * Returns the diff of a file
      *
-     * @param   string  $file       The path to the file
-     * @param   bool    $staged     Should the diff return for the staged file
+     * @param   string[]  $files      The path to the file
+     * @param   bool      $staged     Should the diff return for the staged file
      * @return  string[]
      */
     public function getDiff(array $files = null, $staged = false)
@@ -938,6 +938,7 @@ class Repository extends AbstractRepository
 
             $args[] = $file;
 
+            /** @var CallResult $result */
             $result = $this->getGit()->{'diff'}($this->getRepositoryPath(), $args);
             $result->assertSuccess(sprintf('Cannot show diff for %s from "%s"',
                 $file, $this->getRepositoryPath()
