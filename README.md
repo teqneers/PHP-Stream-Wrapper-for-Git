@@ -167,7 +167,7 @@ StreamWrapper::unregister();
 Requirements
 ------------
 
-- PHP > 5.3.0
+- PHP > 7.0.0
 - [Composer](https://getcomposer.org) available to include the dependencies
 - Git installed on the machine running the PHP code
 - SVN installed on the machine running the PHP code if you want to use the SVN component
@@ -181,9 +181,9 @@ Run tests
 4. adjust the `GIT_BINARY`, `SVN_BINARY` and `SVN_ADMIN_BINARY` constants in `phpunit.xml` to the path to your Git binary
 5. run `phpunit` from within the cloned project folder
 
-Please note that the library has been tested on a Mac OS X 10.7 with the bundled PHP 5.3.6 (git version 1.7.6), on several Ubuntu Linux installations and on Windows Vista running PHP 5.3.7 (1.7.6.msysgit.0). Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
+Please note that the library has been tested on a Mac OS X 10.13 with the bundled PHP 7.1.7 (git version 2.14.3) and on several Ubuntu Linux installations. Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
 
-The unit test suite is continuously tested with [Travis CI](http://travis-ci.org/) on PHP 5.3, 5.4 and 5.5 and its current status is: [![Build Status](https://secure.travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.png)](http://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
+The unit test suite is continuously tested with [Travis CI](http://travis-ci.org/) on PHP 7.0, 7.1 and 7.2 and its current status is: [![Build Status](https://secure.travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.png)](http://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
 
 Contribute
 ----------
