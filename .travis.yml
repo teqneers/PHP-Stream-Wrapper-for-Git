@@ -7,18 +7,15 @@ cache:
     - $HOME/.composer/cache/files
 
 php:
-  - 5.3
-  - 5.4
-  - 5.5
-  - 5.6
   - 7.0
+  - 7.1
+  - 7.2
   - nightly
-  - hhvm
 
 env:
   matrix:
-    - COMPOSER_PARAM="update --prefer-source --prefer-lowest"
-    - COMPOSER_PARAM="update --prefer-source"
+    - COMPOSER_PARAM="update --ansi --prefer-dist --no-interaction --optimize-autoloader --no-suggest --no-progress --prefer-lowest"
+    - COMPOSER_PARAM="update --ansi --prefer-dist --no-interaction --optimize-autoloader --no-suggest --no-progress"
 
 before_script:
   - which git
@@ -37,4 +34,4 @@ after_script:
 
 matrix:
   allow_failures:
-    - php: hhvm
+    - php: nightly
