@@ -1048,19 +1048,4 @@ class Repository extends AbstractRepository
 
         return $retVar;
     }
-
-    /**
-     * Resolves an absolute path into a path relative to the repository path
-     *
-     * @param   string|array  $path         A file system path (or an array of paths)
-     * @return  string|array                Either a single path or an array of paths is returned
-     */
-    public function resolveLocalPath($path)
-    {
-        $path = parent::resolveLocalPath($path);
-        if ($path === '') {
-            $path = '.';
-        }
-        return $path;
-    }
 }
