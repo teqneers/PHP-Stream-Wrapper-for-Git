@@ -262,7 +262,7 @@ class Repository extends AbstractRepository
         }
         if ($file !== null) {
             $args[] = '--';
-            $args   = array_merge($args, $this->resolveLocalPath($file));
+            $args   = array_merge($args, array_map(array($this, 'translatePathspec'), $this->resolveLocalPath($file)));
         } else {
             $args[] = '--all';
         }
@@ -837,6 +837,7 @@ class Repository extends AbstractRepository
     {
         $directory  = FileSystem::normalizeDirectorySeparator($directory);
         $directory  = $this->resolveLocalPath(rtrim($directory, '/') . '/');
+        $directory  = $this->translatePathspec($directory);
         $path       = $this->getRepositoryPath();
 
         /** @var $result CallResult */
@@ -936,7 +937,7 @@ class Repository extends AbstractRepository
                 $args[] = '--staged';
             }
 
-            $args[] = $file;
+            $args[] = $this->translatePathspec($file);
 
             /** @var CallResult $result */
             $result = $this->getGit()->{'diff'}($this->getRepositoryPath(), $args);
