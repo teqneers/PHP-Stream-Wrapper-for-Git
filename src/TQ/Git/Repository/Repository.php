@@ -262,7 +262,7 @@ class Repository extends AbstractRepository
         }
         if ($file !== null) {
             $args[] = '--';
-            $args   = array_merge($args, $this->resolveLocalPath($file));
+            $args   = array_merge($args, array_map(array($this, 'translatePathspec'), $this->resolveLocalPath($file)));
         } else {
             $args[] = '--all';
         }
@@ -845,7 +845,7 @@ class Repository extends AbstractRepository
             '--full-name',
             '-z',
             $ref,
-            $directory
+            $this->translatePathspec($directory)
         ));
         $result->assertSuccess(sprintf('Cannot list directory "%s" at "%s" from "%s"',
             $directory, $ref, $this->getRepositoryPath()
@@ -936,7 +936,7 @@ class Repository extends AbstractRepository
                 $args[] = '--staged';
             }
 
-            $args[] = $file;
+            $args[] = $this->translatePathspec($file);
 
             /** @var CallResult $result */
             $result = $this->getGit()->{'diff'}($this->getRepositoryPath(), $args);
@@ -1047,5 +1047,25 @@ class Repository extends AbstractRepository
             $retVar[$matches[1][$key]][$matches[3][$key]] = $matches[2][$key];
 
         return $retVar;
+    }
+
+    /**
+     * Translates the application's path representation to a valid git pathspec
+     *
+     * @link https://git-scm.com/docs/gitglossary#gitglossary-aiddefpathspecapathspec
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function translatePathspec($path)
+    {
+        // An empty string in this application's context means the current working directory.
+        // Due to breaking changes in git 2.16.0 (see https://github.com/git/git/blob/master/Documentation/RelNotes/2.16.0.txt)
+        // an empty path is no longer a valid pathspec but a dot
+        if ($path === '') {
+            $path = '.';
+        }
+
+        return $path;
     }
 }
