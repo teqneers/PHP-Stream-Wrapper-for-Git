@@ -837,7 +837,6 @@ class Repository extends AbstractRepository
     {
         $directory  = FileSystem::normalizeDirectorySeparator($directory);
         $directory  = $this->resolveLocalPath(rtrim($directory, '/') . '/');
-        $directory  = $this->translatePathspec($directory);
         $path       = $this->getRepositoryPath();
 
         /** @var $result CallResult */
@@ -846,7 +845,7 @@ class Repository extends AbstractRepository
             '--full-name',
             '-z',
             $ref,
-            $directory
+            $this->translatePathspec($directory)
         ));
         $result->assertSuccess(sprintf('Cannot list directory "%s" at "%s" from "%s"',
             $directory, $ref, $this->getRepositoryPath()
