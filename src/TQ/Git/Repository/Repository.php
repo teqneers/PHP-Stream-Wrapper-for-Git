@@ -1048,4 +1048,24 @@ class Repository extends AbstractRepository
 
         return $retVar;
     }
+
+    /**
+     * Translates the application's path representation to a valid git pathspec
+     *
+     * @link https://git-scm.com/docs/gitglossary#gitglossary-aiddefpathspecapathspec
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function translatePathspec($path)
+    {
+        // An empty string in this application's context means the current working directory.
+        // Due to breaking changes in git 2.16.0 (see https://github.com/git/git/blob/master/Documentation/RelNotes/2.16.0.txt)
+        // an empty path is no longer a valid pathspec but a dot
+        if ($path === '') {
+            $path = '.';
+        }
+
+        return $path;
+    }
 }
