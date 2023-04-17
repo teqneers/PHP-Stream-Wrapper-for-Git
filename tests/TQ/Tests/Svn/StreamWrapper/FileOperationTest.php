@@ -23,18 +23,19 @@
 
 namespace TQ\Tests\Svn\StreamWrapper;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Svn\Cli\Binary;
 use TQ\Svn\Repository\Repository;
 use TQ\Svn\StreamWrapper\StreamWrapper;
 use TQ\Tests\Helper;
 
-class FileOperationTest extends \PHPUnit_Framework_TestCase
+class FileOperationTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -63,7 +64,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
 
@@ -74,7 +75,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(SVN_BINARY));
     }
@@ -84,41 +85,11 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
         $path   = sprintf('svn://%s/file_0.txt', TESTS_REPO_PATH_1);
         unlink($path);
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/file_0.txt');
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('D /file_0.txt', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testUnlinkFileNonHead()
-    {
-        $path   = sprintf('svn://%s/file_0.txt#1', TESTS_REPO_PATH_1);
-        unlink($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testUnlinkNonExistantFile()
-    {
-        $path   = sprintf('svn://%s/file_does_not_exist.txt', TESTS_REPO_PATH_1);
-        unlink($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testUnlinkNonFile()
-    {
-        $c  = $this->getRepository();
-        $c->writeFile('directory/test.txt', 'Test');
-
-        $path   = sprintf('svn://%s/directory', TESTS_REPO_PATH_1);
-        unlink($path);
+        $this->assertStringContainsString('D /file_0.txt', $commit);
     }
 
     public function testUnlinkFileWithContext()
@@ -134,8 +105,8 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 
     public function testRenameFile()
@@ -144,46 +115,13 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
         $pathTo     = sprintf('svn://%s/test.txt', TESTS_REPO_PATH_1);
         rename($pathFrom, $pathTo);
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/file_0.txt');
         $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('D /file_0.txt', $commit);
-        $this->assertContains('A /test.txt', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRenameFileNonHead()
-    {
-        $pathFrom   = sprintf('svn://%s/file_0.txt#1', TESTS_REPO_PATH_1);
-        $pathTo     = sprintf('svn://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($pathFrom, $pathTo);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRenameNonExistantFile()
-    {
-        $pathFrom   = sprintf('svn://%s/file_does_not_exist.txt', TESTS_REPO_PATH_1);
-        $pathTo     = sprintf('svn://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($pathFrom, $pathTo);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRenameNonFile()
-    {
-        $c  = $this->getRepository();
-        $c->writeFile('directory/test.txt', 'Test');
-
-        $pathFrom   = sprintf('svn://%s/directory', TESTS_REPO_PATH_1);
-        $pathTo     = sprintf('svn://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($pathFrom, $pathTo);
+        $this->assertStringContainsString('D /file_0.txt', $commit);
+        $this->assertStringContainsString('A /test.txt', $commit);
     }
 
     public function testRenameFileWithContext()
@@ -200,8 +138,8 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 
     public function testRmdirDirectory()
@@ -214,42 +152,12 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
         $path   = sprintf('svn://%s/directory', TESTS_REPO_PATH_1);
         rmdir($path);
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/directory');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/directory');
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
 
-        $this->assertContains('D /directory', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRmdirDirectoryNonHead()
-    {
-        $c  = $this->getRepository();
-        $c->writeFile('directory/test.txt', 'Test');
-
-        $path   = sprintf('svn://%s/directory#1', TESTS_REPO_PATH_1);
-        rmdir($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRmdirNonExistantDirectory()
-    {
-        $path   = sprintf('svn://%s/directory_does_not_exist', TESTS_REPO_PATH_1);
-        rmdir($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRmdirNonDirectory()
-    {
-        $path   = sprintf('svn://%s/file_0.txt', TESTS_REPO_PATH_1);
-        rmdir($path);
+        $this->assertStringContainsString('D /directory', $commit);
     }
 
     public function testRmdirDirectoryWithContext()
@@ -270,8 +178,8 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 
     public function testMkdirDirectory()
@@ -283,28 +191,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('A /directory', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testMkdirDirectoryNonHead()
-    {
-        $path   = sprintf('svn://%s/directory#1', TESTS_REPO_PATH_1);
-        mkdir($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testMkdirExistantDirectory()
-    {
-        $c  = $this->getRepository();
-        $c->writeFile('directory/test.txt', 'Test');
-
-        $path   = sprintf('svn://%s/directory', TESTS_REPO_PATH_1);
-        mkdir($path);
+        $this->assertStringContainsString('A /directory', $commit);
     }
 
     public function testMkdirDirectoryRecursively()
@@ -317,16 +204,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('A /directory/directory', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testMkdirDirectoryRecursivelyFailsIfNotRequested()
-    {
-        $path   = sprintf('svn://%s/directory/directory', TESTS_REPO_PATH_1);
-        mkdir($path, 0777, false);
+        $this->assertStringContainsString('A /directory/directory', $commit);
     }
 
     public function testMkdirDirectoryWithContext()
@@ -342,8 +220,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 }
-

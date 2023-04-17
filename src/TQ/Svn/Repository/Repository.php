@@ -101,6 +101,10 @@ class Repository extends AbstractRepository
 
         $pathWithSvnDir = FileSystem::bubble($path, $hasSvnDir);
 
+        if (is_null($pathWithSvnDir)) {
+            return null;
+        }
+
         $root       = $pathWithSvnDir;
         $parentDir  = dirname($pathWithSvnDir);
         while ($hasSvnDir($parentDir) && strlen($root) > 1) {
@@ -215,8 +219,8 @@ class Repository extends AbstractRepository
     /**
      * Adds one or more files to the staging area
      *
-     * @param   array   $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
-     * @param   boolean $force
+     * @param   array|null  $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
+     * @param   boolean     $force
      */
     public function add(array $file = null, $force = false)
     {
@@ -670,22 +674,23 @@ class Repository extends AbstractRepository
     }
 
     /**
-     * Returns the diff of a file
+     * Returns the diff of a files
      *
-     * @param   array  $files       The path to the file
+     * @param   array|null  $files       The path to the files
      * @return  string[]
      */
     public function getDiff(array $files = null)
     {
-        $diffs  = array();
+        $diffs = array();
 
         if (is_null($files)) {
             $status = $this->getStatus();
 
+            $files = [];
             foreach ($status as $entry) {
                 if ($entry['status'] !== 'modified') {
-			continue;
-		}
+                    continue;
+                }
 
                 $files[] = $entry['file'];
             }

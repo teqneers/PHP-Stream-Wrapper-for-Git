@@ -21,13 +21,14 @@
  * THE SOFTWARE.
  */
 
-namespace TQ\Tests\Vcs\StreamWrapper\FileBuffer\Factory;
+namespace TQ\Tests\Vcs\StreamWrapper\FileBuffer;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Vcs\StreamWrapper\FileBuffer\Factory;
 use TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface;
 use TQ\Vcs\StreamWrapper\PathInformation;
 
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends TestCase
 {
     /**
      * @return  PathInformation
@@ -40,12 +41,12 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return  FactoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return  FactoryInterface|\PHPUnit\Framework\MockObject\MockObject
      */
     protected function createFactoryMock()
     {
         return $this->getMockBuilder('TQ\Vcs\StreamWrapper\FileBuffer\FactoryInterface')
-                    ->setMethods(array('canHandle', 'createFileBuffer'))
+                    ->onlyMethods(array('canHandle', 'createFileBuffer'))
                     ->getMock();
     }
 
@@ -91,11 +92,9 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($factory2, $factory->findFactory($path, 'r+'));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testFailsWithoutAnyFactoryResponsible()
     {
+        $this->expectException(\RuntimeException::class);
         $factory   = new Factory();
 
         $factory1   = $this->createFactoryMock();
@@ -115,4 +114,3 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $factory->findFactory($path, 'r+');
     }
 }
-

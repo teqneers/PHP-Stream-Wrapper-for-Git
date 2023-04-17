@@ -61,8 +61,8 @@ abstract class AbstractPathFactory implements PathFactoryInterface
     /**
      * Creates a path factory
      *
-     * @param   string              $protocol    The protocol (such as "vcs")
-     * @param   RepositoryRegistry  $map         The repository registry
+     * @param   string                   $protocol    The protocol (such as "vcs")
+     * @param   RepositoryRegistry|null  $map         The repository registry
      */
     public function __construct($protocol, RepositoryRegistry $map = null)
     {

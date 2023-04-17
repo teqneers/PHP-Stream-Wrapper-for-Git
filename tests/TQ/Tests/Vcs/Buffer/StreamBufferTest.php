@@ -23,16 +23,17 @@
 
 namespace TQ\Tests\Vcs\Buffer;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Vcs\Buffer\StreamBuffer;
 use TQ\Tests\Helper;
 
-class StreamBufferTest extends \PHPUnit_Framework_TestCase
+class StreamBufferTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -48,7 +49,7 @@ class StreamBufferTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
     }
@@ -154,4 +155,3 @@ class StreamBufferTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
 }
-

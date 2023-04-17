@@ -23,17 +23,18 @@
 
 namespace TQ\Tests\Git\Repository;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 use TQ\Tests\Helper;
 
-class SetupTest extends \PHPUnit_Framework_TestCase
+class SetupTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -49,7 +50,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
     }
@@ -59,16 +60,14 @@ class SetupTest extends \PHPUnit_Framework_TestCase
      * @param   boolean|integer $create
      * @return  Repository
      */
-    protected function getRepository($path, $create = false)
+    protected function getRepository($path, $create = false): Repository
     {
         return Repository::open($path, new Binary(GIT_BINARY), $create);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRepositoryOpenOnNonExistentPath()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->getRepository('/does/not/exist', false);
     }
 
@@ -79,11 +78,9 @@ class SetupTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(PROJECT_PATH, $c->getRepositoryPath());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRepositoryOpenOnNonRepositoryPath()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->getRepository(TESTS_REPO_PATH_2, false);
     }
 
@@ -118,4 +115,3 @@ class SetupTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('TQ\Git\Repository\Repository', $c);
     }
 }
-

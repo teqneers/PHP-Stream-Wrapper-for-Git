@@ -23,13 +23,15 @@
 
 namespace TQ\Tests\Vcs\StreamWrapper;
 
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use TQ\Vcs\Repository\RepositoryInterface;
 use TQ\Vcs\StreamWrapper\RepositoryRegistry;
 
-class RepositoryRegistryTest extends \PHPUnit_Framework_TestCase
+class RepositoryRegistryTest extends TestCase
 {
     /**
-     * @return RepositoryInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return RepositoryInterface|MockObject
      */
     protected function createRepositoryMock()
     {
@@ -42,7 +44,7 @@ class RepositoryRegistryTest extends \PHPUnit_Framework_TestCase
         $registry   = new RepositoryRegistry();
         $a          = $this->createRepositoryMock();
         $registry->addRepository('a', $a);
-        $this->assertEquals(1, count($registry));
+        $this->assertCount(1, $registry);
         $this->assertTrue($registry->hasRepository('a'));
         $this->assertFalse($registry->hasRepository('b'));
         $this->assertSame($a, $registry->getRepository('a'));
@@ -57,7 +59,7 @@ class RepositoryRegistryTest extends \PHPUnit_Framework_TestCase
             'a' => $a,
             'b' => $b
         ));
-        $this->assertEquals(2, count($registry));
+        $this->assertCount(2, $registry);
         $this->assertTrue($registry->hasRepository('a'));
         $this->assertTrue($registry->hasRepository('b'));
         $this->assertFalse($registry->hasRepository('c'));
@@ -65,12 +67,10 @@ class RepositoryRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($b, $registry->getRepository('b'));
     }
 
-    /**
-     * @expectedException           \OutOfBoundsException
-     * @expectedExceptionMessage    a does not exist in the registry
-     */
     public function testGetNonExistentRepositoryThrowsException()
     {
+        $this->expectExceptionMessage("a does not exist in the registry");
+        $this->expectException(\OutOfBoundsException::class);
         $registry   = new RepositoryRegistry();
         $registry->getRepository('a');
     }
@@ -81,4 +81,3 @@ class RepositoryRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($registry->tryGetRepository('a'));
     }
 }
-

@@ -23,17 +23,18 @@
 
 namespace TQ\Tests\Svn\Repository;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Svn\Cli\Binary;
 use TQ\Svn\Repository\Repository;
 use TQ\Tests\Helper;
 
-class InfoTest extends \PHPUnit_Framework_TestCase
+class InfoTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -60,7 +61,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
     }
@@ -69,7 +70,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(SVN_BINARY));
     }
@@ -104,27 +105,27 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     {
         $c      = $this->getRepository();
         $log    = $c->getLog();
-        $this->assertEquals(1, count($log));
-        $this->assertContains('Initial commit', $log[0][3]);
+        $this->assertCount(1, $log);
+        $this->assertStringContainsString('Initial commit', $log[0][3]);
 
         $revision   = $c->writeFile('/directory/test.txt', 'Test');
         $log        = $c->getLog();
 
-        $this->assertEquals(2, count($log));
+        $this->assertCount(2, $log);
         $this->assertEquals($revision, $log[0][0]);
-        $this->assertContains('Initial commit', $log[1][3]);
+        $this->assertStringContainsString('Initial commit', $log[1][3]);
 
         $log    = $c->getLog(1);
-        $this->assertEquals(1, count($log));
+        $this->assertCount(1, $log);
         $this->assertEquals($revision, $log[0][0]);
 
         $log    = $c->getLog(1, 1);
-        $this->assertEquals(1, count($log));
-        $this->assertContains('Initial commit', $log[0][3]);
+        $this->assertCount(1, $log);
+        $this->assertStringContainsString('Initial commit', $log[0][3]);
 
         $log    = $c->getLog(10,0);
-        $this->assertEquals(2, count($log));
-        $this->assertContains('Initial commit', $log[1][3]);
+        $this->assertCount(2, $log);
+        $this->assertStringContainsString('Initial commit', $log[1][3]);
     }
 
     public function testShowCommit()
@@ -132,8 +133,8 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $c          = $this->getRepository();
         $revision   = $c->writeFile('test.txt', 'Test');
         $commit = $c->showCommit($revision);
-        $this->assertContains('test.txt', $commit);
-        $this->assertContains('TQ\Svn\Repository\Repository created or changed file "test.txt"', $commit);
+        $this->assertStringContainsString('test.txt', $commit);
+        $this->assertStringContainsString('TQ\Svn\Repository\Repository created or changed file "test.txt"', $commit);
     }
 
     public function testListDirectory()
@@ -228,12 +229,11 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
         $diff = $c->getDiff(array($file1));
         $this->assertEquals(array('file_1.txt'), array_keys($diff));
-        $this->assertRegExp("/\\+Unstaged1$/", $diff['file_1.txt']);
+        $this->assertMatchesRegularExpression("/\\+Unstaged1$/", $diff['file_1.txt']);
 
         $diff = $c->getDiff();
         $this->assertEquals(array('file_1.txt', 'file_2.txt'), array_keys($diff));
-        $this->assertRegExp("/\\+Unstaged1$/", $diff['file_1.txt']);
-        $this->assertRegExp("/\\+Unstaged2$/", $diff['file_2.txt']);
+        $this->assertMatchesRegularExpression("/\\+Unstaged1$/", $diff['file_1.txt']);
+        $this->assertMatchesRegularExpression("/\\+Unstaged2$/", $diff['file_2.txt']);
     }
 }
-

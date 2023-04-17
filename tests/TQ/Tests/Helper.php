@@ -29,7 +29,7 @@ class Helper
      * @param   string  $path
      * @return  boolean
      */
-    public static function createDirectory($path)
+    public static function createDirectory($path): bool
     {
          return mkdir($path, 0777, true);
     }
@@ -38,7 +38,7 @@ class Helper
      * @param   string  $path
      * @throws  \InvalidArgumentException
      */
-    public static function removeDirectory($path)
+    public static function removeDirectory($path): void
     {
         clearstatcache();
         if (!file_exists($path)) {
@@ -80,7 +80,7 @@ class Helper
      * @param   string  $path
      * @return  string
      */
-    public static function normalizeDirectorySeparator($path)
+    public static function normalizeDirectorySeparator($path): string
     {
         return str_replace(array('\\', '/'), '/', $path);
     }
@@ -89,7 +89,7 @@ class Helper
      * @param   string  $string
      * @return  string
      */
-    public static function normalizeNewLines($string)
+    public static function normalizeNewLines($string): string
     {
         return str_replace("\r\n", "\n", $string);
     }
@@ -98,7 +98,7 @@ class Helper
      * @param   string  $command
      * @return  string
      */
-    public static function normalizeEscapeShellArg($command)
+    public static function normalizeEscapeShellArg($command): string
     {
         return str_replace("'", '"', $command);
     }
@@ -107,7 +107,8 @@ class Helper
      * @param   string  $path
      * @return  string
      */
-    public static function initEmptyGitRepository($path) {
+    public static function initEmptyGitRepository($path): string
+    {
          return exec(
              sprintf(
                 'cd %1$s && %2$s init && %2$s config user.email "test@example.com" && %2$s config user.name "test"',
@@ -122,7 +123,7 @@ class Helper
      * @param   string  $command
      * @return  string
      */
-    public static function executeGit($path, $command)
+    public static function executeGit($path, $command): string
     {
         return exec(
             sprintf(
@@ -138,7 +139,8 @@ class Helper
      * @param   string  $path
      * @return  string
      */
-    public static function initEmptySvnRepository($path) {
+    public static function initEmptySvnRepository($path): string
+    {
         $workingDir = $path;
         $repoDir    = dirname($path).'/'.basename($path).'_repo';
 
@@ -169,7 +171,7 @@ class Helper
      * @param   string  $command
      * @return  string
      */
-    public static function executeSvn($path, $command)
+    public static function executeSvn($path, $command): string
     {
         return exec(
             sprintf(

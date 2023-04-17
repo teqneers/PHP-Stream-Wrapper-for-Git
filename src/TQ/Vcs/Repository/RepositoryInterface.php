@@ -91,8 +91,8 @@ interface RepositoryInterface
     /**
      * Adds one or more files to the staging area
      *
-     * @param   array   $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
-     * @param   boolean $force
+     * @param   array|null  $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
+     * @param   boolean     $force
      */
     public function add(array $file = null, $force = false);
 
@@ -204,10 +204,10 @@ interface RepositoryInterface
     /**
      * Returns the diff of a file
      *
-     * @param   array  $file       The path to the file
+     * @param   array  $files       The path to the file(s)
      * @return  string[]
      */
-    public function getDiff(array $file);
+    public function getDiff(array $files);
 
     /**
      * Returns true if there are uncommitted changes in the working directory and/or the staging area

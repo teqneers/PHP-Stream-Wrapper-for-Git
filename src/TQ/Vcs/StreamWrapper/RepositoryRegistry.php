@@ -127,7 +127,7 @@ class RepositoryRegistry implements \Countable
      * @link    http://php.net/manual/en/countable.count.php
      * @return  integer     The custom count as an integer
      */
-    public function count()
+    public function count(): int
     {
         return count($this->map);
     }

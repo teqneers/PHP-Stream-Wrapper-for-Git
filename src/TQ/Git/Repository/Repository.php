@@ -251,8 +251,8 @@ class Repository extends AbstractRepository
     /**
      * Adds one or more files to the staging area
      *
-     * @param   array   $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
-     * @param   boolean $force
+     * @param   array|null  $file       The file(s) to be added or NULL to add all new and/or changed files to the staging area
+     * @param   boolean     $force
      */
     public function add(array $file = null, $force = false)
     {

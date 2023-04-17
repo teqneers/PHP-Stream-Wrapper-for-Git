@@ -23,6 +23,7 @@
 
 namespace TQ\Tests\Vcs\Gaufrette;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Svn\Cli\Binary as SvnBinary;
 use TQ\Git\Cli\Binary as GitBinary;
 use TQ\Tests\Helper;
@@ -30,13 +31,13 @@ use TQ\Vcs\Cli\Binary;
 use TQ\Vcs\Gaufrette\Adapter;
 use TQ\Vcs\Repository\RepositoryInterface;
 
-class AdapterTest extends \PHPUnit_Framework_TestCase
+class AdapterTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -94,7 +95,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
     }
@@ -105,7 +106,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
      * @param   Binary  $binary
      * @return  Adapter
      */
-    protected function createAdapter($repositoryClass, $path, Binary $binary)
+    protected function createAdapter($repositoryClass, $path, Binary $binary): Adapter
     {
         /** @var $repository RepositoryInterface */
         $repository = call_user_func(array($repositoryClass, 'open'), $path, $binary);
@@ -169,16 +170,16 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
 
         $adapter->write('file_3.txt', 'New content');
         $this->assertEquals('New content', file_get_contents($path.'/file_3.txt'));
-        $this->assertContains('file_3.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('file_3.txt', $repository->showCommit($repository->getCurrentCommit()));
 
         $adapter->write('dir_1/file.txt', 'New content');
         $this->assertEquals('New content', file_get_contents($path.'/dir_1/file.txt'));
-        $this->assertContains('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
 
         $adapter->write('new_file.txt', 'New content');
         $this->assertFileExists($path.'/new_file.txt');
         $this->assertEquals('New content', file_get_contents($path.'/new_file.txt'));
-        $this->assertContains('new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
     }
 
     /**
@@ -194,11 +195,11 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $repository = $adapter->getRepository();
 
         $adapter->rename('file_1.txt', 'file_9.txt');
-        $this->assertFileNotExists($path.'/file_1.txt');
+        $this->assertFileDoesNotExist($path.'/file_1.txt');
         $this->assertFileExists($path.'/file_9.txt');
         $this->assertEquals('File 1', file_get_contents($path.'/file_9.txt'));
-        $this->assertContains('file_1.txt', $repository->showCommit($repository->getCurrentCommit()));
-        $this->assertContains('file_9.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('file_1.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('file_9.txt', $repository->showCommit($repository->getCurrentCommit()));
     }
 
     /**
@@ -214,11 +215,11 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $repository = $adapter->getRepository();
 
         $adapter->rename('dir_1/file.txt', 'dir_1/new_file.txt');
-        $this->assertFileNotExists($path.'/dir_1/file.txt');
+        $this->assertFileDoesNotExist($path.'/dir_1/file.txt');
         $this->assertFileExists($path.'/dir_1/new_file.txt');
         $this->assertEquals('Directory 1 File', file_get_contents($path.'/dir_1/new_file.txt'));
-        $this->assertContains('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
-        $this->assertContains('dir_1/new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('dir_1/new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
     }
 
     /**
@@ -234,11 +235,11 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $repository = $adapter->getRepository();
 
         $adapter->rename('dir_1/file.txt', 'dir_2/new_file.txt');
-        $this->assertFileNotExists($path.'/dir_1/file.txt');
+        $this->assertFileDoesNotExist($path.'/dir_1/file.txt');
         $this->assertFileExists($path.'/dir_2/new_file.txt');
         $this->assertEquals('Directory 1 File', file_get_contents($path.'/dir_2/new_file.txt'));
-        $this->assertContains('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
-        $this->assertContains('dir_2/new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('dir_2/new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
     }
 
     /**
@@ -254,11 +255,11 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $repository = $adapter->getRepository();
 
         $adapter->rename('dir_1/file.txt', 'new_file.txt');
-        $this->assertFileNotExists($path.'/dir_1/file.txt');
+        $this->assertFileDoesNotExist($path.'/dir_1/file.txt');
         $this->assertFileExists($path.'/new_file.txt');
         $this->assertEquals('Directory 1 File', file_get_contents($path.'/new_file.txt'));
-        $this->assertContains('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
-        $this->assertContains('new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
     }
 
     /**
@@ -274,11 +275,11 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $repository = $adapter->getRepository();
 
         $adapter->rename('file_1.txt', 'dir_1/new_file.txt');
-        $this->assertFileNotExists($path.'/file_1.txt');
+        $this->assertFileDoesNotExist($path.'/file_1.txt');
         $this->assertFileExists($path.'/dir_1/new_file.txt');
         $this->assertEquals('File 1', file_get_contents($path.'/dir_1/new_file.txt'));
-        $this->assertContains('file_1.txt', $repository->showCommit($repository->getCurrentCommit()));
-        $this->assertContains('dir_1/new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('file_1.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertStringContainsString('dir_1/new_file.txt', $repository->showCommit($repository->getCurrentCommit()));
     }
 
     /**
@@ -328,12 +329,12 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         $repository = $adapter->getRepository();
 
         $adapter->delete('file_1.txt');
-        $this->assertFileNotExists($path.'/file_1.txt');
-        $this->assertContains('file_1.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertFileDoesNotExist($path.'/file_1.txt');
+        $this->assertStringContainsString('file_1.txt', $repository->showCommit($repository->getCurrentCommit()));
 
         $adapter->delete('dir_1/file.txt');
-        $this->assertFileNotExists($path.'/dir_1/file.txt');
-        $this->assertContains('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
+        $this->assertFileDoesNotExist($path.'/dir_1/file.txt');
+        $this->assertStringContainsString('dir_1/file.txt', $repository->showCommit($repository->getCurrentCommit()));
     }
 
     /**
@@ -383,7 +384,7 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
     /**
      * @return  array
      */
-    public function gaufretteAdapterRepositoryDataProvider()
+    public function gaufretteAdapterRepositoryDataProvider(): array
     {
         return array(
             array(
@@ -399,4 +400,3 @@ class AdapterTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
-

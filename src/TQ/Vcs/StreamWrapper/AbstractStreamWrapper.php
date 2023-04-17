@@ -727,7 +727,7 @@ abstract class AbstractStreamWrapper
      *                              STREAM_URL_STAT_QUIET   If this flag is set, your wrapper should not raise any errors. If this
      *                                                      flag is not set, you are responsible for reporting errors using the
      *                                                      trigger_error() function during stating of the path.
-     * @return  array           Should return as many elements as stat() does. Unknown or unavailable values should be set to a
+     * @return  array|false     Should return as many elements as stat() does. Unknown or unavailable values should be set to a
      *                          rational value (usually 0).
      */
     public function url_stat($path, $flags)
