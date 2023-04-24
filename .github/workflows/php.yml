@@ -53,5 +53,3 @@ jobs:
       run: vendor/bin/phpunit -c phpunit.xml.dist --coverage-text
       env:
         XDEBUG_MODE: coverage
-            with:
-        cli-args: "--format=php-clover coverage.clover"
