@@ -21,20 +21,20 @@
     },
     "require-dev": {
         "phpunit/phpunit": "~9.6",
-        "knplabs/gaufrette": "~0.5",
-        "symfony/yaml": "~3.4"
+        "knplabs/gaufrette": "~0.11",
+        "symfony/yaml": "^3.4|^4.0|^5.0|^6.0"
     },
     "suggest": {
         "knplabs/gaufrette": "to use the Gaufrette adapter"
     },
     "autoload": {
         "psr-4": {
-            "": "src/"
+            "TQ\\": "src/TQ"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "": "tests/"
+            "TQ\\": "tests/TQ"
         }
     },
     "extra": {
