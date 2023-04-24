@@ -1,10 +1,7 @@
 Git Stream Wrapper for PHP
 =========================
 
-[![Build Status](https://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.svg?branch=master)](https://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
-[![Code Coverage](https://scrutinizer-ci.com/g/teqneers/PHP-Stream-Wrapper-for-Git/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/teqneers/PHP-Stream-Wrapper-for-Git/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/teqneers/PHP-Stream-Wrapper-for-Git/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/teqneers/PHP-Stream-Wrapper-for-Git/?branch=master)
-[![Dependency Status](https://www.versioneye.com/user/projects/55b4babe643533001c000587/badge.svg?style=flat)](https://www.versioneye.com/user/projects/55b4babe643533001c000587)
+![PHP Testing](https://github.com/teqneers/PHP-Stream-Wrapper-for-Git/actions/workflows/php.yml/badge.svg)
 
 *Git Stream Wrapper for PHP* is a PHP library that allows PHP code to interact with one or multiple Git repositories from within an application. The library consists of a Git repository abstraction that can be used to programmatically access Git repositories and of a stream wrapper that can be hooked into the PHP stream infrastructure to allow the developer to use file and directory access functions directly on files in a Git repository. The library provides means to access status information on a Git repository, such as the log, the current repository status or commit information, as well.
 
