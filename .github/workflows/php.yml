@@ -34,6 +34,9 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
+        
+    - name: Set master as the default Git branch to prevent warnings
+      run: git config --global init.defaultBranch master
 
     - name: Install dependencies
       run: composer install --no-interaction --no-progress --no-suggest --prefer-dist
