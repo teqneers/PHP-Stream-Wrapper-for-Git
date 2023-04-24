@@ -1,31 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         syntaxCheck="false"
-         bootstrap="tests/bootstrap.php"
->
-    <php>
-        <const name="GIT_BINARY" value="/usr/bin/git"/>
-        <const name="SVN_BINARY" value="/usr/bin/svn"/>
-        <const name="SVN_ADMIN_BINARY" value="/usr/bin/svnadmin"/>
-        <const name="TEST_REPO_PATH" value="false"/>
-    </php>
-    <testsuites>
-        <testsuite name="TEQneers Git Stream Wrapper Test Suite">
-            <directory>./tests/TQ/</directory>
-        </testsuite>
-    </testsuites>
-
-    <filter>
-        <whitelist>
-            <directory>./src/TQ/</directory>
-        </whitelist>
-    </filter>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" backupStaticAttributes="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" bootstrap="tests/bootstrap.php" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory>./src/TQ/</directory>
+    </include>
+  </coverage>
+  <php>
+    <const name="GIT_BINARY" value="/usr/bin/git"/>
+    <const name="SVN_BINARY" value="/usr/bin/svn"/>
+    <const name="SVN_ADMIN_BINARY" value="/usr/bin/svnadmin"/>
+    <const name="TEST_REPO_PATH" value="false"/>
+  </php>
+  <testsuites>
+    <testsuite name="TEQneers Git Stream Wrapper Test Suite">
+      <directory>./tests/TQ/</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>

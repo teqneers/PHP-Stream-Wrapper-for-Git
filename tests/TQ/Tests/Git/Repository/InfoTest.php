@@ -23,17 +23,18 @@
 
 namespace TQ\Tests\Git\Repository;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 use TQ\Tests\Helper;
 
-class InfoTest extends \PHPUnit_Framework_TestCase
+class InfoTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -61,7 +62,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
     }
@@ -70,7 +71,7 @@ class InfoTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(GIT_BINARY));
     }
@@ -121,63 +122,63 @@ class InfoTest extends \PHPUnit_Framework_TestCase
     {
         $c      = $this->getRepository();
         $log    = $c->getLog();
-        $this->assertEquals(1, count($log));
-        $this->assertContains('Initial commit', $log[0]);
+        $this->assertCount(1, $log);
+        $this->assertStringContainsString('Initial commit', $log[0]);
 
         $hash   = $c->writeFile('/directory/test.txt', 'Test');
         $log    = $c->getLog();
-        $this->assertEquals(2, count($log));
-        $this->assertContains($hash, $log[0]);
-        $this->assertContains('Initial commit', $log[1]);
+        $this->assertCount(2, $log);
+        $this->assertStringContainsString($hash, $log[0]);
+        $this->assertStringContainsString('Initial commit', $log[1]);
 
         $log    = $c->getLog(1);
-        $this->assertEquals(1, count($log));
-        $this->assertContains($hash, $log[0]);
+        $this->assertCount(1, $log);
+        $this->assertStringContainsString($hash, $log[0]);
 
         $log    = $c->getLog(array('limit' => 1));
-        $this->assertEquals(1, count($log));
-        $this->assertContains($hash, $log[0]);
+        $this->assertCount(1, $log);
+        $this->assertStringContainsString($hash, $log[0]);
 
         $log    = $c->getLog(1, 1);
-        $this->assertEquals(1, count($log));
-        $this->assertContains('Initial commit', $log[0]);
+        $this->assertCount(1, $log);
+        $this->assertStringContainsString('Initial commit', $log[0]);
 
         $log    = $c->getLog(array('limit' => 1, 'skip' => 1));
-        $this->assertEquals(1, count($log));
-        $this->assertContains('Initial commit', $log[0]);
+        $this->assertCount(1, $log);
+        $this->assertStringContainsString('Initial commit', $log[0]);
 
         $log    = $c->getLog(10,0);
-        $this->assertEquals(2, count($log));
-        $this->assertContains('Initial commit', $log[1]);
+        $this->assertCount(2, $log);
+        $this->assertStringContainsString('Initial commit', $log[1]);
 
         $log    = $c->getLog(array('limit' => 10, 'skip' => 0));
-        $this->assertEquals(2, count($log));
-        $this->assertContains('Initial commit', $log[1]);
+        $this->assertCount(2, $log);
+        $this->assertStringContainsString('Initial commit', $log[1]);
 
         $log    = $c->getLog(null, null);
-        $this->assertEquals(2, count($log));
-        $this->assertContains('Initial commit', $log[1]);
+        $this->assertCount(2, $log);
+        $this->assertStringContainsString('Initial commit', $log[1]);
 
         $hash2 = $c->writeFile('file7.txt', 'Test create file 7', 'Test create file 7');
         $hash3 = $c->writeFile('file8.txt', 'Test create file 8', 'Test create file 8');
 
         $log    = $c->getLog(array('color', '--', 'file_0.txt'));
         $allLogs = implode("\n", $log);
-        $this->assertEquals(1, count($log));
+        $this->assertCount(1, $log);
         $this->assertEquals(1, substr_count($allLogs, 'create mode'));
-        $this->assertContains('Initial commit', $log[0]);
+        $this->assertStringContainsString('Initial commit', $log[0]);
 
         $log    = $c->getLog(array('--', 'file7.txt'));
         $allLogs = implode("\n", $log);
-        $this->assertEquals(1, count($log));
+        $this->assertCount(1, $log);
         $this->assertEquals(1, substr_count($allLogs, 'create mode'));
-        $this->assertContains('Test create file 7', $log[0]);
+        $this->assertStringContainsString('Test create file 7', $log[0]);
 
         $log    = $c->getLog(array('--', 'file8.txt'));
         $allLogs = implode("\n", $log);
-        $this->assertEquals(1, count($log));
+        $this->assertCount(1, $log);
         $this->assertEquals(1, substr_count($allLogs, 'create mode'));
-        $this->assertContains('Test create file 8', $log[0]);
+        $this->assertStringContainsString('Test create file 8', $log[0]);
 
         $log = $c->getLog(array(
             'limit' => 3,
@@ -188,11 +189,11 @@ class InfoTest extends \PHPUnit_Framework_TestCase
             'date' => 'relative'
         ));
 
-        $this->assertEquals(3, count($log));
-        $this->assertContains(substr($hash3, 0, 7) . ' - ', $log[0]);
-        $this->assertContains('Test create file 8', $log[0]);
-        $this->assertContains(substr($hash2, 0, 7) . ' - Test create file 7', $log[1]);
-        $this->assertContains(substr($hash, 0, 7) . ' - TQ\Git\Repository\Repository created or changed file "/directory/test.txt"', $log[2]);
+        $this->assertCount(3, $log);
+        $this->assertStringContainsString(substr($hash3, 0, 7) . ' - ', $log[0]);
+        $this->assertStringContainsString('Test create file 8', $log[0]);
+        $this->assertStringContainsString(substr($hash2, 0, 7) . ' - Test create file 7', $log[1]);
+        $this->assertStringContainsString(substr($hash, 0, 7) . ' - TQ\Git\Repository\Repository created or changed file "/directory/test.txt"', $log[2]);
 
         $log = $c->getLog(array(
             'pretty' => 'format:"%C(yellow)%h%Cred%d %Creset%s%Cblue [%cn]%Creset"',
@@ -206,8 +207,8 @@ class InfoTest extends \PHPUnit_Framework_TestCase
         $c      = $this->getRepository();
         $hash   = $c->writeFile('test.txt', 'Test');
         $commit = $c->showCommit($hash);
-        $this->assertContains('test.txt', $commit);
-        $this->assertContains('Test', $commit);
+        $this->assertStringContainsString('test.txt', $commit);
+        $this->assertStringContainsString('Test', $commit);
     }
 
     public function testListDirectory()
@@ -307,21 +308,20 @@ class InfoTest extends \PHPUnit_Framework_TestCase
 
         $diff = $c->getDiff(array($file1), true);
         $this->assertEquals(array('file_1.txt'), array_keys($diff));
-        $this->assertRegExp("/\\+Staged1$/", $diff['file_1.txt']);
+        $this->assertMatchesRegularExpression("/\\+Staged1$/", $diff['file_1.txt']);
 
         $diff = $c->getDiff(array($file1), false);
         $this->assertEquals(array('file_1.txt'), array_keys($diff));
-        $this->assertRegExp("/ Staged1\\n\\+Unstaged1$/", $diff['file_1.txt']);
+        $this->assertMatchesRegularExpression("/ Staged1\\n\\+Unstaged1$/", $diff['file_1.txt']);
 
         $diff = $c->getDiff(null, true);
         $this->assertEquals(array('file_1.txt', 'file_2.txt'), array_keys($diff));
-        $this->assertRegExp("/\\+Staged1$/", $diff['file_1.txt']);
-        $this->assertRegExp("/\\+Staged2$/", $diff['file_2.txt']);
+        $this->assertMatchesRegularExpression("/\\+Staged1$/", $diff['file_1.txt']);
+        $this->assertMatchesRegularExpression("/\\+Staged2$/", $diff['file_2.txt']);
 
         $diff = $c->getDiff(null, false);
         $this->assertEquals(array('file_1.txt', 'file_2.txt'), array_keys($diff));
-        $this->assertRegExp("/ Staged1\\n\\+Unstaged1$/", $diff['file_1.txt']);
-        $this->assertRegExp("/ Staged2\\n\\+Unstaged2$/", $diff['file_2.txt']);
+        $this->assertMatchesRegularExpression("/ Staged1\\n\\+Unstaged1$/", $diff['file_1.txt']);
+        $this->assertMatchesRegularExpression("/ Staged2\\n\\+Unstaged2$/", $diff['file_2.txt']);
     }
 }
-

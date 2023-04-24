@@ -209,7 +209,7 @@ abstract class AbstractRepository implements RepositoryInterface
      * Runs $function in a transactional scope committing all changes to the repository on success,
      * but rolling back all changes in the event of an Exception being thrown in the closure
      *
-     * The closure $function will be called with a {@see TQ\Vcs\Repository\Transaction} as its only argument
+     * The closure $function will be called with a {@see \TQ\Vcs\Repository\Transaction} as its only argument
      *
      * @param   \Closure   $function        The callback used inside the transaction
      * @return  Transaction

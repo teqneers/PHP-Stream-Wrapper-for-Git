@@ -23,12 +23,13 @@
 
 namespace TQ\Tests\Git\Cli;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Git\Cli\Binary;
 use TQ\Tests\Helper;
 
-class CallCreationTest extends \PHPUnit_Framework_TestCase
+class CallCreationTest extends TestCase
 {
-    protected function assertCliCommandEquals($expected, $actual)
+    protected function assertCliCommandEquals($expected, $actual): void
     {
         if (strpos(PHP_OS, 'WIN') !== false) {
             $expected = Helper::normalizeEscapeShellArg($expected);
@@ -122,4 +123,3 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $this->assertCliCommandEquals("/usr/bin/git 'command' 'option' '/path/to/file' -- 'path/to/file'", $call->getCmd());
     }
 }
-

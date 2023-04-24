@@ -23,18 +23,19 @@
 
 namespace TQ\Tests\Git\StreamWrapper;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 use TQ\Git\StreamWrapper\StreamWrapper;
 use TQ\Tests\Helper;
 
-class StatusReadTest extends \PHPUnit_Framework_TestCase
+class StatusReadTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -51,7 +52,7 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
 
@@ -62,7 +63,7 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(GIT_BINARY));
     }
@@ -80,8 +81,8 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
             $content    = file_get_contents($commitUrl);
 
             $this->assertStringStartsWith('commit '.$commitHash, $content);
-            $this->assertContains(sprintf('+++ b/test_%d.txt', $c), $content);
-            $this->assertContains(sprintf('+This is file %d', $c), $content);
+            $this->assertStringContainsString(sprintf('+++ b/test_%d.txt', $c), $content);
+            $this->assertStringContainsString(sprintf('+This is file %d', $c), $content);
         }
     }
 
@@ -96,16 +97,16 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
         $logUrl  = sprintf('git://%s?log', TESTS_REPO_PATH_1);
         $log     = file_get_contents($logUrl);
         foreach ($commits as $commitHash) {
-            $this->assertContains('commit '.$commitHash, $log);
+            $this->assertStringContainsString('commit '.$commitHash, $log);
         }
 
         $logUrl  = sprintf('git://%s?log&limit=%d', TESTS_REPO_PATH_1, 1);
         $log     = file_get_contents($logUrl);
         foreach ($commits as $c => $commitHash) {
             if ($c == count($commits) - 1) {
-                $this->assertContains('commit '.$commitHash, $log);
+                $this->assertStringContainsString('commit '.$commitHash, $log);
             } else {
-                $this->assertNotContains('commit '.$commitHash, $log);
+                $this->assertStringNotContainsString('commit '.$commitHash, $log);
             }
         }
 
@@ -113,9 +114,9 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
         $log     = file_get_contents($logUrl);
         foreach ($commits as $c => $commitHash) {
             if ($c >= count($commits) - 2) {
-                $this->assertContains('commit '.$commitHash, $log);
+                $this->assertStringContainsString('commit '.$commitHash, $log);
             } else {
-                $this->assertNotContains('commit '.$commitHash, $log);
+                $this->assertStringNotContainsString('commit '.$commitHash, $log);
             }
         }
 
@@ -123,11 +124,10 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
         $log     = file_get_contents($logUrl);
         foreach ($commits as $c => $commitHash) {
             if (($c >= count($commits) - 3) && ($c < count($commits) - 1)) {
-                $this->assertContains('commit '.$commitHash, $log);
+                $this->assertStringContainsString('commit '.$commitHash, $log);
             } else {
-                $this->assertNotContains('commit '.$commitHash, $log);
+                $this->assertStringNotContainsString('commit '.$commitHash, $log);
             }
         }
     }
 }
-

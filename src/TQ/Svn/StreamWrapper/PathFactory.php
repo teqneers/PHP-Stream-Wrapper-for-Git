@@ -58,9 +58,9 @@ class PathFactory extends AbstractPathFactory
     /**
      * Creates a path factory
      *
-     * @param   string              $protocol    The protocol (such as "svn")
-     * @param   Binary|string|null  $svn         The SVN binary
-     * @param   RepositoryRegistry  $map         The repository registry
+     * @param   string                   $protocol    The protocol (such as "svn")
+     * @param   Binary|string|null       $svn         The SVN binary
+     * @param   RepositoryRegistry|null  $map         The repository registry
      */
     public function __construct($protocol, $svn = null, RepositoryRegistry $map = null)
     {

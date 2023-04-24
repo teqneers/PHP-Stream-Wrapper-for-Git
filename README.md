@@ -6,9 +6,9 @@ Git Stream Wrapper for PHP
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/teqneers/PHP-Stream-Wrapper-for-Git/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/teqneers/PHP-Stream-Wrapper-for-Git/?branch=master)
 [![Dependency Status](https://www.versioneye.com/user/projects/55b4babe643533001c000587/badge.svg?style=flat)](https://www.versioneye.com/user/projects/55b4babe643533001c000587)
 
-*Git Stream Wrapper for PHP* is a PHP library that allows PHP code to interact with one or multiple Git repositories from within an application. The library consists of a Git repository abstraction that can be used to programatically access Git repositories and of a stream wrapper that can be hooked into the PHP stream infrastructure to allow the developer to use file and directory access functions directly on files in a Git repository. The library provides means to access status information on a Git repository, such as the log, the current repository status or commit information, as well.
+*Git Stream Wrapper for PHP* is a PHP library that allows PHP code to interact with one or multiple Git repositories from within an application. The library consists of a Git repository abstraction that can be used to programmatically access Git repositories and of a stream wrapper that can be hooked into the PHP stream infrastructure to allow the developer to use file and directory access functions directly on files in a Git repository. The library provides means to access status information on a Git repository, such as the log, the current repository status or commit information, as well.
 
-The *Git Stream Wrapper for PHP* core is a wrapper around the Git command line binary so it is required to have Git installed on the machine running the PHP code. ***Git Stream Wrapper for PHP* does not include a Git protocol abstraction**, it relies on the Git command line binary for all its functionality.
+The *Git Stream Wrapper for PHP* core is a wrapper around the Git command line binary, so it is required to have Git installed on the machine running the PHP code. ***Git Stream Wrapper for PHP* does not include a Git protocol abstraction**, it relies on the Git command line binary for all its functionality.
 
 **The code is currently running stable (see comments on Windows below) and should be API-stable. It's however not feature-complete - so please feel free to request features you require.**
 
@@ -66,7 +66,7 @@ $result = $git->transactional(function(TQ\Vcs\Repository\Transaction $t) {
     $t->setCommitMsg('Don\'t know what to write here');
 
     // if we throw an exception from within the callback the changes are discarded
-    // throw new Exception('No we don\'t want to to these changes');
+    // throw new Exception('No we don\'t want to make these changes');
     // note: the exception will be re-thrown by the repository so you have to catch
     // the exception yourself outside the transactional scope.
 });
@@ -167,7 +167,7 @@ StreamWrapper::unregister();
 Requirements
 ------------
 
-- PHP > 7.0.0
+- PHP >= 8.0.0
 - [Composer](https://getcomposer.org) available to include the dependencies
 - Git installed on the machine running the PHP code
 - SVN installed on the machine running the PHP code if you want to use the SVN component
@@ -181,9 +181,9 @@ Run tests
 4. adjust the `GIT_BINARY`, `SVN_BINARY` and `SVN_ADMIN_BINARY` constants in `phpunit.xml` to the path to your Git binary
 5. run `phpunit` from within the cloned project folder
 
-Please note that the library has been tested on a Mac OS X 10.13 with the bundled PHP 7.1.7 (git version 2.14.3) and on several Ubuntu Linux installations. Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
+Please note that the library has been tested on a Mac OS X 12.6 with the bundled PHP 8.0.27, 8.1.14 and 8.2.1 (git version 2.39.1) and on several Ubuntu Linux installations. Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
 
-The unit test suite is continuously tested with [Travis CI](http://travis-ci.org/) on PHP 7.0, 7.1 and 7.2 and its current status is: [![Build Status](https://secure.travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.png)](http://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
+The unit test suite is continuously tested with [Travis CI](http://travis-ci.org/) on PHP 8.0 and 8.1 and its current status is: [![Build Status](https://secure.travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.png)](http://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
 
 Contribute
 ----------

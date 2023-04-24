@@ -23,17 +23,18 @@
 
 namespace TQ\Tests\Svn\Repository;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Svn\Cli\Binary;
 use TQ\Svn\Repository\Repository;
 use TQ\Tests\Helper;
 
-class SetupTest extends \PHPUnit_Framework_TestCase
+class SetupTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -49,7 +50,7 @@ class SetupTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
     }
@@ -58,24 +59,20 @@ class SetupTest extends \PHPUnit_Framework_TestCase
      * @param   string          $path
      * @return  Repository
      */
-    protected function getRepository($path)
+    protected function getRepository($path): Repository
     {
         return Repository::open($path, new Binary(SVN_BINARY));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRepositoryOpenOnNonExistentPath()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->getRepository('/does/not/exist');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRepositoryOpenOnNonRepositoryPath()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->getRepository(TESTS_REPO_PATH_2);
     }
 
@@ -95,4 +92,3 @@ class SetupTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(TESTS_REPO_PATH_1, $c->getRepositoryPath());
     }
 }
-

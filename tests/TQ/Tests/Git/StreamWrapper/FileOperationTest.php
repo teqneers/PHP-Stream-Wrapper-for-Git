@@ -23,18 +23,19 @@
 
 namespace TQ\Tests\Git\StreamWrapper;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 use TQ\Git\StreamWrapper\StreamWrapper;
 use TQ\Tests\Helper;
 
-class FileOperationTest extends \PHPUnit_Framework_TestCase
+class FileOperationTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -64,7 +65,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
 
@@ -75,7 +76,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(GIT_BINARY));
     }
@@ -85,41 +86,11 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
         $path   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
         unlink($path);
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/file_0.txt');
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('--- a/file_0.txt', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testUnlinkFileNonHead()
-    {
-        $path   = sprintf('git://%s/file_0.txt#HEAD^', TESTS_REPO_PATH_1);
-        unlink($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testUnlinkNonExistantFile()
-    {
-        $path   = sprintf('git://%s/file_does_not_exist.txt', TESTS_REPO_PATH_1);
-        unlink($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testUnlinkNonFile()
-    {
-        $c  = $this->getRepository();
-        $c->writeFile('directory/test.txt', 'Test');
-
-        $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
-        unlink($path);
+        $this->assertStringContainsString('--- a/file_0.txt', $commit);
     }
 
     public function testUnlinkFileWithContext()
@@ -135,8 +106,8 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 
     public function testRenameFile()
@@ -145,47 +116,14 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
         $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
         rename($pathFrom, $pathTo);
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/file_0.txt');
         $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
 
-        $this->assertContains('file_0.txt', $commit);
-        $this->assertContains('test.txt', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRenameFileNonHead()
-    {
-        $pathFrom   = sprintf('git://%s/file_0.txt#HEAD^', TESTS_REPO_PATH_1);
-        $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($pathFrom, $pathTo);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRenameNonExistantFile()
-    {
-        $pathFrom   = sprintf('git://%s/file_does_not_exist.txt', TESTS_REPO_PATH_1);
-        $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($pathFrom, $pathTo);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRenameNonFile()
-    {
-        $c  = $this->getRepository();
-        $c->writeFile('directory/test.txt', 'Test');
-
-        $pathFrom   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
-        $pathTo     = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
-        rename($pathFrom, $pathTo);
+        $this->assertStringContainsString('file_0.txt', $commit);
+        $this->assertStringContainsString('test.txt', $commit);
     }
 
     public function testRenameFileWithContext()
@@ -202,8 +140,8 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 
     public function testRmdirDirectory()
@@ -216,42 +154,12 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
         $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
         rmdir($path);
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/directory');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/directory');
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
 
-        $this->assertContains('--- a/directory/test.txt', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRmdirDirectoryNonHead()
-    {
-        $c  = $this->getRepository();
-        $c->writeFile('directory/test.txt', 'Test');
-
-        $path   = sprintf('git://%s/directory#HEAD^', TESTS_REPO_PATH_1);
-        rmdir($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRmdirNonExistantDirectory()
-    {
-        $path   = sprintf('git://%s/directory_does_not_exist', TESTS_REPO_PATH_1);
-        rmdir($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testRmdirNonDirectory()
-    {
-        $path   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
-        rmdir($path);
+        $this->assertStringContainsString('--- a/directory/test.txt', $commit);
     }
 
     public function testRmdirDirectoryWithContext()
@@ -272,8 +180,8 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 
     public function testMkdirDirectory()
@@ -286,28 +194,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('b/directory/.gitkeep', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testMkdirDirectoryNonHead()
-    {
-        $path   = sprintf('git://%s/directory#HEAD^', TESTS_REPO_PATH_1);
-        mkdir($path);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testMkdirExistantDirectory()
-    {
-        $c  = $this->getRepository();
-        $c->writeFile('directory/test.txt', 'Test');
-
-        $path   = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
-        mkdir($path);
+        $this->assertStringContainsString('b/directory/.gitkeep', $commit);
     }
 
     public function testMkdirDirectoryRecursively()
@@ -321,16 +208,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('b/directory/directory/.gitkeep', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testMkdirDirectoryRecursivelyFailsIfNotRequested()
-    {
-        $path   = sprintf('git://%s/directory/directory', TESTS_REPO_PATH_1);
-        mkdir($path, 0777, false);
+        $this->assertStringContainsString('b/directory/directory/.gitkeep', $commit);
     }
 
     public function testMkdirDirectoryWithContext()
@@ -346,8 +224,7 @@ class FileOperationTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 }
-

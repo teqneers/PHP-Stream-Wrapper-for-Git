@@ -21,68 +21,63 @@
  * THE SOFTWARE.
  */
 
-namespace TQ\Tests\Git\StreamWrapper;
+namespace TQ\Tests\Svn\StreamWrapper;
 
-use TQ\Git\Cli\Binary;
-use TQ\Git\Repository\Repository;
-use TQ\Git\StreamWrapper\StreamWrapper;
+use PHPUnit\Framework\TestCase;
+use TQ\Svn\Cli\Binary;
+use TQ\Svn\Repository\Repository;
+use TQ\Svn\StreamWrapper\StreamWrapper;
 use TQ\Tests\Helper;
 
-class FileStatTest extends \PHPUnit_Framework_TestCase
+class FileStatTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_REPO_PATH_1);
 
-        Helper::initEmptyGitRepository(TESTS_REPO_PATH_1);
+        Helper::initEmptySvnRepository(TESTS_REPO_PATH_1);
 
         $path   = TESTS_REPO_PATH_1.'/test.txt';
         file_put_contents($path, 'File 1');
-        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('add %s',
+        Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('add %s',
             escapeshellarg($path)
         ));
-
-        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
+        Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
             escapeshellarg('Commit 1')
         ));
 
         $path   = TESTS_REPO_PATH_1.'/directory';
         Helper::createDirectory($path);
         file_put_contents($path.'/test.txt', 'Directory File 1');
-        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('add %s',
+        Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('add %s',
             escapeshellarg($path)
         ));
-
-        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
+        Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
             escapeshellarg('Commit 2')
         ));
 
         $path   = TESTS_REPO_PATH_1.'/test.txt';
         file_put_contents($path, 'File 1 New');
-        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('add %s',
-            escapeshellarg($path)
-        ));
-
-        Helper::executeGit(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
+        Helper::executeSvn(TESTS_REPO_PATH_1, sprintf('commit --message=%s',
             escapeshellarg('Commit 3')
         ));
 
         clearstatcache();
 
-        StreamWrapper::register('git', new Binary(GIT_BINARY));
+        StreamWrapper::register('svn', new Binary(SVN_BINARY));
     }
 
     /**
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
 
@@ -93,16 +88,16 @@ class FileStatTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
-        return Repository::open(TESTS_REPO_PATH_1, new Binary(GIT_BINARY));
+        return Repository::open(TESTS_REPO_PATH_1, new Binary(SVN_BINARY));
     }
 
     public function testUrlStatFileWorkingDirectory()
     {
-        $filePath   = sprintf('git://%s/test.txt', TESTS_REPO_PATH_1);
+        $filePath   = sprintf('svn://%s/test.txt', TESTS_REPO_PATH_1);
         $stat       = stat($filePath);
-        $this->assertEquals(26, count($stat));
+        $this->assertCount(26, $stat);
         $this->assertEquals(0100000, $stat['mode'] & 0100000);
         $this->assertEquals(10, $stat['size']);
 
@@ -110,28 +105,27 @@ class FileStatTest extends \PHPUnit_Framework_TestCase
 
     public function testUrlStatDirWorkingDirectory()
     {
-        $dirPath    = sprintf('git://%s/directory', TESTS_REPO_PATH_1);
+        $dirPath    = sprintf('svn://%s/directory', TESTS_REPO_PATH_1);
         $stat       = stat($dirPath);
-        $this->assertEquals(26, count($stat));
+        $this->assertCount(26, $stat);
         $this->assertEquals(0040000, $stat['mode'] & 0040000);
     }
 
     public function testUrlStatFileHistory()
     {
-        $filePath   = sprintf('git://%s/test.txt#HEAD^', TESTS_REPO_PATH_1);
+        $filePath   = sprintf('svn://%s/test.txt#2', TESTS_REPO_PATH_1);
         $stat       = stat($filePath);
-        $this->assertEquals(26, count($stat));
+        $this->assertCount(26, $stat);
         $this->assertEquals(0100000, $stat['mode'] & 0100000);
-        $this->assertEquals(6, $stat['size']);
+        $this->assertEquals(0, $stat['size']);
 
     }
 
     public function testUrlStatDirHistory()
     {
-        $dirPath    = sprintf('git://%s/directory#HEAD^', TESTS_REPO_PATH_1);
+        $dirPath    = sprintf('svn://%s/directory#2', TESTS_REPO_PATH_1);
         $stat       = stat($dirPath);
-        $this->assertEquals(26, count($stat));
+        $this->assertCount(26, $stat);
         $this->assertEquals(0040000, $stat['mode'] & 0040000);
     }
 }
-

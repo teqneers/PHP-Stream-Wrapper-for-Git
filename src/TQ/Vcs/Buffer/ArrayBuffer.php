@@ -67,7 +67,7 @@ class ArrayBuffer implements \Iterator
      * @link    http://php.net/manual/en/iterator.current.php
      * @return  string
      */
-    public function current()
+    public function current(): mixed
     {
         return current($this->array);
     }
@@ -77,7 +77,7 @@ class ArrayBuffer implements \Iterator
      *
      * @link    http://php.net/manual/en/iterator.next.php
      */
-    public function next()
+    public function next(): void
     {
         next($this->array);
     }
@@ -88,7 +88,7 @@ class ArrayBuffer implements \Iterator
      * @link    http://php.net/manual/en/iterator.key.php
      * @return  integer|boolean     False on failure
      */
-    public function key()
+    public function key(): mixed
     {
         return key($this->array);
     }
@@ -99,7 +99,7 @@ class ArrayBuffer implements \Iterator
      * @link    http://php.net/manual/en/iterator.valid.php
      * @return  boolean
      */
-    public function valid()
+    public function valid(): bool
     {
         return (key($this->array) !== null);
     }
@@ -109,7 +109,7 @@ class ArrayBuffer implements \Iterator
      *
      * @link    http://php.net/manual/en/iterator.rewind.php
      */
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->array);
     }

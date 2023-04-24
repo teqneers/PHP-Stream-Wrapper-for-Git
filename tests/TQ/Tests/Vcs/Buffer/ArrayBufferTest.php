@@ -23,9 +23,10 @@
 
 namespace TQ\Tests\Vcs\Buffer;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Vcs\Buffer\ArrayBuffer;
 
-class ArrayBufferTest extends \PHPUnit_Framework_TestCase
+class ArrayBufferTest extends TestCase
 {
     public function testIteration()
     {
@@ -38,7 +39,7 @@ class ArrayBufferTest extends \PHPUnit_Framework_TestCase
             $i++;
             $iterator->next();
         }
-        $this->assertEquals(count($listing), $i);
+        $this->assertCount($i, $listing);
 
         $iterator->rewind();
         $this->assertEquals(reset($listing), $iterator->current());
@@ -58,4 +59,3 @@ class ArrayBufferTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(count($listing), $i);
     }
 }
-

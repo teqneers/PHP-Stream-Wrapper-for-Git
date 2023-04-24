@@ -23,18 +23,19 @@
 
 namespace TQ\Tests\Svn\StreamWrapper;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Svn\Cli\Binary;
 use TQ\Svn\Repository\Repository;
 use TQ\Svn\StreamWrapper\StreamWrapper;
 use TQ\Tests\Helper;
 
-class StatusReadTest extends \PHPUnit_Framework_TestCase
+class StatusReadTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -51,7 +52,7 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
 
@@ -62,7 +63,7 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(SVN_BINARY));
     }
@@ -79,8 +80,8 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
             $commitUrl  = sprintf('svn://%s?commit&ref=%s', TESTS_REPO_PATH_1, $commitRevision);
             $content    = file_get_contents($commitUrl);
 
-            $this->assertContains('r'.$commitRevision.' |', $content);
-            $this->assertContains(sprintf('A /test_%d.txt', $c), $content);
+            $this->assertStringContainsString('r'.$commitRevision.' |', $content);
+            $this->assertStringContainsString(sprintf('A /test_%d.txt', $c), $content);
         }
     }
 
@@ -95,16 +96,16 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
         $logUrl  = sprintf('svn://%s?log', TESTS_REPO_PATH_1);
         $log     = file_get_contents($logUrl);
         foreach ($commits as $commitRevision) {
-            $this->assertContains('r'.$commitRevision.' |', $log);
+            $this->assertStringContainsString('r'.$commitRevision.' |', $log);
         }
 
         $logUrl  = sprintf('svn://%s?log&limit=%d', TESTS_REPO_PATH_1, 1);
         $log     = file_get_contents($logUrl);
         foreach ($commits as $c => $commitRevision) {
             if ($c == count($commits) - 1) {
-                $this->assertContains('r'.$commitRevision.' |', $log);
+                $this->assertStringContainsString('r'.$commitRevision.' |', $log);
             } else {
-                $this->assertNotContains('r'.$commitRevision.' |', $log);
+                $this->assertStringNotContainsString('r'.$commitRevision.' |', $log);
             }
         }
 
@@ -112,9 +113,9 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
         $log     = file_get_contents($logUrl);
         foreach ($commits as $c => $commitRevision) {
             if ($c >= count($commits) - 2) {
-                $this->assertContains('r'.$commitRevision.' |', $log);
+                $this->assertStringContainsString('r'.$commitRevision.' |', $log);
             } else {
-                $this->assertNotContains('r'.$commitRevision.' |', $log);
+                $this->assertStringNotContainsString('r'.$commitRevision.' |', $log);
             }
         }
 
@@ -122,11 +123,10 @@ class StatusReadTest extends \PHPUnit_Framework_TestCase
         $log     = file_get_contents($logUrl);
         foreach ($commits as $c => $commitRevision) {
             if (($c >= count($commits) - 3) && ($c < count($commits) - 1)) {
-                $this->assertContains('r'.$commitRevision.' |', $log);
+                $this->assertStringContainsString('r'.$commitRevision.' |', $log);
             } else {
-                $this->assertNotContains('r'.$commitRevision.' |', $log);
+                $this->assertStringNotContainsString('r'.$commitRevision.' |', $log);
             }
         }
     }
 }
-

@@ -23,9 +23,10 @@
 
 namespace TQ\Tests\Svn\Cli;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Svn\Cli\Binary;
 
-class CallResultTest extends \PHPUnit_Framework_TestCase
+class CallResultTest extends TestCase
 {
     public function testSuccessfulCall()
     {
@@ -56,4 +57,3 @@ class CallResultTest extends \PHPUnit_Framework_TestCase
         $this->assertGreaterThan(0, $result->getReturnCode());
     }
 }
-

@@ -23,9 +23,10 @@
 
 namespace TQ\Tests\Vcs\StreamWrapper;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Vcs\StreamWrapper\PathFactoryInterface;
 
-class PathFactoryTest extends \PHPUnit_Framework_TestCase
+class PathFactoryTest extends TestCase
 {
     /**
      * @dataProvider parsePathDataProvider
@@ -48,7 +49,7 @@ class PathFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @return  array
      */
-    public function parsePathDataProvider()
+    public function parsePathDataProvider(): array
     {
         return array(
             array(
@@ -96,4 +97,3 @@ class PathFactoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 }
-

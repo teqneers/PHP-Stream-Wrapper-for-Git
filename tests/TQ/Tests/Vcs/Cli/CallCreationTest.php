@@ -23,12 +23,13 @@
 
 namespace TQ\Tests\Vcs\Cli;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Vcs\Cli\Binary;
 use TQ\Tests\Helper;
 
-class CallCreationTest extends \PHPUnit_Framework_TestCase
+class CallCreationTest extends TestCase
 {
-    protected function assertCliCommandEquals($expected, $actual)
+    protected function assertCliCommandEquals($expected, $actual): void
     {
         if (strpos(PHP_OS, 'WIN') !== false) {
             $expected = Helper::normalizeEscapeShellArg($expected);
@@ -39,7 +40,8 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
     /**
      * @return Binary
      */
-    protected function createBinaryMock() {
+    protected function createBinaryMock()
+    {
         return $this->getMockForAbstractClass('TQ\Vcs\Cli\Binary', array('/usr/bin/command'));
     }
 
@@ -129,4 +131,3 @@ class CallCreationTest extends \PHPUnit_Framework_TestCase
         $this->assertCliCommandEquals("/usr/bin/command 'command' 'option' '/path/to/file' -- 'path/to/file'", $call->getCmd());
     }
 }
-

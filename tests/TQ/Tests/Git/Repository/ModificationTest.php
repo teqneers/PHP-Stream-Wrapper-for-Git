@@ -23,18 +23,19 @@
 
 namespace TQ\Tests\Git\Repository;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 use TQ\Vcs\Repository\Transaction;
 use TQ\Tests\Helper;
 
-class ModificationTest extends \PHPUnit_Framework_TestCase
+class ModificationTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -61,7 +62,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
     }
@@ -70,7 +71,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(GIT_BINARY));
     }
@@ -85,7 +86,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/test.txt'));
 
         $commit = $c->showCommit($hash);
-        $this->assertContains('+++ b/test.txt', $commit);
+        $this->assertStringContainsString('+++ b/test.txt', $commit);
     }
 
     public function testAddFileInSubdirectory()
@@ -98,7 +99,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Test', file_get_contents(TESTS_REPO_PATH_1.'/directory/test.txt'));
 
         $commit = $c->showCommit($hash);
-        $this->assertContains('+++ b/directory/test.txt', $commit);
+        $this->assertStringContainsString('+++ b/directory/test.txt', $commit);
     }
 
     public function testAddMultipleFiles()
@@ -108,7 +109,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
             $hash   = $c->writeFile(sprintf('test_%s.txt', $i), $i);
             $this->assertEquals(40, strlen($hash));
             $commit = $c->showCommit($hash);
-            $this->assertContains(sprintf('+++ b/test_%d.txt', $i), $commit);
+            $this->assertStringContainsString(sprintf('+++ b/test_%d.txt', $i), $commit);
         }
 
         for ($i = 0; $i < 5; $i++) {
@@ -123,10 +124,10 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $hash   = $c->removeFile('file_0.txt');
         $this->assertEquals(40, strlen($hash));
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/file_0.txt');
 
         $commit = $c->showCommit($hash);
-        $this->assertContains('--- a/file_0.txt', $commit);
+        $this->assertStringContainsString('--- a/file_0.txt', $commit);
     }
 
     public function testRemoveMultipleFiles()
@@ -136,11 +137,11 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
             $hash   = $c->removeFile(sprintf('file_%s.txt', $i), $i);
             $this->assertEquals(40, strlen($hash));
             $commit = $c->showCommit($hash);
-            $this->assertContains(sprintf('--- a/file_%d.txt', $i), $commit);
+            $this->assertStringContainsString(sprintf('--- a/file_%d.txt', $i), $commit);
         }
 
         for ($i = 0; $i < 5; $i++) {
-            $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
+            $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
         }
     }
 
@@ -151,15 +152,15 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(40, strlen($hash));
 
         for ($i = 0; $i < 5; $i++) {
-            $this->assertFileNotExists(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
+            $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.sprintf('/file_%d.txt', $i));
         }
 
         $commit = $c->showCommit($hash);
-        $this->assertContains('--- a/file_0.txt', $commit);
-        $this->assertContains('--- a/file_1.txt', $commit);
-        $this->assertContains('--- a/file_2.txt', $commit);
-        $this->assertContains('--- a/file_3.txt', $commit);
-        $this->assertContains('--- a/file_4.txt', $commit);
+        $this->assertStringContainsString('--- a/file_0.txt', $commit);
+        $this->assertStringContainsString('--- a/file_1.txt', $commit);
+        $this->assertStringContainsString('--- a/file_2.txt', $commit);
+        $this->assertStringContainsString('--- a/file_3.txt', $commit);
+        $this->assertStringContainsString('--- a/file_4.txt', $commit);
     }
 
     public function testRemoveSubdirectory()
@@ -170,10 +171,10 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $hash   = $c->removeFile('subdirectory', null, true);
         $this->assertEquals(40, strlen($hash));
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/subdirectory');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/subdirectory');
 
         $commit = $c->showCommit($hash);
-        $this->assertContains('deleted file', $commit);
+        $this->assertStringContainsString('deleted file', $commit);
     }
 
     public function testMoveFile()
@@ -182,12 +183,12 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $hash   = $c->renameFile('file_0.txt', 'test.txt');
         $this->assertEquals(40, strlen($hash));
 
-        $this->assertFileNotExists(TESTS_REPO_PATH_1.'/file_0.txt');
+        $this->assertFileDoesNotExist(TESTS_REPO_PATH_1.'/file_0.txt');
         $this->assertFileExists(TESTS_REPO_PATH_1.'/test.txt');
 
         $commit = $c->showCommit($hash);
-        $this->assertContains('file_0.txt', $commit);
-        $this->assertContains('test.txt', $commit);
+        $this->assertStringContainsString('file_0.txt', $commit);
+        $this->assertStringContainsString('test.txt', $commit);
     }
 
     public function testReset()
@@ -200,19 +201,19 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($c->isDirty());
         $c->reset();
         $this->assertFalse($c->isDirty());
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
 
         file_put_contents($file, 'Test');
         $c->add(array('test.txt'));
         $c->reset();
         $this->assertFalse($c->isDirty());
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
 
         file_put_contents($file, 'Test');
         $this->assertTrue($c->isDirty());
         $c->reset(Repository::RESET_WORKING);
         $this->assertFalse($c->isDirty());
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
 
         file_put_contents($file, 'Test');
         $c->add(array('test.txt'));
@@ -222,7 +223,7 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertFileExists($file);
         $c->reset(Repository::RESET_STAGED);
         $this->assertFalse($c->isDirty());
-        $this->assertFileNotExists($file);
+        $this->assertFileDoesNotExist($file);
     }
 
     public function testTransactionalChangesNoException()
@@ -255,18 +256,17 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('test_4.txt', $list);
 
         $commit = $c->showCommit($result->getCommitHash());
-        $this->assertContains($result->getCommitMsg(), $commit);
-        $this->assertContains('+++ b/test_0.txt', $commit);
-        $this->assertContains('+++ b/test_1.txt', $commit);
-        $this->assertContains('+++ b/test_2.txt', $commit);
-        $this->assertContains('+++ b/test_3.txt', $commit);
-        $this->assertContains('+++ b/test_4.txt', $commit);
+        $this->assertStringContainsString($result->getCommitMsg(), $commit);
+        $this->assertStringContainsString('+++ b/test_0.txt', $commit);
+        $this->assertStringContainsString('+++ b/test_1.txt', $commit);
+        $this->assertStringContainsString('+++ b/test_2.txt', $commit);
+        $this->assertStringContainsString('+++ b/test_3.txt', $commit);
+        $this->assertStringContainsString('+++ b/test_4.txt', $commit);
     }
 
     public function testTransactionalChangesException()
     {
         $c  = $this->getRepository();
-
 
         try {
             $c->transactional(function(Transaction $t) {
@@ -307,10 +307,10 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertContains('file_4.txt', $list);
 
         $commit = $c->showCommit($result->getCommitHash());
-        $this->assertContains($result->getCommitMsg(), $commit);
-        $this->assertContains('--- a/file_0.txt', $commit);
-        $this->assertContains('file_1.txt', $commit);
-        $this->assertContains('test.txt', $commit);
+        $this->assertStringContainsString($result->getCommitMsg(), $commit);
+        $this->assertStringContainsString('--- a/file_0.txt', $commit);
+        $this->assertStringContainsString('file_1.txt', $commit);
+        $this->assertStringContainsString('test.txt', $commit);
     }
 
     public function testTransactionalNoChanges()
@@ -328,4 +328,3 @@ class ModificationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($currentCommit, $c->getCurrentCommit());
     }
 }
-

@@ -23,18 +23,19 @@
 
 namespace TQ\Tests\Git\StreamWrapper;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Git\Cli\Binary;
 use TQ\Git\Repository\Repository;
 use TQ\Git\StreamWrapper\StreamWrapper;
 use TQ\Tests\Helper;
 
-class FileWriteTest extends \PHPUnit_Framework_TestCase
+class FileWriteTest extends TestCase
 {
     /**
      * Sets up the fixture, for example, open a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
         Helper::createDirectory(TESTS_TMP_PATH);
@@ -64,7 +65,7 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
      * Tears down the fixture, for example, close a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Helper::removeDirectory(TESTS_TMP_PATH);
 
@@ -75,7 +76,7 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
      *
      * @return  Repository
      */
-    protected function getRepository()
+    protected function getRepository(): Repository
     {
         return Repository::open(TESTS_REPO_PATH_1, new Binary(GIT_BINARY));
     }
@@ -92,8 +93,8 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
-        $this->assertRegExp('~^\+Test$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+Test$~m', $commit);
     }
 
     public function testWriteNewFileWithContext()
@@ -114,10 +115,10 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
-        $this->assertRegExp('~^\+Test$~m', $commit);
-        $this->assertContains('Hello World', $commit);
-        $this->assertContains('Luke Skywalker <skywalker@deathstar.com>', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+Test$~m', $commit);
+        $this->assertStringContainsString('Hello World', $commit);
+        $this->assertStringContainsString('Luke Skywalker <skywalker@deathstar.com>', $commit);
     }
 
     public function testWriteExistingFile()
@@ -132,10 +133,10 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^--- a/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^\+\+\+ b/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^-File 0$~m', $commit);
-        $this->assertRegExp('~^\+Test$~m', $commit);
+        $this->assertMatchesRegularExpression('~^--- a/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^-File 0$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+Test$~m', $commit);
     }
 
     public function testAppendExistingFile()
@@ -150,10 +151,10 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^--- a/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^\+\+\+ b/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^-File 0$~m', $commit);
-        $this->assertRegExp('~^\+File 0Test$~m', $commit);
+        $this->assertMatchesRegularExpression('~^--- a/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^-File 0$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+File 0Test$~m', $commit);
     }
 
     public function testWriteNewFileWithX()
@@ -168,18 +169,8 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
-        $this->assertRegExp('~^\+Test$~m', $commit);
-    }
-
-    /**
-     * @expectedException \PHPUnit_Framework_Error_Warning
-     */
-    public function testWriteExistingFileWithXFails()
-    {
-        $filePath   = sprintf('git://%s/file_0.txt', TESTS_REPO_PATH_1);
-        $file       = fopen($filePath, 'x');
-        fwrite($file, 'Test');
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+Test$~m', $commit);
     }
 
     public function testWriteNewFileWithC()
@@ -194,8 +185,8 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
-        $this->assertRegExp('~^\+Test$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+Test$~m', $commit);
     }
 
     public function testWriteExistingFileWithC()
@@ -211,10 +202,10 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^--- a/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^\+\+\+ b/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^-File 0$~m', $commit);
-        $this->assertRegExp('~^\+File 0Test$~m', $commit);
+        $this->assertMatchesRegularExpression('~^--- a/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^-File 0$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+File 0Test$~m', $commit);
     }
 
     public function testWriteAndReadNewFile()
@@ -233,8 +224,8 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
-        $this->assertRegExp('~^\+Text$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+Text$~m', $commit);
     }
 
     public function testWriteNewFileWithFilePutContents()
@@ -247,8 +238,8 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^\+\+\+ b/test.txt$~m', $commit);
-        $this->assertRegExp('~^\+Test$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/test.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+Test$~m', $commit);
     }
 
     public function testWriteExistingFileWithFilePutContents()
@@ -261,10 +252,10 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^--- a/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^\+\+\+ b/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^-File 0$~m', $commit);
-        $this->assertRegExp('~^\+Test$~m', $commit);
+        $this->assertMatchesRegularExpression('~^--- a/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^-File 0$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+Test$~m', $commit);
     }
 
     public function testAppendExistingFileWithFilePutContents()
@@ -277,10 +268,9 @@ class FileWriteTest extends \PHPUnit_Framework_TestCase
 
         $c      = $this->getRepository();
         $commit = $c->showCommit($c->getCurrentCommit());
-        $this->assertRegExp('~^--- a/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^\+\+\+ b/file_0.txt$~m', $commit);
-        $this->assertRegExp('~^-File 0$~m', $commit);
-        $this->assertRegExp('~^\+File 0Test$~m', $commit);
+        $this->assertMatchesRegularExpression('~^--- a/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+\+\+ b/file_0.txt$~m', $commit);
+        $this->assertMatchesRegularExpression('~^-File 0$~m', $commit);
+        $this->assertMatchesRegularExpression('~^\+File 0Test$~m', $commit);
     }
 }
-

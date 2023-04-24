@@ -23,9 +23,10 @@
 
 namespace TQ\Tests\Vcs\Buffer;
 
+use PHPUnit\Framework\TestCase;
 use TQ\Vcs\Buffer\StringBuffer;
 
-class StringBufferTest extends \PHPUnit_Framework_TestCase
+class StringBufferTest extends TestCase
 {
     public function testReadByByte()
     {
@@ -170,4 +171,3 @@ class StringBufferTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('143', $buffer->getBuffer());
     }
 }
-
