@@ -36,11 +36,18 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         
+    - name: Show Git and SVN versions
+      run: | 
+        which git
+        git --version
+        which svn
+        svn --version
+        
     - name: Set master as the default Git branch to prevent warnings
       run: git config --global init.defaultBranch master
 
     - name: Install dependencies
-      run: composer install --no-interaction --no-progress --no-suggest --prefer-dist ${{ matrix.dep-version }}
+      run: composer update --no-interaction --no-progress --no-suggest --prefer-dist ${{ matrix.dep-version }}
 
     - name: Run test suite
       run: vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
