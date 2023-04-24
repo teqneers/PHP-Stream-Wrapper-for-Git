@@ -8,9 +8,10 @@ permissions:
 jobs:
   test:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
+        operating-system: ['ubuntu-latest', 'windows-latest', 'macos-latest']
         php-versions: ['8.0', '8.1', '8.2', '8.3']
         dep-version: ['', '--prefer-lowest']
 
@@ -18,17 +19,17 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 10
-        
+
     - name: Show Git and SVN versions
       run: | 
         which git
         git --version
         which svn
         svn --version
-        
+
     - name: Set master as the default Git branch to prevent warnings
       run: git config --global init.defaultBranch master
-    
+
     - name: Install PHP
       uses: shivammathur/setup-php@v2
       with:
