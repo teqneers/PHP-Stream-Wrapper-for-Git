@@ -180,7 +180,7 @@ Run tests
 
 Please note that the library has been tested on a Mac OS X 12.6 with the bundled PHP 8.0.27, 8.1.14 and 8.2.1 (git version 2.39.1) and on several Ubuntu Linux installations. Due to currently unknown reasons the test run a bit unstable on Windows. All tests should be *green* but during cleanup there may be the possibility that some access restrictions randomly kick in and prevent the cleanup code from removing the test directories.
 
-The unit test suite is continuously tested with [Travis CI](http://travis-ci.org/) on PHP 8.0 and 8.1 and its current status is: [![Build Status](https://secure.travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git.png)](http://travis-ci.org/teqneers/PHP-Stream-Wrapper-for-Git)
+The unit test suite is continuously tested with [GitHub Actions](https://github.com/teqneers/PHP-Stream-Wrapper-for-Git/actions) on PHP 8.0, 8.1, 8.2 and 8.3 and its current status is: ![Build Status](https://github.com/teqneers/PHP-Stream-Wrapper-for-Git/actions/workflows/php.yml/badge.svg)
 
 Contribute
 ----------
