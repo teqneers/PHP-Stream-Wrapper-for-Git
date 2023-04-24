@@ -9,6 +9,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-versions: ['8.0', '8.1', '8.2', '8.3']
 
     steps:
     - uses: actions/checkout@v3
@@ -26,6 +29,11 @@ jobs:
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
+    
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-versions }}
 
     - name: Install dependencies
       run: composer install --no-interaction --no-progress --no-suggest --prefer-dist
